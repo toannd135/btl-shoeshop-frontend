@@ -1,0 +1,73 @@
+import LayoutDefault from "../layout/LayoutDefault";
+import Dashboard from "../components/Dashboard";
+import Product from "../pages/Product/Product";
+import ProductList from "../pages/Product/ProductList";
+import ProductCreate from "../pages/Product/ProductCreate";
+import User from "../pages/User/index";
+import UserList from "../pages/User/UserList";
+import Permission from "../pages/Permission/index";
+import PermissionList from "../pages/Permission/PermissionList";
+import PermissionUpdate from "../pages/Permission/PermissionUpdate";
+import PermissionCreate from "../pages/Permission/PermissionCreate";
+export const routes = [
+    {
+        path: "/",
+        element: <LayoutDefault />,
+        children: [
+            {
+                index: true,
+                element: <Dashboard />
+            },
+            {
+                path: "product",
+                element: <Product />,
+                children: [
+                    {
+                        index: true,
+                        element: <ProductList />
+                    },
+                    {
+                        path: "product-list",
+                        element: <ProductList />
+                    },
+                    {
+                        path: "product-create",
+                        element: <ProductCreate />
+                    },
+                ]
+            },
+            {
+                path: "user",
+                element: <User/>,
+                children: [
+                    {
+                        index: true,
+                        element: <UserList/>
+                    },
+                    {
+                        path: "user-list",
+                        element: <UserList/>
+                    }
+                ]
+            },
+            {
+                path: "permission",
+                element: <Permission/>,
+                children: [
+                    {
+                        path: "permission-list",
+                        element: <PermissionList/>
+                    },
+                    {
+                        path: "permission-create",
+                        element: <PermissionCreate/>
+                    },
+                    {
+                        path: "permission-update",
+                        element: <PermissionUpdate/>
+                    }
+                ]
+            }
+        ]
+    }
+]
