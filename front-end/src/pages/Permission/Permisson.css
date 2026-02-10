@@ -1,0 +1,133 @@
+.admin-container {
+    padding: 24px;
+    max-width: 1100px;
+    margin: auto;
+    background: #f5f7fa;
+    min-height: 100vh;
+}
+
+.admin-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* ===== LIST ===== */
+.permission-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 18px;
+}
+
+.permission-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    transition: transform .2s;
+}
+
+.permission-card:hover {
+    transform: translateY(-4px);
+}
+
+.permission-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.permission-name {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.status {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.status.active {
+    background: #e6f4ff;
+    color: #1677ff;
+}
+
+.status.inactive {
+    background: #fff1f0;
+    color: #ff4d4f;
+}
+
+.permission-body {
+    margin: 12px 0;
+    font-size: 13px;
+}
+
+.permission-body code {
+    background: #f0f0f0;
+    padding: 3px 6px;
+    border-radius: 6px;
+    margin-right: 6px;
+}
+
+.permission-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.module {
+    font-size: 12px;
+    font-weight: 500;
+    color: #555;
+}
+
+/* ===== FORM ===== */
+.form-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 520px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.full {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* ===== BUTTON ===== */
+button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background: #1677ff;
+    color: #fff;
+}
+
+.btn-danger {
+    background: #ff4d4f;
+    color: #fff;
+}
