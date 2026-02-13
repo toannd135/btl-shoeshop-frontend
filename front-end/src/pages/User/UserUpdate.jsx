@@ -35,23 +35,20 @@ function UserUpdate(props) {
     const handleSubmit = async (values) => {
         setLoading(true);
         const res = await updateUser(record.userId, values);
-
-        setTimeout(() => {
-            if (res) {
-                api.success({
-                    message: "Cập nhật thành công",
-                    description: `User ${record.username} đã được cập nhật`
-                });
-                setOpen(false);
-                onReload();
-            } else {
-                api.error({
-                    message: "Cập nhật thất bại",
-                    description: "Có lỗi xảy ra"
-                });
-            }
-            setLoading(false);
-        }, 2000);
+        if (res) {
+            api.success({
+                message: "Cập nhật thành công",
+                description: `User ${record.username} đã được cập nhật`
+            });
+            setOpen(false);
+            onReload();
+        } else {
+            api.error({
+                message: "Cập nhật thất bại",
+                description: "Có lỗi xảy ra"
+            });
+        }
+        setLoading(false);
     };
 
     return (
