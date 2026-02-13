@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
 import { getPermissionList, deletePermission } from "../../services/permissionService";
+import PermissionModal from "./PermissionModal";
+
 import "./Permisson.css";
 
 function PermissionList() {
+    const [openModal, setOpenModal] = useState(false);
+    const [editingData, setEditingData] = useState(null);
+
+
     const [permissions, setPermissions] = useState([]);
 
     const fetchAPI = async () => {
@@ -24,6 +30,15 @@ function PermissionList() {
         <div className="admin-container">
             <div className="admin-header">
                 <h2 className="admin-title">Permission Management</h2>
+                <button
+                    className="btn-primary"
+                    onClick={() => {
+                        setEditingData(null);
+                        setOpenModal(true);
+                    }}
+                >
+                    Create
+                </button>
             </div>
 
             <div className="permission-grid">
@@ -43,16 +58,33 @@ function PermissionList() {
 
                         <div className="permission-footer">
                             <span className="module">{item.module}</span>
-                            <button
-                                className="btn-danger"
-                                onClick={() => handleDelete(item.permissionId)}
-                            >
-                                Delete
-                            </button>
+                            <div>
+                                <button
+                                    className="btn-primary"
+                                    onClick={() => {
+                                        setEditingData(item);
+                                        setOpenModal(true);
+                                    }}
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    className="btn-danger"
+                                    onClick={() => handleDelete(item.permissionId)}
+                                >
+                                    Delete
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}
             </div>
+            <PermissionModal
+                open={openModal}
+                onClose={() => setOpenModal(false)}
+                onReload={fetchAPI}
+                editingData={editingData}
+            />
         </div>
     );
 }

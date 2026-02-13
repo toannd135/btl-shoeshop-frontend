@@ -7,8 +7,7 @@ import User from "../pages/User/index";
 import UserList from "../pages/User/UserList";
 import Permission from "../pages/Permission/index";
 import PermissionList from "../pages/Permission/PermissionList";
-import PermissionUpdate from "../pages/Permission/PermissionUpdate";
-import PermissionCreate from "../pages/Permission/PermissionCreate";
+
 export const routes = [
     {
         path: "/",
@@ -58,14 +57,6 @@ export const routes = [
                         path: "permission-list",
                         element: <PermissionList/>
                     },
-                    {
-                        path: "permission-create",
-                        element: <PermissionCreate/>
-                    },
-                    {
-                        path: "permission-update",
-                        element: <PermissionUpdate/>
-                    }
                 ]
             }
         ]

@@ -1,5 +1,5 @@
 import { Menu } from "antd";
-import { DashboardOutlined, ProductOutlined } from "@ant-design/icons";
+import { DashboardOutlined, ProductOutlined, UserOutlined, AuditOutlined } from "@ant-design/icons";
 import { Link, useLocation } from 'react-router-dom';
 
 
@@ -34,6 +34,7 @@ function MenuSider() {
         },
         {
             label: <Link to="/user">Người dùng</Link>,
+            icon: <UserOutlined />,
             key: "user",
             children: [
                 {
@@ -44,20 +45,13 @@ function MenuSider() {
         },
         {
             label: <Link to="/permission">Permission</Link>,
+            icon: <AuditOutlined />,
             key: "permission",
             children: [
                 {
                     label: <Link to="/permission/permission-list">Permission-list</Link>,
                     key: "/permission/permission-list"
                 },
-                {
-                    label: <Link to="/permission/permission-create">Permission-create</Link>,
-                    key: "/permission/permission-create"
-                },
-                {
-                    label: <Link to="/permission/permission-update">Permission-update</Link>,
-                    key: "/permission/permission-update"
-                }
             ]
         }
     ]
