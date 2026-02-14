@@ -53,6 +53,10 @@ function MenuSider() {
                     key: "/permission/permission-list"
                 },
             ]
+        },
+        {
+            label: <Link to="/role">Vai trò</Link>,
+            key: "role",
         }
     ]
     return (
