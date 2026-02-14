@@ -7,7 +7,7 @@ import User from "../pages/User/index";
 import UserList from "../pages/User/UserList";
 import Permission from "../pages/Permission/index";
 import PermissionList from "../pages/Permission/PermissionList";
-
+import RoleList from "../pages/Role/RoleList";
 export const routes = [
     {
         path: "/",
@@ -58,6 +58,10 @@ export const routes = [
                         element: <PermissionList/>
                     },
                 ]
+            },
+            {
+                path: "role",
+                element: <RoleList/>,
             }
         ]
     }
