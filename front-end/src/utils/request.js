@@ -37,3 +37,10 @@ export const edit = async (path, options) => {
     const result = await response.json();
     return result;
 }
+export const getPage = async (path, params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    const url = queryString ? `${API_DOMAIN + path}?${queryString}` : API_DOMAIN + path;
+    const response = await fetch(url);
+    const res = await response.json();
+    return res;
+}
