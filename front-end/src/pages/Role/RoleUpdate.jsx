@@ -57,11 +57,11 @@ function RoleUpdate({ open, onClose, role }) {
 
                 <Form form={form} layout="vertical" onFinish={handleSubmit}>
                     <Form.Item label="Tên" name="name">
-                        <Input />
+                        <Input disabled/>
                     </Form.Item>
 
                     <Form.Item label="Code" name="code">
-                        <Input />
+                        <Input disabled/>
                     </Form.Item>
 
                     <Form.Item label="Trạng thái" name="status">

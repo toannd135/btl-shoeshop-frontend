@@ -1,11 +1,10 @@
-import { Outlet } from "react-router-dom";
-
+import UserList from "./UserList";
 
 function User() {
 
     return (
         <>
-            <Outlet />
+            <UserList />
         </>
     )
 }

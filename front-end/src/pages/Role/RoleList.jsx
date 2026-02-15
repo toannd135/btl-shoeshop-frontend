@@ -14,7 +14,6 @@ function RoleList() {
     const [openUpdateModal, setOpenUpdateModal] = useState(false);
     const [selectedRole, setSelectedRole] = useState(null);
     const [searchValue, setSearchValue] = useState("");
-    const [sortValue, setSortValue] = useState("default");
 
     const handleViewDetail = (role) => {
         setSelectedRole(role);

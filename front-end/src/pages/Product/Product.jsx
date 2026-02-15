@@ -1,11 +1,10 @@
-import { Outlet } from "react-router-dom";
-
+import ProductList from "../Product/ProductList";
 
 function Product() {
 
     return (
         <>
-            <Outlet />
+            <ProductList />
         </>
     )
 }
