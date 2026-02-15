@@ -3,14 +3,12 @@ import ProductEdit from "./ProductEdit";
 import ProductDelete from "./ProductDelete";
 import { useEffect, useState } from "react";
 import { getProductList } from "../../services/productService";
-import { PlusOutlined } from "@ant-design/icons";
-import { Button } from "antd";
 import { Link } from "react-router-dom";
 function ProductList() {
     const [products, setProducts] = useState([]);
     const fetchAPI = async () => {
         const response = await getProductList();
-        setProducts(response);
+        setProducts(response.data.products || []);
     }
     useEffect(() => {
         fetchAPI();
@@ -83,14 +81,9 @@ function ProductList() {
                     alignItems: "center"
                 }}>
                     <div style={{ color: "#1677ff" }}>
-                        <Link to="/">Dashboard</Link> / Pages / Sản phẩm
+                        <Link to="/">Trang chủ</Link> / Pages / Sản phẩm
                     </div>
 
-                    <Link to="/product/product-create">
-                        <Button type="primary" icon={<PlusOutlined />}>
-                            Thêm sản phẩm
-                        </Button>
-                    </Link>
                 </div>
             </div>
             <Table dataSource={products} columns={columns} rowKey="id" />

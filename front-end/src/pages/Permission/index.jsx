@@ -1,9 +1,9 @@
-import { Outlet} from "react-router-dom";
+import PermissionList from "./PermissionList";
 import "./Permisson.css";
 function Permission(){
     return(
         <>
-            <Outlet/>
+            <PermissionList/>
         </>
     )
 }

@@ -8,14 +8,14 @@ function UserDelete(props) {
 
     const handleDelete = async () => {
         try {
-            const res = await deleteUser(record.userId);
-            if (res) {
-                api.success({
-                    message: "Xóa thành công",
-                    description: `User ${record.username} đã bị xóa`
-                });
-                onReload();
-            }
+            await deleteUser(record.userId);
+
+            api.success({
+                message: "Xóa thành công",
+                description: `User ${record.username} đã bị xóa`
+            });
+
+            onReload();
         } catch (err) {
             api.error({
                 message: "Xóa thất bại",
@@ -23,6 +23,7 @@ function UserDelete(props) {
             });
         }
     };
+
 
     return (
         <>
@@ -33,11 +34,18 @@ function UserDelete(props) {
                 cancelText="Hủy"
                 onConfirm={handleDelete}
             >
-                <Button
-                    danger
-                    size="small"
-                    icon={<DeleteOutlined />}
-                />
+                <button
+                    style={{
+                        border: "1px solid #dc2626",
+                        background: "white",
+                        color: "#dc2626",
+                        padding: "4px 10px",
+                        borderRadius: 6,
+                        cursor: "pointer"
+                    }}
+                >
+                    <DeleteOutlined />
+                </button>
             </Popconfirm>
         </>
     );
