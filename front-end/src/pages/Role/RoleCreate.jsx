@@ -2,28 +2,46 @@ import { Modal, Form, Input, Select, Button, message } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { useEffect } from "react";
 import { createRole } from "../../services/roleService";
-
+import { getPermissionList } from "../../services/permissionService";
+import { useState } from "react";
 function RoleCreate({ open, onClose, role }) {
     const [form] = Form.useForm();
-
+    const [permissions, setPermissions] = useState([]);
     useEffect(() => {
+        const fetchPermissions = async () => {
+            const res = await getPermissionList();
+            setPermissions(res.data.permissions || []);
+        };
+        fetchPermissions();
         if (role) {
             form.setFieldsValue({
                 name: role.name,
                 code: role.code,
                 status: role.status,
-                description: role.description
             });
         }
     }, [role, form]);
 
     const handleSubmit = async (values) => {
-        const response = await createRole(values);
-        if (response) {
-            form.resetFields();
-            message.success("Tạo vai trò thành công!");
-            onClose(true);
-        } else {
+        try {
+            const payload = {
+                name: values.name,
+                code: values.code,
+                status: values.status,
+                permissions: values.permissionIds
+                    ? values.permissionIds.map(id => ({ id }))
+                    : []
+            };
+
+            const response = await createRole(payload);
+
+            if (response) {
+                form.resetFields();
+                message.success("Tạo vai trò thành công!");
+                onClose(true);
+            }
+        } catch (error) {
+            console.error(error);
             message.error("Tạo vai trò thất bại!");
         }
     };
@@ -73,8 +91,18 @@ function RoleCreate({ open, onClose, role }) {
                         </Select>
                     </Form.Item>
 
-                    <Form.Item label="Mô tả" name="description">
-                        <Input.TextArea rows={8} />
+                    <Form.Item
+                        label="Quyền hạn"
+                        name="permissionIds"
+                    >
+                        <Select
+                            mode="multiple"
+                            placeholder="Chọn quyền"
+                            options={permissions.map(p => ({
+                                value: p.permissionId,
+                                label: p.name
+                            }))}
+                        />
                     </Form.Item>
                 </Form>
             </Modal>

@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { getUserList, getUserPage } from "../../services/userService";
-import { Table, Input, Select } from "antd";
+import { Table, Input, Select, Button } from "antd";
 import { Link } from "react-router-dom";
 import UserUpdate from "./UserUpdate";
 import UserDelete from "./UserDelete";
 import { EyeOutlined, SearchOutlined, EditOutlined } from "@ant-design/icons";
 import UserDetail from "./UserDetail";
+import { PlusOutlined } from "@ant-design/icons";
+import UserCreate from "./UserCreate";
 import "./User.css";
 
 function UserList() {
@@ -14,7 +16,7 @@ function UserList() {
     const [openDetail, setOpenDetail] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [openUpdate, setOpenUpdate] = useState(false);
-
+    const [openCreate, setOpenCreate] = useState(false);
     const handleUpdate = (user) => {
         setSelectedUser(user);
         setOpenUpdate(true);
@@ -216,10 +218,10 @@ function UserList() {
                         />
 
                         <Select
-                            defaultValue="default"
+                            defaultValue="Sắp xếp theo"
                             className="user-arrange"
                             onChange={(value) => {
-                                if (value === "default") {
+                                if (value === "Sắp xếp theo") {
                                     fetchAPI();
                                     return;
                                 }
@@ -235,16 +237,38 @@ function UserList() {
                                 fetchSearchAPI({
                                     username: searchValue,
                                     email: searchValue,
-                                    sort: sortParam,
+                                    sort: value,
                                 });
                             }}
                             options={[
-                                { value: "default", label: "Sắp xếp theo" },
-                                { value: "name_asc", label: "Tên A-Z" },
-                                { value: "name_desc", label: "Tên Z-A" },
+                                { value: "username,asc", label: "Username A-Z" },
+                                { value: "username,desc", label: "Username Z-A" },
+
+                                { value: "email,asc", label: "Email A-Z" },
+                                { value: "email,desc", label: "Email Z-A" },
+
+                                { value: "gender,asc", label: "Giới tính A-Z" },
+                                { value: "gender,desc", label: "Giới tính Z-A" },
+
+                                { value: "dateOfBirth,asc", label: "Ngày sinh tăng dần" },
+                                { value: "dateOfBirth,desc", label: "Ngày sinh giảm dần" },
+
+                                { value: "createdAt,asc", label: "Ngày khởi tạo sớm nhất" },
+                                { value: "createdAt,desc", label: "Ngày khởi tạo mới nhất" },
+
+                                { value: "updatedAt,asc", label: "Cập nhật cũ nhất" },
+                                { value: "updatedAt,desc", label: "Cập nhật lần gần nhất" },
                             ]}
                         />
                     </div>
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        className="user-create"
+                        onClick={() => setOpenCreate(true)}
+                    >
+                        Tạo mới
+                    </Button>
                 </div>
                 <Table
                     dataSource={users}
@@ -262,7 +286,15 @@ function UserList() {
                     user={selectedUser}
                     onReload={handleReload}
                 />
-
+                <UserCreate
+                    open={openCreate}
+                    onClose={(created) => {
+                        setOpenCreate(false);
+                        if (created) {
+                            fetchAPI();
+                        }
+                    }}
+                />
             </div>
 
         </>

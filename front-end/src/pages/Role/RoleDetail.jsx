@@ -2,8 +2,8 @@ import { Modal, Form, Input, Select } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { useEffect } from "react";
 
-function RoleDetail({ open, onClose, role }) {
-    
+function RoleDetail({ open, onClose, role, permissions = [] }) {
+
     const [form] = Form.useForm();
 
     useEffect(() => {
@@ -12,7 +12,7 @@ function RoleDetail({ open, onClose, role }) {
                 name: role.name,
                 code: role.code,
                 status: role.status,
-                description: role.description
+                permissionIds: role.permissions?.map(p => p.name),
             });
         }
     }, [role, form]);
@@ -32,15 +32,15 @@ function RoleDetail({ open, onClose, role }) {
         >
             <Form form={form} layout="vertical">
                 <Form.Item label="Tên" name="name">
-                    <Input />
+                    <Input disabled />
                 </Form.Item>
 
                 <Form.Item label="Code" name="code">
-                    <Input />
+                    <Input disabled/>
                 </Form.Item>
 
                 <Form.Item label="Trạng thái" name="status">
-                    <Select>
+                    <Select disabled>
                         <Select.Option value="ACTIVE">ACTIVE</Select.Option>
                         <Select.Option value="INACTIVE">INACTIVE</Select.Option>
                         <Select.Option value="SUSPENDED">SUSPENDED</Select.Option>
@@ -48,9 +48,17 @@ function RoleDetail({ open, onClose, role }) {
                     </Select>
                 </Form.Item>
 
-                <Form.Item label="Mô tả" name="description">
-                    <Input.TextArea rows={8} />
+                <Form.Item label="Quyền hạn" name="permissionIds">
+                    <Select
+                        mode="multiple"
+                        disabled
+                        options={permissions.map(p => ({
+                            value: p.name,
+                            label: p.name
+                        }))}
+                    />
                 </Form.Item>
+
             </Form>
         </Modal>
     );
