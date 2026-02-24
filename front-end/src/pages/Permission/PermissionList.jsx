@@ -100,10 +100,27 @@ function PermissionList() {
 
                             let sortParam;
 
-                            if (value === "name_asc") {
-                                sortParam = "name,asc";
-                            } else if (value === "name_desc") {
-                                sortParam = "name,desc";
+                            switch (value) {
+                                case "name_asc":
+                                    sortParam = "name,asc";
+                                    break;
+                                case "name_desc":
+                                    sortParam = "name,desc";
+                                    break;
+                                case "created_asc":
+                                    sortParam = "createdAt,asc";
+                                    break;
+                                case "created_desc":
+                                    sortParam = "createdAt,desc";
+                                    break;
+                                case "updated_asc":
+                                    sortParam = "updatedAt,asc";
+                                    break;
+                                case "updated_desc":
+                                    sortParam = "updatedAt,desc";
+                                    break;
+                                default:
+                                    return;
                             }
 
                             fetchSearchAPI({
@@ -118,6 +135,10 @@ function PermissionList() {
                             { value: "default", label: "Sắp xếp theo" },
                             { value: "name_asc", label: "Tên A-Z" },
                             { value: "name_desc", label: "Tên Z-A" },
+                            { value: "created_desc", label: "Mới tạo gần đây" },
+                            { value: "created_asc", label: "Cũ nhất" },
+                            { value: "updated_desc", label: "Vừa cập nhật" },
+                            { value: "updated_asc", label: "Cập nhật lâu nhất" },
                         ]}
                     />
                 </div>
@@ -179,7 +200,7 @@ function PermissionList() {
                                     <span className="view-detail" onClick={() => handleViewDetail(permission)}>
                                         Xem chi tiết
                                     </span>
-                                    <Button icon={<EditOutlined />} onClick={()=> handleEdit(permission)}>
+                                    <Button icon={<EditOutlined />} onClick={() => handleEdit(permission)}>
                                         Edit
                                     </Button>
                                 </div>

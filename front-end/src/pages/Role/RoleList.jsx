@@ -7,8 +7,10 @@ import { Link } from "react-router-dom";
 import "./Role.css";
 import RoleCreate from "./RoleCreate";
 import RoleUpdate from "./RoleUpdate";
+import { getPermissionList } from "../../services/permissionService";
 function RoleList() {
     const [roles, setRoles] = useState([]);
+    const [permissions, setPermissions] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [openCreateModal, setOpenCreateModal] = useState(false);
     const [openUpdateModal, setOpenUpdateModal] = useState(false);
@@ -28,12 +30,18 @@ function RoleList() {
         const res = await getRoleList();
         setRoles(res.data.roles || []);
     };
+    const fetchPermissions = async () => {
+        const res = await getPermissionList();
+        setPermissions(res.data.permissions || []);
+    };
+
     const fetchSearchAPI = async (params = {}) => {
         const res = await getRolePage(params);
         setRoles(res.data.roles || []);
     }
     useEffect(() => {
         fetchAPI();
+        fetchPermissions();
     }, []);
     const renderStatus = (status) => {
         const colorMap = {
@@ -69,7 +77,7 @@ function RoleList() {
                 <div className="role-bar">
                     <div className="role-bar_left">
                         <Input
-                            placeholder="Tìm theo tên hoặc code"
+                            placeholder="Tìm kiếm..."
                             prefix={<SearchOutlined />}
                             className="role-search"
                             value={searchValue}
@@ -80,7 +88,8 @@ function RoleList() {
                                 } else {
                                     fetchSearchAPI({
                                         name: searchValue,
-                                        code: searchValue
+                                        code: searchValue,
+                                        status: searchValue,
                                     });
                                 }
                             }}
@@ -97,10 +106,33 @@ function RoleList() {
 
                                 let sortParam;
 
-                                if (value === "name_asc") {
-                                    sortParam = "name,asc";
-                                } else if (value === "name_desc") {
-                                    sortParam = "name,desc";
+                                switch (value) {
+                                    case "name_asc":
+                                        sortParam = "name,asc";
+                                        break;
+                                    case "name_desc":
+                                        sortParam = "name,desc";
+                                        break;
+                                    case "code_asc":
+                                        sortParam = "code,asc";
+                                        break;
+                                    case "code_desc":
+                                        sortParam = "code,desc";
+                                        break;
+                                    case "created_desc":
+                                        sortParam = "createdAt,desc";
+                                        break;
+                                    case "created_asc":
+                                        sortParam = "createdAt,asc";
+                                        break;
+                                    case "updated_desc":
+                                        sortParam = "updatedAt,desc";
+                                        break;
+                                    case "updated_asc":
+                                        sortParam = "updatedAt,asc";
+                                        break;
+                                    default:
+                                        return;
                                 }
 
                                 fetchSearchAPI({
@@ -113,6 +145,12 @@ function RoleList() {
                                 { value: "default", label: "Sắp xếp theo" },
                                 { value: "name_asc", label: "Tên A-Z" },
                                 { value: "name_desc", label: "Tên Z-A" },
+                                { value: "code_asc", label: "Code A-Z" },
+                                { value: "code_desc", label: "Code Z-A" },
+                                { value: "created_desc", label: "Mới tạo gần đây" },
+                                { value: "created_asc", label: "Cũ nhất" },
+                                { value: "updated_desc", label: "Vừa cập nhật" },
+                                { value: "updated_asc", label: "Cập nhật lâu nhất" },
                             ]}
                         />
 
@@ -181,6 +219,7 @@ function RoleList() {
                     open={openModal}
                     onClose={() => setOpenModal(false)}
                     role={selectedRole}
+                    permissions={permissions}
                 />
                 <RoleCreate
                     open={openCreateModal}
@@ -194,6 +233,7 @@ function RoleList() {
                 <RoleUpdate
                     open={openUpdateModal}
                     role={selectedRole}
+                    permissions={permissions}
                     onClose={(updated) => {
                         setOpenUpdateModal(false);
                         if (updated) {
