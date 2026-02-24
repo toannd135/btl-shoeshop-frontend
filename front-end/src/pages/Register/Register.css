@@ -1,0 +1,188 @@
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f4f6f9;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.register-card {
+    display: flex;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    width: 100%;
+    max-width: 900px;
+    min-height: 550px;
+}
+
+/* --- Phần Form Đăng ký --- */
+.register-form-section {
+    flex: 1;
+    padding: 40px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.register-header {
+    margin-bottom: 25px;
+}
+
+.register-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 5px 0;
+}
+
+.register-subtitle {
+    font-size: 14px;
+    color: #718096;
+    margin: 0;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    /* Khoảng cách đều giữa các ô input */
+}
+
+/* Cấu trúc cho hàng chứa 2 input (First name & Last name) */
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-group-half {
+    flex: 1;
+}
+
+.form-group input,
+.form-group-half input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+    color: #4a5568;
+}
+
+.form-group input::placeholder,
+.form-group-half input::placeholder {
+    color: #a0aec0;
+}
+
+.form-group input:focus,
+.form-group-half input:focus {
+    border-color: #ff4d4f;
+}
+
+/* --- Cấu trúc cho ô Mật khẩu có icon con mắt --- */
+.password-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-group input {
+    padding-right: 40px;
+    /* Chừa chỗ cho icon con mắt */
+}
+
+.password-toggle-icon {
+    position: absolute;
+    right: 15px;
+    cursor: pointer;
+    color: #a0aec0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-toggle-icon:hover {
+    color: #4a5568;
+}
+
+/* Nút Submit */
+.btn-register {
+    width: 100%;
+    padding: 12px;
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 5px;
+}
+
+.btn-register:hover {
+    background-color: #ff7875;
+}
+
+/* Link Đăng nhập */
+.login-link {
+    text-align: center;
+    font-size: 14px;
+    color: #718096;
+    margin-top: 30px;
+
+}
+
+.login-link a {
+    color: #2b6cb0;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* --- Phần Cột Phải: Hình ảnh --- */
+.register-image-section {
+    flex: 1;
+    background-color: #ff4d4f;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.shoes-logo {
+    max-width: 70%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .register-card {
+        flex-direction: column;
+        max-width: 450px;
+    }
+
+    .register-image-section {
+        display: none;
+    }
+
+    .register-form-section {
+        padding: 40px 30px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        /* Trên điện thoại First name và Last name sẽ xếp dọc */
+        gap: 15px;
+    }
+}

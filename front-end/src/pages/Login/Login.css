@@ -1,0 +1,219 @@
+/* Đảm bảo reset margin body nếu bạn chưa reset ở index.css */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    /* Màu nền xám nhạt */
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-card {
+    display: flex;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    /* Đổ bóng mềm */
+    overflow: hidden;
+    width: 100%;
+    max-width: 900px;
+    /* Tổng chiều rộng thẻ */
+    min-height: 500px;
+}
+
+/* --- Phần Cột Trái: Form --- */
+.login-form-section {
+    flex: 1;
+    /* Chiếm 1/2 chiều rộng */
+    padding: 50px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-top: 0;
+    margin-bottom: 35px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: #ff4d4f;
+    /* Đổi màu viền khi click vào */
+}
+
+.label-password {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.forgot-password {
+    font-size: 13px;
+    color: #1890ff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background-color: #ff4d4f;
+    /* Màu đỏ chủ đạo */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background-color: #ff7875;
+}
+
+/* --- Đường gạch ngang "Hoặc" --- */
+.login-divider {
+    text-align: center;
+    margin: 25px 0;
+    position: relative;
+}
+
+.login-divider::before,
+.login-divider::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 25%;
+    height: 1px;
+    background-color: #e2e8f0;
+}
+
+.login-divider::before {
+    left: 0;
+}
+
+.login-divider::after {
+    right: 0;
+}
+
+.login-divider span {
+    font-size: 13px;
+    color: #718096;
+    background: #ffffff;
+    padding: 0 10px;
+}
+
+/* --- Nút Google --- */
+.btn-google {
+    width: 100%;
+    padding: 12px;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #4a5568;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: background-color 0.2s;
+}
+
+.btn-google:hover {
+    background-color: #f7fafc;
+}
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* --- Chân trang form --- */
+.register-link {
+    text-align: center;
+    font-size: 14px;
+    color: #718096;
+    margin-top: 30px;
+}
+
+.register-link a {
+    color: #1890ff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}
+
+/* --- Phần Cột Phải: Hình ảnh/Logo --- */
+.login-image-section {
+    flex: 1;
+    /* Chiếm 1/2 chiều rộng */
+    background-color: #ff4d4f;
+    /* Màu đỏ nền */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.shoes-logo {
+    max-width: 70%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* --- Responsive cho mobile (màn hình nhỏ) --- */
+@media (max-width: 768px) {
+    .login-card {
+        flex-direction: column;
+        max-width: 450px;
+    }
+
+    .login-image-section {
+        display: none;
+        /* Ẩn cột ảnh khi ở màn hình điện thoại */
+    }
+
+    .login-form-section {
+        padding: 40px 30px;
+    }
+}

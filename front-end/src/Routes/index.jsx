@@ -8,7 +8,21 @@ import UserList from "../pages/User/UserList";
 import Permission from "../pages/Permission/index";
 import PermissionList from "../pages/Permission/PermissionList";
 import RoleList from "../pages/Role/RoleList";
+import Register from "../pages/Register"; // Thêm dòng này
+// 1. Import trang Login vừa tạo
+import Login from "../pages/Login";
+
 export const routes = [
+    // 2. Thêm route Login ở mức ngoài cùng (không bị dính LayoutDefault)
+    {
+        path: "/login",
+        element: <Login />
+    },
+    {
+        path: "/register", // Thêm block này
+        element: <Register />
+    },
+    // Các route cũ của bạn giữ nguyên
     {
         path: "/",
         element: <LayoutDefault />,
@@ -37,32 +51,32 @@ export const routes = [
             },
             {
                 path: "user",
-                element: <User/>,
+                element: <User />,
                 children: [
                     {
                         index: true,
-                        element: <UserList/>
+                        element: <UserList />
                     },
                     {
                         path: "user-list",
-                        element: <UserList/>
+                        element: <UserList />
                     }
                 ]
             },
             {
                 path: "permission",
-                element: <Permission/>,
+                element: <Permission />,
                 children: [
                     {
                         path: "permission-list",
-                        element: <PermissionList/>
+                        element: <PermissionList />
                     },
                 ]
             },
             {
                 path: "role",
-                element: <RoleList/>,
+                element: <RoleList />,
             }
         ]
     }
-]
+];
