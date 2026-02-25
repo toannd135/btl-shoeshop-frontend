@@ -1,4 +1,5 @@
-const API_DOMAIN = "http://localhost:8080/api/v1/";
+const API_DOMAIN = import.meta.env.VITE_API_BASE_URL
+
 export const get = async (path) => {
     const response = await fetch(API_DOMAIN + path);
     const result = await response.json();
