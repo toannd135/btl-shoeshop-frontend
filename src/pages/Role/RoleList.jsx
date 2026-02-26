@@ -44,20 +44,23 @@ function RoleList() {
         fetchPermissions();
     }, []);
     const renderStatus = (status) => {
-        const colorMap = {
-            ACTIVE: "green",
-            INACTIVE: "default",
-            SUSPENDED: "blue",
-            DELETED: "red"
+       const colorMap = {
+            ACTIVE: { bg: "#d9f7e6", color: "#1f8f4e" },
+            DELETED: { bg: "#fde2e2", color: "#c53030" },
+            INACTIVE: { bg: "#f0f0f0", color: "#555" },
+            SUSPENDED: { bg: "#e6f0ff", color: "#1d4ed8" },
         };
 
+        const style = colorMap[status] || colorMap.INACTIVE;
         return (
             <Tag
-                color={colorMap[status]}
                 style={{
-                    borderRadius: 20,
-                    padding: "2px 12px",
-                    fontWeight: 500
+                    background: style.bg,
+                    color: style.color,
+                    padding: "6px 14px",
+                    borderRadius: 999,
+                    fontWeight: 600,
+                    fontSize: 12,
                 }}
             >
                 {status}
@@ -70,7 +73,7 @@ function RoleList() {
                 <div className="role-header">
                     <h2>Quản lý vai trò</h2>
                     <h5>
-                        <Link to="/">Dashboard</Link> / Quản lý vai trò / Vai trò
+                        <Link to="/">Dashboard</Link>/ Vai trò
                     </h5>
 
                 </div>

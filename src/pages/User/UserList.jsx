@@ -204,7 +204,7 @@ function UserList() {
                 <div className="user-header">
                     <h2>Quản lý người dùng</h2>
                     <h5>
-                        <Link to="/">Dashboard</Link> / Quản lý người dùng / Người dùng
+                        <Link to="/">Dashboard</Link> / Người dùng
                     </h5>
                 </div>
 
