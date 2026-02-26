@@ -17,6 +17,10 @@ function UserList() {
     const [selectedUser, setSelectedUser] = useState(null);
     const [openUpdate, setOpenUpdate] = useState(false);
     const [openCreate, setOpenCreate] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [total, setTotal] = useState(0);
+    const [sort, setSort] = useState("");
     const handleUpdate = (user) => {
         setSelectedUser(user);
         setOpenUpdate(true);
@@ -27,23 +31,30 @@ function UserList() {
         setOpenDetail(true);
     };
 
-
-    const fetchAPI = async () => {
-        const res = await getUserList();
-        setUsers(res.data.users || []);
-    };
-
     const fetchSearchAPI = async (params = {}) => {
         const res = await getUserPage(params);
         setUsers(res.data.users || []);
+        setTotal(res.data.total);
     };
 
     useEffect(() => {
-        fetchAPI();
-    }, []);
+        const params = {
+            page: currentPage - 1,
+            size: pageSize,
+            sort: sort
+        };
+        if (searchValue && searchValue.trim() !== "") {
+            params.username = searchValue.trim();
+            params.email = searchValue.trim();
+        }
+        fetchSearchAPI(params);
+    }, [currentPage, pageSize, searchValue, sort]);
 
     const handleReload = () => {
-        fetchAPI();
+        fetchSearchAPI({
+            page: currentPage - 1,
+            size: pageSize
+        });
     };
 
     const renderStatus = (status) => {
@@ -206,14 +217,7 @@ function UserList() {
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                             onPressEnter={() => {
-                                if (!searchValue.trim()) {
-                                    fetchAPI();
-                                } else {
-                                    fetchSearchAPI({
-                                        username: searchValue,
-                                        email: searchValue,
-                                    });
-                                }
+                                setCurrentPage(1);
                             }}
                         />
 
@@ -221,24 +225,8 @@ function UserList() {
                             defaultValue="Sắp xếp theo"
                             className="user-arrange"
                             onChange={(value) => {
-                                if (value === "Sắp xếp theo") {
-                                    fetchAPI();
-                                    return;
-                                }
-
-                                let sortParam;
-
-                                if (value === "name_asc") {
-                                    sortParam = "username,asc";
-                                } else if (value === "name_desc") {
-                                    sortParam = "username,desc";
-                                }
-
-                                fetchSearchAPI({
-                                    username: searchValue,
-                                    email: searchValue,
-                                    sort: value,
-                                });
+                                setSort(value);
+                                setCurrentPage(1);
                             }}
                             options={[
                                 { value: "username,asc", label: "Username A-Z" },
@@ -274,6 +262,15 @@ function UserList() {
                     dataSource={users}
                     columns={columns}
                     rowKey="userId"
+                    pagination={{
+                        current: currentPage,
+                        pageSize: pageSize,
+                        total: total,
+                    }}
+                    onChange={(pagination) => {
+                        setCurrentPage(pagination.current);
+                        setPageSize(pagination.pageSize);
+                    }}
                 />
                 <UserDetail
                     open={openDetail}
@@ -291,7 +288,12 @@ function UserList() {
                     onClose={(created) => {
                         setOpenCreate(false);
                         if (created) {
-                            fetchAPI();
+                            fetchSearchAPI({
+                                page: currentPage - 1,
+                                size: pageSize,
+                                username: searchValue,
+                                email: searchValue
+                            });
                         }
                     }}
                 />

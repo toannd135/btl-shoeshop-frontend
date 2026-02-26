@@ -1,6 +1,34 @@
 import AllRoute from "./components/AllRoute";
-function App() {
+import { useEffect, useState } from "react";
+import { refreshToken } from "./services/authService";
+import { setAccessToken, clearAccessToken, getAccessToken } from "./utils/tokenStore";
 
+function App() {
+  const [isAuthInitialized, setIsAuthInitialized] = useState(false);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const token = getAccessToken(); 
+
+      if (!token) {
+        setIsAuthInitialized(true);
+        return;
+      }
+
+      try {
+        const res = await refreshToken();
+        const { accessToken } = res.data;
+        setAccessToken(accessToken);
+      } catch (error) {
+        clearAccessToken();
+      } finally {
+        setIsAuthInitialized(true);
+      }
+    };
+
+    initAuth();
+  }, []);
+  if (!isAuthInitialized) return null;
   return (
     <>
       <AllRoute />

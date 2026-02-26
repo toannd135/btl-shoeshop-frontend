@@ -4,10 +4,25 @@ import ProductList from "../pages/Product/ProductList";
 import UserList from "../pages/User/UserList";
 import PermissionList from "../pages/Permission/PermissionList";
 import RoleList from "../pages/Role/RoleList";
+import Login from "../pages/Login/index";
+import Register from "../pages/Register/index";
+import ProtectRoute from "../Routes/ProtectRoute";
 export const routes = [
     {
+        path: "/login",
+        element: <Login/>
+    },
+    {
+        path: "/register",
+        element: <Register/>
+    },
+    {
         path: "/",
-        element: <LayoutDefault />,
+        element: (
+            <ProtectRoute>
+                <LayoutDefault/>
+            </ProtectRoute>
+        ),
         children: [
             {
                 index: true,

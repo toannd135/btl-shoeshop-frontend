@@ -12,7 +12,7 @@ function RoleUpdate({ open, onClose, role, permissions = [] }) {
                 name: role.name,
                 code: role.code,
                 status: role.status,
-                permissionIds: role.permissions?.map(p => p.permissionId),
+                permissionIds: role.permissions?.map(p => p.name),
             });
         }
     }, [role, form]);
@@ -86,7 +86,7 @@ function RoleUpdate({ open, onClose, role, permissions = [] }) {
                             mode="multiple"
                             placeholder="Chọn quyền"
                             options={permissions.map(p => ({
-                                value: p.permissionId,
+                                value: p.name,
                                 label: p.name
                             }))}
                         />
