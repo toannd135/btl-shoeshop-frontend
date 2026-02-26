@@ -1,10 +1,24 @@
-import { Button, Dropdown } from "antd";
+import { Button, Dropdown, message } from "antd";
 import "./Profile.css";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../../services/authService";
+import { clearAccessToken } from "../../utils/tokenStore";
+
 function Profile() {
+    const navigate = useNavigate();
+    const handleLogout = async () => {
+        try {
+            await logout();
+        } catch (error) {
+            console.log("Logout API failed, clearing client anyway");
+        }
+
+        clearAccessToken();
+        message.success("Đăng xuất thành công");
+        navigate("/login");
+    };
     return (
         <>
-
-
             <Dropdown
                 trigger={["click"]}
                 popupRender={() => (
@@ -15,7 +29,7 @@ function Profile() {
                         </div>
                         <div className="profile__down">
                             <div className="item">Help</div>
-                            <div className="item">Sign out</div>
+                            <div className="item" onClick={handleLogout}>Log out</div>
                         </div>
                     </div>
                 )}

@@ -64,6 +64,7 @@ function RoleCreate({ open, onClose, role }) {
                         Hủy
                     </Button>,
                     <Button
+                        key="create"
                         type="primary"
                         className="btn-create"
                         onClick={() => form.submit()}
