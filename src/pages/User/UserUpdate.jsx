@@ -17,7 +17,8 @@ function UserUpdate({ open, onClose, user, onReload }) {
         fetchAPIRole();
         if (user) {
             form.setFieldsValue({
-                fullName: user.fullName,
+                firstName: user.firstName,
+                lastName: user.lastName,
                 username: user.username,
                 email: user.email,
                 phone: user.phone,
@@ -34,11 +35,13 @@ function UserUpdate({ open, onClose, user, onReload }) {
 
     const handleSubmit = async (values) => {
         try {
+            const { roleId, ...rest } = values;
             const payload = {
-                ...values,
+                ...rest,
                 dateOfBirth: values.dateOfBirth
                     ? values.dateOfBirth.format("YYYY-MM-DD")
-                    : null
+                    : null,
+                role: roleId ? { id: roleId } : null
             };
             await updateUser(user.userId, payload);
             message.success("Cập nhật thành công");
@@ -96,8 +99,16 @@ function UserUpdate({ open, onClose, user, onReload }) {
                 </Form.Item>
 
                 <Form.Item
-                    label="Họ và tên"
-                    name="fullName"
+                    label="Tên"
+                    name="firstName"
+                    rules={[{ required: true, message: "Không được để trống" }]}
+                >
+                    <Input />
+                </Form.Item>
+                
+                <Form.Item
+                    label="Họ và tên đệm"
+                    name="lastName"
                     rules={[{ required: true, message: "Không được để trống" }]}
                 >
                     <Input />
@@ -116,7 +127,7 @@ function UserUpdate({ open, onClose, user, onReload }) {
                     name="email"
                     rules={[{ required: true, type: "email", message: "Email không hợp lệ" }]}
                 >
-                    <Input />
+                     <Input disabled />
                 </Form.Item>
 
                 <Form.Item label="Số điện thoại" name="phone">
@@ -138,7 +149,7 @@ function UserUpdate({ open, onClose, user, onReload }) {
                 </Form.Item>
 
                 <Form.Item label="Trạng thái" name="status">
-                    <Select
+                    <Select 
                         options={[
                             { value: "ACTIVE", label: "ACTIVE" },
                             { value: "INACTIVE", label: "INACTIVE" },
