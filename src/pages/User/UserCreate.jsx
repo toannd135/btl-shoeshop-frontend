@@ -1,8 +1,8 @@
-import { Modal, Form, Input, Select, Button, message, DatePicker } from "antd";
+import { Modal, Form, Input, Select, Button, message, DatePicker, Upload } from "antd";
 import { useEffect, useState } from "react";
 import { getRoleList } from "../../services/roleService";
 import { createUser } from "../../services/userService";
-import { SafetyCertificateOutlined } from "@ant-design/icons";
+import { SafetyCertificateOutlined, UploadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 
 function UserCreate({ open, onClose, user, onReload }) {
@@ -82,27 +82,36 @@ function UserCreate({ open, onClose, user, onReload }) {
                 onFinish={handleSubmit}
             >
                 <Form.Item label="Ảnh đại diện" name="avatarImage">
-                    <Input />
+                    <Upload
+                        showUploadList={false}
+                        beforeUpload={file => {
+                            const reader = new FileReader();
+                            reader.onload = e => {
+                                form.setFieldsValue({ avatarImage: e.target.result });
+                            };
+                            reader.readAsDataURL(file);
+                            return false;
+                        }}
+                    >
+                        <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+                    </Upload>
                 </Form.Item>
                 <Form.Item shouldUpdate>
                     {() => {
                         const avatar = form.getFieldValue("avatarImage");
                         return avatar ? (
-                            <div style={{ marginBottom: 20 }}>
+                            <div style={{ marginBottom: 20, display: "flex", justifyContent: "center" }}>
                                 <img
                                     src={avatar}
                                     alt="avatar preview"
                                     style={{
-                                        width: 120,
-                                        height: 120,
+                                        width: 150,
+                                        height: 150,
                                         objectFit: "cover",
                                         borderRadius: "50%",
-                                        border: "3px solid #16a34a"
+                                        border: "1px solid #ddd"
                                     }}
                                 />
-                                <div style={{ marginTop: 8, fontSize: 12, color: "#555" }}>
-
-                                </div>
                             </div>
                         ) : null;
                     }}
@@ -117,7 +126,7 @@ function UserCreate({ open, onClose, user, onReload }) {
                 </Form.Item>
 
                 <Form.Item
-                    label="Họ đệm"
+                    label="Họ và tên đệm"
                     name="lastName"
                     rules={[{ required: true }]}
                 >

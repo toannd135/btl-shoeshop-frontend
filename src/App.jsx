@@ -8,13 +8,6 @@ function App() {
 
   useEffect(() => {
     const initAuth = async () => {
-      const token = getAccessToken(); 
-
-      if (!token) {
-        setIsAuthInitialized(true);
-        return;
-      }
-
       try {
         const res = await refreshToken();
         const { accessToken } = res.data;

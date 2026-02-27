@@ -80,7 +80,7 @@ function RoleList() {
                 <div className="role-bar">
                     <div className="role-bar_left">
                         <Input
-                            placeholder="Tìm kiếm..."
+                            placeholder="Tìm kiếm theo name va code..."
                             prefix={<SearchOutlined />}
                             className="role-search"
                             value={searchValue}
@@ -92,7 +92,6 @@ function RoleList() {
                                     fetchSearchAPI({
                                         name: searchValue,
                                         code: searchValue,
-                                        status: searchValue,
                                     });
                                 }
                             }}

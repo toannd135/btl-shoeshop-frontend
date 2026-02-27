@@ -39,29 +39,22 @@ function UserDetail({ open, onClose, user }) {
             <Form form={form} layout="vertical">
 
                 <Form.Item label="Ảnh đại diện">
-                    {user?.avatarImage && (
-                        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+                    <div style={{ display: "flex", gap: 16, alignItems: "center", justifyContent: "center" }}>
+                        {user?.avatarImage && (
                             <img
                                 src={user.avatarImage}
                                 alt="avatar"
                                 style={{
-                                    width: 100,
-                                    height: 100,
+                                    width: 150,
+                                    height: 150,
                                     objectFit: "cover",
                                     borderRadius: "50%",
                                     border: "1px solid #ddd"
                                 }}
                             />
-                            <a
-                                href={user.avatarImage}
-                                target="_blank"
-                                rel="noreferrer"
-                                style={{ wordBreak: "break-all" }}
-                            >
-                                {user.avatarImage}
-                            </a>
-                        </div>
-                    )}
+                        )}
+                        
+                    </div>
                 </Form.Item>
 
                 <Form.Item label="Họ và tên" name="fullName">
