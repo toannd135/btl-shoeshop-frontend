@@ -7,30 +7,41 @@ function RoleUpdate({ open, onClose, role, permissions = [] }) {
     const [form] = Form.useForm();
 
     useEffect(() => {
-        if (role) {
-            form.setFieldsValue({
-                name: role.name,
-                code: role.code,
-                status: role.status,
-                permissionIds: role.permissions?.map(p => p.name),
-            });
+        if (open) {
+            form.resetFields();
+            if (role) {
+                form.setFieldsValue({
+                    name: role.name,
+                    code: role.code,
+                    status: role.status,
+                    permissionIds: role.permissions?.map(p => ({
+                        value: p.permissionId || p.id,
+                        label: p.name
+                    })),
+                });
+            }
         }
-    }, [role, form]);
+    }, [open, role, form]);
 
     const handleSubmit = async (values) => {
         const payload = {
             status: values.status,
-            permissions: values.permissionIds?.map(id => ({ id }))
+            permissions: values.permissionIds?.map(obj => ({
+                id: obj.value || obj 
+            }))
         };
 
-        const response = await updateRole(role.roleId, payload);
-
-        if (response) {
-            form.resetFields();
-            message.success("Cập nhật vai trò thành công!");
-            onClose(true);
-        } else {
-            message.error("Cập nhật vai trò thất bại!");
+        try {
+            const response = await updateRole(role.roleId, payload);
+            if (response) {
+                message.success("Cập nhật vai trò thành công!");
+                onClose(true);
+            } else {
+                message.error("Cập nhật vai trò thất bại!");
+            }
+        } catch (error) {
+            console.error(error);
+            message.error("Lỗi hệ thống khi cập nhật!");
         }
     };
 
@@ -47,6 +58,7 @@ function RoleUpdate({ open, onClose, role, permissions = [] }) {
                 open={open}
                 onCancel={onClose}
                 centered
+                destroyOnClose
                 footer={[
                     <Button key="cancel" onClick={onClose}>
                         Hủy
@@ -85,8 +97,10 @@ function RoleUpdate({ open, onClose, role, permissions = [] }) {
                         <Select
                             mode="multiple"
                             placeholder="Chọn quyền"
+                            labelInValue
                             options={permissions.map(p => ({
-                                value: p.name,
+                                key: p.permissionId || p.id,
+                                value: p.permissionId || p.id,
                                 label: p.name
                             }))}
                         />

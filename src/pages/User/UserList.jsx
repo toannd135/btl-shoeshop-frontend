@@ -39,10 +39,12 @@ function UserList() {
 
     useEffect(() => {
         const params = {
-            page: currentPage - 1,
+            page: currentPage ,
             size: pageSize,
-            sort: sort
         };
+        if (sort) {
+            params.sort = sort;
+        }
         if (searchValue && searchValue.trim() !== "") {
             params.username = searchValue.trim();
             params.email = searchValue.trim();
@@ -52,7 +54,7 @@ function UserList() {
 
     const handleReload = () => {
         fetchSearchAPI({
-            page: currentPage - 1,
+            page: currentPage ,
             size: pageSize
         });
     };
@@ -289,7 +291,7 @@ function UserList() {
                         setOpenCreate(false);
                         if (created) {
                             fetchSearchAPI({
-                                page: currentPage - 1,
+                                page: currentPage ,
                                 size: pageSize,
                                 username: searchValue,
                                 email: searchValue

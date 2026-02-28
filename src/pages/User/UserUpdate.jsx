@@ -1,5 +1,5 @@
-import { Modal, Form, Input, Select, Button, message, DatePicker } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { Modal, Form, Input, Select, Button, message, DatePicker, Upload } from "antd";
+import { EditOutlined, UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { updateUser } from "../../services/userService";
 import { getRoleList } from "../../services/roleService";
@@ -9,35 +9,65 @@ import dayjs from "dayjs";
 function UserUpdate({ open, onClose, user, onReload }) {
     const [form] = Form.useForm();
     const [role, setRole] = useState([]);
+    const [avatarFile, setAvatarFile] = useState(null);
+
     const fetchAPIRole = async () => {
         const response = await getRoleList();
         setRole(response.data.roles || []);
     }
     useEffect(() => {
         fetchAPIRole();
-        if (user) {
-            form.setFieldsValue({
-                firstName: user.firstName,
-                lastName: user.lastName,
-                username: user.username,
-                email: user.email,
-                phone: user.phone,
-                gender: user.gender,
-                dateOfBirth: user.dateOfBirth
-                    ? dayjs(user.dateOfBirth)
-                    : null,
-                avatarImage: user.avatarImage,
-                status: user.status,
-                roleId: user.role?.roleId
-            });
+        if (open) {
+            form.resetFields();
+            setAvatarFile(null);
+            if (user) {
+                form.setFieldsValue({
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    username: user.username,
+                    email: user.email,
+                    phone: user.phone,
+                    gender: user.gender,
+                    dateOfBirth: user.dateOfBirth
+                        ? dayjs(user.dateOfBirth)
+                        : null,
+                    avatarImage: user.avatarImage,
+                    status: user.status,
+                    roleId: user.role?.roleId
+                });
+            }
         }
-    }, [user, form]);
+
+    }, [open, user, form]);
 
     const handleSubmit = async (values) => {
         try {
+            let finalAvatarUrl = values.avatarImage;
+            if (avatarFile) {
+                const formData = new FormData();
+                formData.append("file", avatarFile);
+                formData.append("upload_preset", "shoes_shop_fe");
+
+                const cloudinaryRes = await fetch(
+                    "https://api.cloudinary.com/v1_1/dkuckfe1m/image/upload",
+                    {
+                        method: "POST",
+                        body: formData,
+                    }
+                );
+
+                const cloudData = await cloudinaryRes.json();
+                if (cloudData.secure_url) {
+                    finalAvatarUrl = cloudData.secure_url; 
+                } else {
+                    message.error("Lỗi khi upload ảnh lên Cloudinary!");
+                    return;
+                }
+            }
             const { roleId, ...rest } = values;
             const payload = {
                 ...rest,
+                avatarImage: finalAvatarUrl,
                 dateOfBirth: values.dateOfBirth
                     ? values.dateOfBirth.format("YYYY-MM-DD")
                     : null,
@@ -61,10 +91,14 @@ function UserUpdate({ open, onClose, user, onReload }) {
                 </div>
             }
             open={open}
-            onCancel={onClose}
+            onCancel={() => {
+                setAvatarFile(null);
+                onClose();
+            }}
             footer={null}
             centered
             width={800}
+            destroyOnClose
         >
             <Form
                 form={form}
@@ -72,7 +106,24 @@ function UserUpdate({ open, onClose, user, onReload }) {
                 onFinish={handleSubmit}
             >
                 <Form.Item label="Ảnh đại diện" name="avatarImage">
-                    <Input />
+                    <Upload
+                        showUploadList={false}
+                        beforeUpload={(file) => {
+                            if (file.size > 1024 * 1024) {
+                                message.error("Ảnh phải nhỏ hơn 1 MB");
+                                return Upload.LIST_IGNORE;
+                            }
+                            setAvatarFile(file);
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                form.setFieldsValue({ avatarImage: e.target.result }); // Hiển thị preview
+                            };
+                            reader.readAsDataURL(file);
+                            return false;
+                        }}
+                    >
+                        <Button icon={<UploadOutlined />}>Chọn ảnh mới</Button>
+                    </Upload>
                 </Form.Item>
                 <Form.Item shouldUpdate>
                     {() => {
@@ -105,7 +156,7 @@ function UserUpdate({ open, onClose, user, onReload }) {
                 >
                     <Input />
                 </Form.Item>
-                
+
                 <Form.Item
                     label="Họ và tên đệm"
                     name="lastName"
@@ -127,7 +178,7 @@ function UserUpdate({ open, onClose, user, onReload }) {
                     name="email"
                     rules={[{ required: true, type: "email", message: "Email không hợp lệ" }]}
                 >
-                     <Input disabled />
+                    <Input disabled />
                 </Form.Item>
 
                 <Form.Item label="Số điện thoại" name="phone">
@@ -149,7 +200,7 @@ function UserUpdate({ open, onClose, user, onReload }) {
                 </Form.Item>
 
                 <Form.Item label="Trạng thái" name="status">
-                    <Select 
+                    <Select
                         options={[
                             { value: "ACTIVE", label: "ACTIVE" },
                             { value: "INACTIVE", label: "INACTIVE" },
@@ -174,7 +225,10 @@ function UserUpdate({ open, onClose, user, onReload }) {
 
                 <Form.Item>
                     <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-                        <Button onClick={onClose}>
+                        <Button onClick={() => {
+                            setAvatarFile(null);
+                            onClose();
+                        }}>
                             Hủy
                         </Button>
                         <Button type="primary" htmlType="submit">

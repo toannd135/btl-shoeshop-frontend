@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 function UserCreate({ open, onClose, user, onReload }) {
     const [form] = Form.useForm();
     const [roles, setRoles] = useState([]);
+    const [avatarFile, setAvatarFile] = useState(null);
 
     const fetchRoles = async () => {
         const res = await getRoleList();
@@ -35,6 +36,29 @@ function UserCreate({ open, onClose, user, onReload }) {
 
     const handleSubmit = async (values) => {
         try {
+            let avatarUrl = null;
+            if (avatarFile) {
+                const formData = new FormData();
+                formData.append("file", avatarFile);
+                
+                formData.append("upload_preset", "shoes_shop_fe");
+
+                const cloudinaryRes = await fetch(
+                    "https://api.cloudinary.com/v1_1/dkuckfe1m/image/upload",
+                    {
+                        method: "POST",
+                        body: formData,
+                    }
+                );
+
+                const cloudData = await cloudinaryRes.json();
+                if (cloudData.secure_url) {
+                    avatarUrl = cloudData.secure_url; 
+                } else {
+                    message.error("Lỗi khi upload ảnh lên Cloudinary!");
+                    return;
+                }
+            }
             const payload = {
                 firstName: values.firstName,
                 lastName: values.lastName,
@@ -43,7 +67,7 @@ function UserCreate({ open, onClose, user, onReload }) {
                 password: values.password,
                 phone: values.phone,
                 gender: values.gender,
-                avatarImage: values.avatarImage,
+                avatarImage: avatarUrl,
                 dateOfBirth: values.dateOfBirth
                     ? values.dateOfBirth.format("YYYY-MM-DD")
                     : null,
@@ -54,12 +78,13 @@ function UserCreate({ open, onClose, user, onReload }) {
 
             await createUser(payload);
             message.success("Tạo người dùng thành công");
+            setAvatarFile(null);
             onClose(true);
 
         } catch (err) {
             console.error(err);
             message.error("Tạo thất bại");
-        }
+        } 
     };
 
     return (
@@ -71,7 +96,10 @@ function UserCreate({ open, onClose, user, onReload }) {
                 </div>
             }
             open={open}
-            onCancel={() => onClose(false)}
+            onCancel={() =>{
+                setAvatarFile(null);
+                onClose(false)
+            }}
             footer={null}
             centered
             width={800}
@@ -85,6 +113,11 @@ function UserCreate({ open, onClose, user, onReload }) {
                     <Upload
                         showUploadList={false}
                         beforeUpload={file => {
+                            if (file.size > 1024 * 1024) {
+                                message.error('Ảnh phải nhỏ hơn 1 MB');
+                                return Upload.LIST_IGNORE;
+                            }
+                            setAvatarFile(file);
                             const reader = new FileReader();
                             reader.onload = e => {
                                 form.setFieldsValue({ avatarImage: e.target.result });
