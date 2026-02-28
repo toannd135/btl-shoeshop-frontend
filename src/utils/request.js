@@ -102,7 +102,13 @@ export const edit = async (path, body = {}) => {
 };
 
 export const getPage = async (path, params = {}) => {
-    const queryString = new URLSearchParams(params).toString();
+    // drop undefined / empty-string values to avoid confusing Spring's Pageable binder
+    const cleanParams = Object.entries(params).reduce((acc, [k, v]) => {
+        if (v !== undefined && v !== "") acc[k] = v;
+        return acc;
+    }, {});
+
+    const queryString = new URLSearchParams(cleanParams).toString();
     const url = queryString
         ? `${API_DOMAIN + path}?${queryString}`
         : API_DOMAIN + path;

@@ -13,7 +13,7 @@ function Login() {
         password: "",
     });
     const handleChange = (e) => {
-        const {id, value} = e.target;
+        const { id, value } = e.target;
         setData({
             ...data,
             [id]: value
@@ -21,14 +21,14 @@ function Login() {
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if(!data.username || !data.password){
+        if (!data.username || !data.password) {
             message.warning("Vui lòng nhập đầy đủ thông tin!");
             return;
         }
-        try{
+        try {
             const res = await login(data);
-            const {accessToken, user} = res.data;
-            
+            const { accessToken, user } = res.data;
+
             setAccessToken(accessToken);
 
             notification.success({
@@ -36,7 +36,9 @@ function Login() {
                 description: `Chào mừng ${user.username} đã quay trở lại!`
             });
 
-            navigate("/");
+            if (user.roleCode === 'ADMIN' || user.roleCode === 'ROLE_ADMIN') {
+                navigate("/");
+            }
         } catch (err) {
             notification.error({
                 message: "Đăng nhập thất bại!",

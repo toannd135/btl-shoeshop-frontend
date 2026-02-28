@@ -3,8 +3,9 @@ import './Register.css';
 import logoShoes from '../../images/logoPtitShoesShoppng.png';
 import { message, notification } from 'antd';
 import { register } from '../../services/authService';
+import { useNavigate } from 'react-router-dom';
 function Register() {
-
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -52,6 +53,9 @@ function Register() {
                 message: "Đăng ký thành công",
                 description: "Tài khoản của bạn đã được tạo. Hãy đăng nhập để tiếp tục.",
             });
+            setTimeout(() => {
+                navigate('/login');
+            }, 1500);
         }
         catch (err) {
             console.log("REGISTER ERROR:", err);
