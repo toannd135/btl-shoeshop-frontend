@@ -6,27 +6,33 @@ function PermissionUpdate({ open, onClose, permission }) {
     const [form] = Form.useForm();
 
     useEffect(() => {
-            if (permission) {
-                form.setFieldsValue({
-                    name: permission.name,
-                    apiPath: permission.apiPath,
-                    method: permission.method,
-                    module: permission.module,
-                    status: permission.status
-                });
-            }
-        }, [permission, form]);
-    
-        const handleSubmit = async (values) => {
-            const response = await updatePermission(permission.permissionId, values);
-            if (response) {
-                form.resetFields();
-                message.success("Cập nhật quyền thành công!");
-                onClose(true);
-            } else {
-                message.error("Cập nhật quyền thất bại!");
-            }
+        if (permission) {
+            form.setFieldsValue({
+                name: permission.name,
+                apiPath: permission.apiPath,
+                method: permission.method,
+                module: permission.module,
+                status: permission.status
+            });
+        }
+    }, [permission, form]);
+
+    const handleSubmit = async (values) => {
+        const allValues = form.getFieldsValue(true);
+        const requestBody = {
+            name: allValues.name,
+            module: values.module,
+            status: values.status
         };
+        const response = await updatePermission(permission.permissionId, requestBody);
+        if (response) {
+            form.resetFields();
+            message.success("Cập nhật quyền thành công!");
+            onClose(true);
+        } else {
+            message.error("Cập nhật quyền thất bại!");
+        }
+    };
 
     return (
         <Modal
@@ -58,7 +64,7 @@ function PermissionUpdate({ open, onClose, permission }) {
                     name="name"
                     rules={[{ required: true, message: "Vui lòng nhập tên quyền!" }]}
                 >
-                    <Input disabled/>
+                    <Input disabled />
                 </Form.Item>
 
                 <Form.Item
@@ -66,7 +72,7 @@ function PermissionUpdate({ open, onClose, permission }) {
                     name="apiPath"
                     rules={[{ required: true, message: "Vui lòng nhập API Path!" }]}
                 >
-                    <Input disabled/>
+                    <Input disabled />
                 </Form.Item>
 
                 <Form.Item

@@ -14,7 +14,6 @@ const parseJwt = (token) => {
 const ProtectRoute = ({ children, allowedRoles }) => {
   const token = getAccessToken();
   const decodedToken = token ? parseJwt(token) : null;
-
   if (!token || !decodedToken) {
     return <Navigate to="/login" replace />;
   }

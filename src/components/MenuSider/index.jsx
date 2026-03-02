@@ -1,5 +1,5 @@
 import { Menu } from "antd";
-import { DashboardOutlined, ProductOutlined, UserOutlined, AuditOutlined, BarsOutlined } from "@ant-design/icons";
+import { AppstoreOutlined, DashboardOutlined, BookOutlined, UserOutlined, AuditOutlined, BarsOutlined } from "@ant-design/icons";
 import { Link, useLocation } from 'react-router-dom';
 
 
@@ -25,6 +25,16 @@ function MenuSider() {
             label: <Link to="/role">Vai trò</Link>,
             icon: <BarsOutlined />,
             key: "/role",
+        },
+        {
+            label: <Link to="/category">Danh mục</Link>,
+            icon: <BookOutlined />,
+            key: "/category"
+        },
+        {
+            label: <Link to="/product">Sản phẩm</Link>,
+            icon: <AppstoreOutlined />,
+            key: "/product"
         }
     ]
     return (

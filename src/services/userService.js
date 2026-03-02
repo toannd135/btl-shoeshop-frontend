@@ -1,4 +1,4 @@
-import { dele, edit, get, getPage, post} from "../utils/request";
+import { del, dele, edit, get, getPage, post} from "../utils/request";
 export const getUserList = async () => {
     const response = await get("users");
     return response;
@@ -8,7 +8,7 @@ export const updateUser = async (userId, data) => {
     return response;
 }
 export const deleteUser = async (userId) => {
-    const response = await dele(`users/${userId}`);
+    const response = await del(`users/${userId}`);
     return response;
 }
 export const getUserPage = async (params) => {
