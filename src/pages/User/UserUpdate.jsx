@@ -42,7 +42,8 @@ function UserUpdate({ open, onClose, user, onReload }) {
 
     const handleSubmit = async (values) => {
         try {
-            let finalAvatarUrl = values.avatarImage;
+            const allValues = form.getFieldsValue(true);
+            let finalAvatarUrl = allValues.avatarImage;
             if (avatarFile) {
                 const formData = new FormData();
                 formData.append("file", avatarFile);
@@ -64,12 +65,12 @@ function UserUpdate({ open, onClose, user, onReload }) {
                     return;
                 }
             }
-            const { roleId, ...rest } = values;
+            const { roleId, email, ...rest } = allValues;
             const payload = {
                 ...rest,
                 avatarImage: finalAvatarUrl,
-                dateOfBirth: values.dateOfBirth
-                    ? values.dateOfBirth.format("YYYY-MM-DD")
+                dateOfBirth: allValues.dateOfBirth
+                    ? allValues.dateOfBirth.format("YYYY-MM-DD")
                     : null,
                 role: roleId ? { id: roleId } : null
             };

@@ -46,6 +46,9 @@ function Login() {
             });
         }
     }
+    const handleGoogleLogin = () =>{
+        window.location.href="http://localhost:8080/oauth2/authorization/google";
+    }
     return (
         <div className="login-container">
             <div className="login-card">
@@ -85,7 +88,7 @@ function Login() {
                         <span>Hoặc tiếp tục với</span>
                     </div>
 
-                    <button type="button" className="btn-google">
+                    <button type="button" className="btn-google" onClick={handleGoogleLogin}>
                         <img
                             src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
                             alt="Google logo"

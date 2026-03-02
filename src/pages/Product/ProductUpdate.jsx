@@ -1,12 +1,12 @@
 import { Modal, Form, Input, Select, Button, message, Upload } from "antd";
-import { SafetyCertificateOutlined, UploadOutlined } from "@ant-design/icons";
+import { EditOutlined, UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import { createProduct } from "../../services/productService";
+import { updateProduct } from "../../services/productService";
 import { getCateList } from "../../services/cateService";
 
 const { TextArea } = Input;
 
-function ProductCreate({ open, onClose }) {
+function ProductUpdate({ open, onClose, product, onReload }) {
     const [form] = Form.useForm();
     const [categories, setCategories] = useState([]);
     const [imageFile, setImageFile] = useState(null);
@@ -23,30 +23,45 @@ function ProductCreate({ open, onClose }) {
         fetchCategories();
     }, []);
 
+    useEffect(() => {
+        if (open) {
+            form.resetFields();
+            setImageFile(null);
+            if (product) {
+                form.setFieldsValue({
+                    name: product.name,
+                    brand: product.brand,
+                    description: product.description,
+                    categoryId: product.categoryId,
+                    gender: product.gender,
+                    status: product.status,
+                    imageUrl: product.imageUrl
+                });
+            }
+        }
+    }, [open, product, form]);
+
     const handleSubmit = async (values) => {
         try {
             const formData = new FormData();
-            formData.append("name", values.name);
-            formData.append("brand", values.brand);
-            formData.append("description", values.description);
-            formData.append("gender", values.gender);
-            
+            if (values.name) formData.append("name", values.name);
+            if (values.brand) formData.append("brand", values.brand);
+            if (values.description) formData.append("description", values.description);
+            if (values.gender) formData.append("gender", values.gender);
             if (values.categoryId) formData.append("categoryId", values.categoryId);
             if (values.status) formData.append("status", values.status);
-            
+
             if (imageFile) {
                 formData.append("image", imageFile); 
             }
 
-            await createProduct(formData);
-            message.success("Tạo sản phẩm gốc thành công!");
-            
-            form.resetFields();
-            setImageFile(null);
-            onClose(true);
-        } catch (err) {
-            console.error(err);
-            message.error("Tạo thất bại");
+            await updateProduct(product.productId, formData);
+            message.success("Cập nhật sản phẩm thành công");
+
+            onClose();
+            onReload();
+        } catch (error) {
+            message.error("Cập nhật thất bại");
         }
     };
 
@@ -54,14 +69,14 @@ function ProductCreate({ open, onClose }) {
         <Modal
             title={
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <SafetyCertificateOutlined />
-                    <span>Tạo mới sản phẩm</span>
+                    <EditOutlined />
+                    <span>Cập nhật sản phẩm</span>
                 </div>
             }
             open={open}
             onCancel={() => {
                 setImageFile(null);
-                onClose(false);
+                onClose();
             }}
             footer={null}
             centered
@@ -69,22 +84,18 @@ function ProductCreate({ open, onClose }) {
             destroyOnClose
         >
             <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                <Form.Item label="Ảnh sản phẩm (MultipartFile image)">
+                <Form.Item label="Đổi ảnh minh họa">
                     <Upload
                         showUploadList={false}
                         beforeUpload={file => {
-                            if (file.size > 2 * 1024 * 1024) {
-                                message.error('Ảnh phải nhỏ hơn 2MB');
-                                return Upload.LIST_IGNORE;
-                            }
                             setImageFile(file);
                             const reader = new FileReader();
                             reader.onload = e => form.setFieldsValue({ imageUrl: e.target.result });
                             reader.readAsDataURL(file);
-                            return false; 
+                            return false;
                         }}
                     >
-                        <Button icon={<UploadOutlined />}>Chọn file ảnh</Button>
+                        <Button icon={<UploadOutlined />}>Tải ảnh khác lên</Button>
                     </Upload>
                 </Form.Item>
 
@@ -100,57 +111,45 @@ function ProductCreate({ open, onClose }) {
                 </Form.Item>
 
                 <div style={{ display: "flex", gap: 16 }}>
-                    <Form.Item label="Tên sản phẩm" name="name" rules={[{ required: true, message: "Bắt buộc nhập" }]} style={{ flex: 1 }}>
-                        <Input placeholder="VD: Nike Air Force 1" />
+                    <Form.Item label="Tên sản phẩm" name="name" style={{ flex: 1 }}>
+                        <Input />
                     </Form.Item>
-                    <Form.Item label="Thương hiệu (Brand)" name="brand" rules={[{ required: true, message: "Bắt buộc nhập" }]} style={{ flex: 1 }}>
-                        <Input placeholder="VD: Nike" />
+                    <Form.Item label="Thương hiệu" name="brand" style={{ flex: 1 }}>
+                        <Input />
                     </Form.Item>
                 </div>
 
                 <div style={{ display: "flex", gap: 16 }}>
-                    <Form.Item label="Danh mục" name="categoryId" style={{ flex: 1 }}>
+                    <Form.Item label="Danh mục (Category)" name="categoryId" style={{ flex: 1 }}>
                         <Select
                             options={categories
                                 .filter(c => c.parentId != null) 
-                                .map(c => ({ 
-                                    value: c.categoryId, 
+                                .map(c => ({
+                                    value: c.categoryId,
                                     label: c.categoryName 
                                 }))
                             }
                             placeholder="Chọn danh mục con"
                         />
                     </Form.Item>
-                    <Form.Item label="Giới tính" name="gender" rules={[{ required: true, message: "Bắt buộc chọn" }]} style={{ flex: 1 }}>
-                        <Select
-                            options={[
-                                { value: "MALE", label: "MALE" },
-                                { value: "FEMALE", label: "FEMALE" },
-                                { value: "OTHER", label: "OTHER" },
-                            ]}
-                        />
+                    <Form.Item label="Giới tính" name="gender" style={{ flex: 1 }}>
+                        <Select options={[{ value: "MALE", label: "MALE" }, { value: "FEMALE", label: "FEMALE" }, { value: "OTHER", label: "OTHER" }]} />
                     </Form.Item>
                 </div>
 
-                <Form.Item label="Trạng thái" name="status" initialValue="ACTIVE">
-                    <Select
-                        options={[
-                            { value: "ACTIVE", label: "ACTIVE" },
-                            { value: "INACTIVE", label: "INACTIVE" },
-                            { value: "SUSPENDED", label: "SUSPENDED"},
-                            { value: "DELETED", label: "DELETED"}
-                        ]}
-                    />
+                <Form.Item label="Trạng thái" name="status">
+                    <Select options={[{ value: "ACTIVE", label: "ACTIVE" }, { value: "INACTIVE", label: "INACTIVE" }, { value: "SUSPENDED", label: "SUSPENDED" },
+                    { value: "DELETED", label: "DELETED" }]} />
                 </Form.Item>
 
-                <Form.Item label="Mô tả chi tiết" name="description" rules={[{ required: true, message: "Bắt buộc nhập" }]}>
-                    <TextArea rows={4} placeholder="Nhập mô tả..." />
+                <Form.Item label="Mô tả" name="description">
+                    <TextArea rows={4} />
                 </Form.Item>
 
                 <Form.Item>
                     <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-                        <Button onClick={() => onClose(false)}>Hủy</Button>
-                        <Button type="primary" htmlType="submit">Tạo mới</Button>
+                        <Button onClick={onClose}>Hủy</Button>
+                        <Button type="primary" htmlType="submit">Lưu thay đổi</Button>
                     </div>
                 </Form.Item>
             </Form>
@@ -158,4 +157,4 @@ function ProductCreate({ open, onClose }) {
     );
 }
 
-export default ProductCreate;
+export default ProductUpdate;

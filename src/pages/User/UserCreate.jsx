@@ -71,6 +71,7 @@ function UserCreate({ open, onClose, user, onReload }) {
                 dateOfBirth: values.dateOfBirth
                     ? values.dateOfBirth.format("YYYY-MM-DD")
                     : null,
+                status: values.status,
                 role: {
                     id: values.roleId
                 }

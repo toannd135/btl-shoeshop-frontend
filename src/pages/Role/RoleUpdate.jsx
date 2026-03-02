@@ -26,9 +26,15 @@ function RoleUpdate({ open, onClose, role, permissions = [] }) {
     const handleSubmit = async (values) => {
         const payload = {
             status: values.status,
-            permissions: values.permissionIds?.map(obj => ({
-                id: obj.value || obj 
-            }))
+            permissions: values.permissionIds ? values.permissionIds.map(item => {
+                let idValue = item;
+
+                if (item && typeof item === 'object') {
+                    idValue = item.value || item.key || item.id;
+                }
+
+                return { id: idValue };
+            }).filter(p => p.id) : []
         };
 
         try {

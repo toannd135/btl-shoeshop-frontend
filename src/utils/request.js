@@ -41,6 +41,26 @@ const handleResponse = async (response) => {
     return result;
 };
 
+export const sendForm = async (path, method = "POST", formData) => {
+    const token = getAccessToken();
+    const headers = {
+        Accept: "application/json",
+    };
+
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await fetch(API_DOMAIN + path, {
+        method: method,
+        headers: headers,
+        body: formData,
+        credentials: "include"
+    });
+
+    return handleResponse(response); 
+};
+
 export const get = async (path) => {
     const response = await fetch(API_DOMAIN + path, {
         method: "GET",
@@ -102,7 +122,7 @@ export const edit = async (path, body = {}) => {
 };
 
 export const getPage = async (path, params = {}) => {
-    // drop undefined / empty-string values to avoid confusing Spring's Pageable binder
+    
     const cleanParams = Object.entries(params).reduce((acc, [k, v]) => {
         if (v !== undefined && v !== "") acc[k] = v;
         return acc;
