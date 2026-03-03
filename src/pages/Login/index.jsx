@@ -39,6 +39,7 @@ function Login() {
             if (user.roleCode === 'ADMIN' || user.roleCode === 'ROLE_ADMIN') {
                 navigate("/");
             }
+            else navigate("/home");
         } catch (err) {
             notification.error({
                 message: "Đăng nhập thất bại!",
