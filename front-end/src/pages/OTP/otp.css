@@ -1,0 +1,91 @@
+/* Wrapper */
+.otp-wrapper {
+    min-height: 100vh;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Container */
+.otp-container {
+    width: 850px;
+    height: 450px;
+    background: white;
+    display: flex;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* LEFT */
+.otp-left {
+    flex: 1;
+    padding: 50px;
+}
+
+.otp-left h2 {
+    margin-bottom: 30px;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* Form */
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.otp-inputs {
+    display: flex;
+    gap: 12px;
+}
+
+.otp-inputs input {
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    font-size: 18px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+    transition: 0.3s;
+}
+
+.otp-inputs input:focus {
+    border-color: #ff3b30;
+}
+
+/* Button */
+.otp-btn {
+    margin-top: 30px;
+    width: 100%;
+    height: 45px;
+    border: none;
+    border-radius: 8px;
+    background: #ff3b30;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.otp-btn:hover {
+    background: #e60023;
+}
+
+/* RIGHT */
+.otp-right {
+    flex: 1;
+    background: #ff4d4f;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.otp-logo {
+    width: 220px;
+    object-fit: contain;
+}

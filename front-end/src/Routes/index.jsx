@@ -8,21 +8,39 @@ import UserList from "../pages/User/UserList";
 import Permission from "../pages/Permission/index";
 import PermissionList from "../pages/Permission/PermissionList";
 import RoleList from "../pages/Role/RoleList";
-import Register from "../pages/Register"; // Thêm dòng này
-// 1. Import trang Login vừa tạo
+import Register from "../pages/Register";
 import Login from "../pages/Login";
-
+import Home from "../pages/Home";
+import ForgotPassword from "../pages/Forgot-Password";
+import OTP from "../pages/OTP";
+import ResetPassword from "../pages/ResetPassword";
 export const routes = [
-    // 2. Thêm route Login ở mức ngoài cùng (không bị dính LayoutDefault)
+
     {
         path: "/login",
         element: <Login />
     },
     {
-        path: "/register", // Thêm block này
+        path: "/register",
         element: <Register />
     },
-    // Các route cũ của bạn giữ nguyên
+    {
+        path: "/home",
+        element: <Home />
+    },
+    {
+        path: "/forgot-password",
+        element: <ForgotPassword />
+    },
+    {
+        path: "/otp",
+        element: <OTP />
+    },
+    {
+        path: "/resetpassword",
+        element: <ResetPassword />
+    },
+
     {
         path: "/",
         element: <LayoutDefault />,
