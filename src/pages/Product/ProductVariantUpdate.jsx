@@ -1,11 +1,12 @@
-import { Modal, Form, Input, InputNumber, Select, Button, message, Row, Col, ColorPicker } from "antd";
-import { EditOutlined } from "@ant-design/icons";
-import { useEffect } from "react";
-import { updateProductVariant } from "../../services/productService";
+import { Modal, Form, Input, InputNumber, Select, Button, message, Row, Col, ColorPicker, Upload } from "antd";
+import { EditOutlined, UploadOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
+import { updateProductVariant, createVariantImage } from "../../services/productService";
 
 function ProductVariantUpdate({ open, onClose, productId, variant, onReload }) {
     const [form] = Form.useForm();
-
+    const [fileList, setFileList] = useState([]);
+    const [loading, setLoading] = useState(false);
     useEffect(() => {
         if (open && variant) {
             form.setFieldsValue({
@@ -16,10 +17,21 @@ function ProductVariantUpdate({ open, onClose, productId, variant, onReload }) {
                 basePrice: variant.basePrice,
                 status: variant.status
             });
+            if (variant.imageURL) {
+                setFileList([{
+                    uid: '-1',
+                    name: 'image.png',
+                    status: 'done',
+                    url: variant.imageURL,
+                }]);
+            } else {
+                setFileList([]);
+            }
         }
     }, [open, variant, form]);
 
     const handleSubmit = async (values) => {
+        setLoading(true);
         try {
             const colorHex = typeof values.color === 'string' ? values.color : values.color.toHexString();
 
@@ -31,14 +43,21 @@ function ProductVariantUpdate({ open, onClose, productId, variant, onReload }) {
                 basePrice: values.basePrice,
                 status: values.status
             };
-
             await updateProductVariant(productId, variant.productVariantId, payload);
+            if (fileList.length > 0 && fileList[0].originFileObj) {
+                const formData = new FormData();
+                formData.append("image", fileList[0].originFileObj);
+                formData.append("isPrimary", true);
+                await createVariantImage(productId, variant.productVariantId, formData);
+            }
             message.success("Cập nhật biến thể thành công!");
             onReload();
             onClose();
         } catch (err) {
             console.error(err);
             message.error("Cập nhật thất bại");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -68,7 +87,7 @@ function ProductVariantUpdate({ open, onClose, productId, variant, onReload }) {
                 <Row gutter={16}>
                     <Col span={8}>
                         <Form.Item label="Kích thước" name="size">
-                            <InputNumber style={{ width: '100%' }}/>
+                            <InputNumber style={{ width: '100%' }} />
                         </Form.Item>
                     </Col>
                     <Col span={8}>
@@ -88,9 +107,27 @@ function ProductVariantUpdate({ open, onClose, productId, variant, onReload }) {
                     </Col>
                 </Row>
 
-                <Form.Item label="Giá cơ bản (VNĐ)" name="basePrice">
-                    <InputNumber style={{ width: '100%' }} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => value.replace(/\$\s?|(,*)/g, '')} />
-                </Form.Item>
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item label="Giá cơ bản (VNĐ)" name="basePrice">
+                            <InputNumber style={{ width: '100%' }} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => value.replace(/\$\s?|(,*)/g, '')} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item label="Đổi hình ảnh">
+                            <Upload
+                                beforeUpload={() => false}
+                                maxCount={1}
+                                listType="picture"
+                                fileList={fileList}
+                                onChange={({ fileList: newFileList }) => setFileList(newFileList)}
+                                accept="image/*"
+                            >
+                                <Button icon={<UploadOutlined />}>Chọn ảnh mới</Button>
+                            </Upload>
+                        </Form.Item>
+                    </Col>
+                </Row>
 
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
                     <Button onClick={onClose}>Hủy</Button>

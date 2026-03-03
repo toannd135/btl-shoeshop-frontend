@@ -8,8 +8,12 @@ import Register from "../pages/Register/index";
 import ProtectRoute from "../Routes/ProtectRoute";
 import CateList from "../pages/Category/CateList";
 import ProductList from "../pages/Product/ProductList";
-import ProductVariant from "../pages/ProductVariant";
+import ProductDetail from "../pages/ProductDetail/ProductDetail";
 import OAuth2RedirectHandler from "../pages/Login/OAuth2RedirectHandler";
+import Home from "../pages/Home/index";
+import ForgotPassword from "../pages/Forgot-Password/index";
+import OTP from "../pages/OTP/index";
+import ResetPassword from "../pages/ResetPassword/index";
 export const routes = [
     {
         path: "/login",
@@ -24,8 +28,24 @@ export const routes = [
         element: <Register/>
     },
     {
-        path: "/productVariant/:id",
-        element: <ProductVariant/>
+        path: "/home",
+        element: <Home/>
+    },
+    {
+        path: "/forgot-password",
+        element: <ForgotPassword />
+    },
+    {
+        path: "/otp",
+        element: <OTP />
+    },
+    {
+        path: "/resetpassword",
+        element: <ResetPassword />
+    },
+    {
+        path: "/productDetail/:id",
+        element: <ProductDetail/>
     },
     {
         path: "/",

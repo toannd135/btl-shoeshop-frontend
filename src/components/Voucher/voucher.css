@@ -1,0 +1,90 @@
+/* ===== SECTION ===== */
+.voucher-section {
+    padding: 80px 40px;
+    background: #f5f5f5;
+}
+
+.voucher-heading {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 50px;
+}
+
+.voucher-heading span {
+    color: #e53935;
+    border-bottom: 3px solid #e53935;
+    padding-bottom: 4px;
+}
+
+/* ===== LIST ===== */
+.voucher-list {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+/* ===== CARD ===== */
+.voucher-card {
+    position: relative;
+    background: #ffffff;
+    width: 280px;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    transition: 0.3s;
+}
+
+.voucher-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Badge nhỏ phía trên */
+.voucher-tag {
+    display: inline-block;
+    background: #ff6d00;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.voucher-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.voucher-desc {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+/* ===== BUTTON ===== */
+.voucher-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 30px;
+    border: none;
+    background: #111;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.voucher-btn:hover {
+    background: #333;
+}
+
+/* Khi hết hạn */
+.voucher-btn.disabled {
+    background: #ddd;
+    color: #999;
+    cursor: not-allowed;
+}

@@ -1,11 +1,14 @@
-import { Modal, Form, Input, InputNumber, Select, Button, message, Row, Col, ColorPicker } from "antd";
-import { SafetyCertificateOutlined } from "@ant-design/icons";
-import { createProductVariant } from "../../services/productService";
+import { Modal, Form, Input, InputNumber, Select, Button, message, Row, Col, ColorPicker, Upload } from "antd";
+import { SafetyCertificateOutlined, UploadOutlined } from "@ant-design/icons";
+import { createProductVariant, createVariantImage } from "../../services/productService";
+import { useState } from "react";
 
 function ProductVariantCreate({ open, onClose, productId, onReload }) {
     const [form] = Form.useForm();
-
+    const [fileList, setFileList] = useState([]);
+    const [loading, setLoading] = useState(false);
     const handleSubmit = async (values) => {
+        setLoading(true);
         try {
             const colorHex = typeof values.color === 'string' ? values.color : values.color.toHexString();
 
@@ -17,16 +20,26 @@ function ProductVariantCreate({ open, onClose, productId, onReload }) {
                 basePrice: values.basePrice,
                 status: values.status || "ACTIVE"
             };
+            const res = await createProductVariant(productId, payload);
+            const newVariantId = res.data?.productVariantId || res.productVariantId;
+            if (fileList.length > 0 && newVariantId) {
+                const formData = new FormData();
+                formData.append("image", fileList[0].originFileObj);
+                formData.append("isPrimary", true);
+                formData.append("status", "ACTIVE");
 
-            await createProductVariant(productId, payload);
+                await createVariantImage(productId, newVariantId, formData);
+            }
             message.success("Tạo biến thể thành công!");
-
             form.resetFields();
+            setFileList([]);
             onReload();
             onClose();
         } catch (err) {
             console.error(err);
             message.error("Tạo biến thể thất bại");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -76,9 +89,27 @@ function ProductVariantCreate({ open, onClose, productId, onReload }) {
                     </Col>
                 </Row>
 
-                <Form.Item label="Giá cơ bản (VNĐ)" name="basePrice" rules={[{ required: true, type: 'number', min: 1 }]}>
-                    <InputNumber style={{ width: '100%' }} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => value.replace(/\$\s?|(,*)/g, '')} />
-                </Form.Item>
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item label="Giá cơ bản (VNĐ)" name="basePrice" rules={[{ required: true, type: 'number', min: 1 }]}>
+                            <InputNumber style={{ width: '100%' }} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => value.replace(/\$\s?|(,*)/g, '')} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item label="Hình ảnh (Tùy chọn)">
+                            <Upload
+                                beforeUpload={() => false} 
+                                maxCount={1}
+                                listType="picture"
+                                fileList={fileList}
+                                onChange={({ fileList: newFileList }) => setFileList(newFileList)}
+                                accept="image/*"
+                            >
+                                <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+                            </Upload>
+                        </Form.Item>
+                    </Col>
+                </Row>
 
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
                     <Button onClick={onClose}>Hủy</Button>
