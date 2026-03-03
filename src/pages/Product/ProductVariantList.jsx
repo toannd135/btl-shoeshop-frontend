@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Table, Button, Popconfirm, message, Space } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import { getProductVariants, deleteProductVariant } from "../../services/productService";
+import { getProductVariants, deleteProductVariant, getVariantImages } from "../../services/productService";
 import ProductVariantCreate from "./ProductVariantCreate";
 import ProductVariantUpdate from "./ProductVariantUpdate";
 
@@ -18,7 +18,23 @@ function ProductVariantList({ productId, productName, productBrand, productImage
         setLoading(true);
         try {
             const res = await getProductVariants(productId);
-            setVariants(res.data || res || []);
+            const variantsData = res.data || res || [];
+            const variantsWithImages = await Promise.all(
+                variantsData.map(async (variant) => {
+                    try {
+                        const imageRes = await getVariantImages(productId, variant.productVariantId);
+                        const images = imageRes.data || imageRes || [];
+                        const primaryImg = images.find(img => img.isPrimary) || images[0];
+                        return {
+                            ...variant,
+                            imageURL: primaryImg ? primaryImg.imageURL : null
+                        };
+                    } catch (err) {
+                        return { ...variant, imageURL: null };
+                    }
+                })
+            );
+            setVariants(variantsWithImages);
         } catch (error) {
             console.error("Lỗi khi tải biến thể:", error);
             message.error("Không thể tải danh sách biến thể");
@@ -69,10 +85,30 @@ function ProductVariantList({ productId, productName, productBrand, productImage
     };
     const columns = [
         {
+            title: "Hình ảnh",
+            dataIndex: "imageURL", 
+            key: "imageURL",
+            width: 80,
+            align: "center",
+            render: (url) => (
+                <img
+                    src={url || "https://placehold.co/40x40?text=No+Image"} 
+                    alt="variant"
+                    style={{ 
+                        width: 40, 
+                        height: 40, 
+                        objectFit: "cover", 
+                        borderRadius: 4, 
+                        border: "1px solid #f0f0f0" 
+                    }}
+                />
+            )
+        },
+        {
             title: "Màu",
             dataIndex: "color",
             key: "color",
-            width: 80, 
+            width: 60, 
             align: "center", 
             render: (color) => (
                 <div style={{ display: "flex", justifyContent: "center" }}>
