@@ -1,4 +1,4 @@
-.header {
+.home-header {
     position: absolute;
     width: 100%;
     top: 0;
@@ -7,22 +7,26 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 10;
-
+    z-index: 1000; 
     background: rgba(16, 15, 15, 0.5);
 }
 
-.logo {
+.home-logo {
     font-size: 24px;
     font-weight: bold;
     color: red;
 }
 
-.logo span {
+.home-logo span {
     color: white;
 }
 
-.nav a {
+.home-nav {
+    display: flex;
+    align-items: center;
+}
+
+.home-nav a {
     margin: 0 15px;
     text-decoration: none;
     color: white;
@@ -30,11 +34,50 @@
     transition: 0.3s;
 }
 
-.nav a:hover {
+.home-nav a:hover {
     color: orange;
 }
 
-.header-icons .icon {
+.nav-item-dropdown {
+    position: relative; 
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none; 
+    position: absolute; 
+    top: 100%; 
+    left: 15px; 
+    background-color: #222; 
+    min-width: 250px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); 
+    z-index: 1;
+    border-radius: 4px;
+    padding: 10px 0;
+}
+
+.nav-item-dropdown:hover .dropdown-content {
+    display: flex;
+    flex-direction: column; 
+}
+
+.dropdown-content .dropdown-item {
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    display: block;
+    margin: 0; 
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
+
+.dropdown-content .dropdown-item:hover {
+    background-color: #444; 
+    color: orange;
+}
+
+.home-header-icons .home-icon {
     margin-left: 20px;
     text-decoration: none;
     color: white;
@@ -42,6 +85,6 @@
     transition: 0.3s;
 }
 
-.header-icons .icon:hover {
+.home-header-icons .home-icon:hover {
     color: orange;
 }
