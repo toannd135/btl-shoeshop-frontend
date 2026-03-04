@@ -9,7 +9,7 @@ const Otp = () => {
 
                 {/* LEFT */}
                 <div className="forgot-left">
-                    <h2>Xác thực OTP</h2>
+                    <h2 >Xác thực OTP</h2>
 
                     <div className="form-group">
                         <label>Mã OTP gồm 6 số</label>

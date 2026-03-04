@@ -1,5 +1,5 @@
 import React from "react";
-import "./resetPassword.css";
+import "./resetpassword.css";
 import logo from "../../images/logoPtitShoesShoppng.png";
 
 const CreatePassword = () => {
@@ -9,7 +9,7 @@ const CreatePassword = () => {
 
                 {/* LEFT */}
                 <div className="forgot-left">
-                    <h2>Tạo mật khẩu</h2>
+                    <h2 >Tạo mật khẩu</h2>
 
                     <div className="form-group">
                         <label>Mật khẩu mới</label>

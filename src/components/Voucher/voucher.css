@@ -56,6 +56,7 @@
     font-size: 22px;
     font-weight: 700;
     margin-bottom: 10px;
+    color: #38434F;
 }
 
 .voucher-desc {
@@ -71,7 +72,7 @@
     padding: 12px;
     border-radius: 30px;
     border: none;
-    background: #111;
+    background: #38434F;
     color: white;
     font-weight: 600;
     cursor: pointer;
