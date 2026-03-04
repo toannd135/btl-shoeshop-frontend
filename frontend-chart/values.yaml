@@ -3,11 +3,10 @@ replicaCount: 2
 image:
   repository: "toannd135/shoeshop-frontend"
   tag: "v1.1.5"
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 service:
   port: 80
-  targetPort: 5173
   type: LoadBalancer
   name: shoeshop-frontend
 
