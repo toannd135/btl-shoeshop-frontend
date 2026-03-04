@@ -1,7 +1,7 @@
 /* WRAPPER */
 .forgot-wrapper {
     height: 100vh;
-    background: #e5e5e5;
+    background: #F8F9FA;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -31,6 +31,7 @@
     margin-bottom: 30px;
     font-size: 24px;
     font-weight: 600;
+    color: #38434F;
 }
 
 .form-group {
@@ -53,28 +54,30 @@
 }
 
 .form-group input:focus {
-    border-color: #ff3b30;
+    border-color: #F8F9FA;
 }
 
 .forgot-btn {
     margin-top: 20px;
     padding: 12px;
-    background: #ff3b30;
+    background: #38434F;
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     transition: 0.3s;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 .forgot-btn:hover {
-    background: #e6352b;
+    background: #2B343F;
 }
 
 /* RIGHT SIDE */
 .forgot-right {
     flex: 1;
-    background: #ff4d4f;
+    background: #F8F9FA;
     display: flex;
     justify-content: center;
     align-items: center;
