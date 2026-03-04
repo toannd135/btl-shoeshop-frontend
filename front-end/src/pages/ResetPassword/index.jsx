@@ -1,5 +1,5 @@
 import React from "react";
-import "./resetPassword.css";
+import "./resetpassword.css";
 import logo from "../../images/logoPtitShoesShoppng.png";
 
 const CreatePassword = () => {
