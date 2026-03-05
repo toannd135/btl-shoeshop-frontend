@@ -144,7 +144,7 @@ pipeline {
                     }
                     
                     sh """
-                        docker push ${env.IMAGE_NAME}:${env.TAG_NAME}
+                        docker push ${env.IMAGE_NAME}:${env.IMAGE_TAG}
                     
                     """
                     
