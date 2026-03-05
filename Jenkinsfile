@@ -247,7 +247,7 @@ pipeline {
     //         }
     //     }
     // }
-    
+    }
     post {
         always {
             echo " Cleaning up frontend build..."
