@@ -133,22 +133,17 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    echo " Pushing frontend image to Docker Hub..."
-                    
+                    echo "Pushing Docker image to registry..."
+
                     withCredentials([usernamePassword(
-                        credentialsId: env.DOCKER_HUB_CREDENTIALS, 
-                        passwordVariable: 'DOCKER_PASSWORD', 
-                        usernameVariable: 'DOCKER_USERNAME'
+                        credentialsId: env.DOCKER_CREDENTIALS ,
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
                     )]) {
-                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                        sh " echo ${env.DOCKER_PASSWORD} | docker login -u ${env.DOCKER_USERNAME} --password-stdin"
+                        sh " docker push ${env.IMAGE_NAME}:${env.IMAGE_TAG}"
                     }
-                    
-                    sh """
-                        docker push ${env.IMAGE_NAME}:${env.IMAGE_TAG}
-                    
-                    """
-                    
-                    echo " Successfully pushed frontend image to Docker Hub!"
+                    echo "Docker image pushed successfully!"
                 }
             }
         }
