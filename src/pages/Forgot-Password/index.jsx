@@ -16,7 +16,9 @@ const ForgotPassword = () => {
         try {
             const response = await forgotPassword({ email });
             alert("Mã OTP đã được gửi đến email của bạn.");
-            navigate("/otp", { state: { email } });
+            const apiTime = response.data?.timeToLive;
+            const timeToLive = apiTime ? apiTime * 60 : 180;
+            navigate("/otp", { state: { email, timeToLive } });
         } catch (error) {
             alert(error.message || "Có lỗi xảy ra khi gửi yêu cầu.");
         }
