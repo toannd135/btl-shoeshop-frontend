@@ -1,4 +1,4 @@
-import {getAccessToken} from "./tokenStore";
+import { getAccessToken } from "./tokenStore";
 
 const API_DOMAIN = "http://localhost:8080/api/v1/";
 
@@ -22,7 +22,7 @@ const handleResponse = async (response) => {
     if (response.status === 204) {
         return null;
     }
-    
+
     const contentType = response.headers.get("content-type");
 
     let result = null;
@@ -58,7 +58,7 @@ export const sendForm = async (path, method = "POST", formData) => {
         credentials: "include"
     });
 
-    return handleResponse(response); 
+    return handleResponse(response);
 };
 
 export const get = async (path) => {
@@ -73,8 +73,13 @@ export const get = async (path) => {
 
 export const post = async (path, body = {}) => {
     const headers = getHeaders();
-
-    if (path === "auth/login" || path === "auth/register") {
+    if (
+        path === "auth/login" ||
+        path === "auth/register" ||
+        path === "auth/forgot-password" ||
+        path === "auth/verify-otp" ||
+        path === "auth/reset-password"
+    ) {
         delete headers.Authorization;
     }
 
@@ -122,7 +127,7 @@ export const edit = async (path, body = {}) => {
 };
 
 export const getPage = async (path, params = {}) => {
-    
+
     const cleanParams = Object.entries(params).reduce((acc, [k, v]) => {
         if (v !== undefined && v !== "") acc[k] = v;
         return acc;

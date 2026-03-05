@@ -17,3 +17,15 @@ export const register = async (data) => {
 export const refreshToken = () => {
     return post("auth/refresh-token");
 };
+
+export const verifyOtp = async (data) => {
+    return post("auth/verify-otp", data);
+};
+
+export const forgotPassword = async (data) => {
+    return post("auth/forgot-password", data);
+};
+
+export const resetPassword = async (data) => {
+    return post("auth/reset-password", data);
+};
