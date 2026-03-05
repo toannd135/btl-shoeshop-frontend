@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./resetPassword.css";
+import "./resetpassword.css";
 import logo from "../../images/logoPtitShoesShoppng.png";
 import { resetPassword } from "../../services/authService";
 
