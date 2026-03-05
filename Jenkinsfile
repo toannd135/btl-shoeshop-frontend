@@ -179,24 +179,14 @@ pipeline {
                     echo " Updating frontend Helm values with new image version..."
                     
                     dir('config-repo') {
-                      
-                        echo "Current frontend helm values:"
-                        sh 'cat helm-values/values-prod.yaml | grep -A3 -B3 tag || echo "Tag not found in current format"'
-                        
-                        
+                        def tagName = env.IMAGE_TAG
+                        echo "Updating with tag: ${tagName}"
+
                         sh """
-                            # Update tag field for frontend
-                            sed -i 's/^  tag.*/  tag: "${env.IMAGE_TAG}"/' helm-values/values-prod.yaml 
+                            sed -i 's/^  tag:.*/  tag: "${tagName}"/' frontend-chart/values.yaml
                         """
                         
-                        
-                        echo "Updated frontend helm values:"
-                        sh 'cat helm-values/values-prod.yaml | grep -A3 -B3 tag'
-                        
-                        
-                        sh 'git diff helm-values/values-prod.yaml || echo "No changes detected"'
-                        
-                        echo " Frontend Helm values updated successfully!"
+                        sh "grep 'tag:' frontend-chart/values.yaml"
                     }
                 }
             }
@@ -221,7 +211,7 @@ pipeline {
                                 git add .
                                 git commit -m " Update frontend image version to ${env.IMAGE_TAG}
                                 
-                                - Updated helm-values/values-prod.yaml
+                                - Updated frontend-chart/values-prod.yaml
                                 - Image: ${env.IMAGE_NAME}:${env.IMAGE_TAG}
                                 - Build: ${env.BUILD_NUMBER}
                                 - Jenkins Job: ${env.JOB_NAME}
