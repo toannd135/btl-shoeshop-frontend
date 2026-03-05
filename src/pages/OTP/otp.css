@@ -1,7 +1,7 @@
 /* Wrapper */
 .otp-wrapper {
     min-height: 100vh;
-    background: #f0f2f5;
+    background: #F8F9FA;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -26,8 +26,9 @@
 
 .otp-left h2 {
     margin-bottom: 30px;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 600;
+    color: #38434F;
 }
 
 /* Form */
@@ -55,7 +56,7 @@
 }
 
 .otp-inputs input:focus {
-    border-color: #ff3b30;
+    border-color: #F8F9FA;
 }
 
 /* Button */
@@ -65,21 +66,22 @@
     height: 45px;
     border: none;
     border-radius: 8px;
-    background: #ff3b30;
+    background: #38434F;
     color: white;
     font-weight: 600;
     cursor: pointer;
     transition: 0.3s;
+    font-size: 16px;
 }
 
 .otp-btn:hover {
-    background: #e60023;
+    background: #2B343F;
 }
 
 /* RIGHT */
 .otp-right {
     flex: 1;
-    background: #ff4d4f;
+    background: #F8F9FA;
     display: flex;
     justify-content: center;
     align-items: center;

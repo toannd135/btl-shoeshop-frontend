@@ -9,20 +9,15 @@ const ForgotPassword = () => {
     const navigate = useNavigate();
 
     const handleSendRequest = async () => {
-        alert("🟢 TEST: Nút bấm đã nhận lệnh!");
-        console.log("👉 Bắt đầu gửi email:", email);
         if (!email) {
             alert("Vui lòng nhập email!");
             return;
         }
         try {
-            console.log("👉 Đang gọi API forgotPassword...");
             const response = await forgotPassword({ email });
-            console.log("✅ API trả về:", response);
             alert("Mã OTP đã được gửi đến email của bạn.");
             navigate("/otp", { state: { email } });
         } catch (error) {
-            console.error("🛑 LỖI RỒI NÀY:", error);
             alert(error.message || "Có lỗi xảy ra khi gửi yêu cầu.");
         }
     };

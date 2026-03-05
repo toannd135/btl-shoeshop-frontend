@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 
 import slide1 from "../../images/slide1.png";
 import slide2 from "../../images/slide2.png";
+// import slide3 from "../../images/slide3.png";
+// import slide4 from "../../images/slide4.png";
+
 import i1 from "../../images/coll_1.png";
 import i2 from "../../images/coll_2.png";
 import i3 from "../../images/coll_3.png";
@@ -25,8 +28,8 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 const Home = () => {
     const slides = [
-        { image: slide1, title: "NƠI HIỆU SUẤT GẶP GỠ PHONG CÁCH HẰNG NGÀY" },
-        { image: slide2, title: "TỰ TIN THỂ HIỆN PHONG CÁCH CỦA BẠN" },
+        { image: slide1 },
+        { image: slide2 }
     ];
 
     const [current, setCurrent] = useState(0);
@@ -52,7 +55,7 @@ const Home = () => {
 
     useEffect(() => {
         const targetDate = new Date();
-        targetDate.setHours(targetDate.getHours() + 12); // 12 tiếng nữa kết thúc
+        targetDate.setHours(targetDate.getHours() + 12); 
 
         const timer = setInterval(() => {
             const now = new Date();
@@ -84,12 +87,12 @@ const Home = () => {
                     className="slide"
                     style={{ backgroundImage: `url(${slides[current].image})` }}
                 >
-                    <div className="overlay">
+                    {/* <div className="overlay">
                         <h1>{slides[current].title}</h1>
                         <Link to="/products" className="btn">
                             Khám phá ngay →
                         </Link>
-                    </div>
+                    </div> */}
                 </div>
 
                 <button className="next" onClick={nextSlide}>❯</button>
