@@ -178,75 +178,75 @@ pipeline {
             }
         }
         
-        stage('Update Frontend Helm Values') {
-            steps {
-                script {
-                    echo " Updating frontend Helm values with new image version..."
+    //     stage('Update Frontend Helm Values') {
+    //         steps {
+    //             script {
+    //                 echo " Updating frontend Helm values with new image version..."
                     
-                    dir('config-repo') {
+    //                 dir('config-repo') {
                       
-                        echo "Current frontend helm values:"
-                        sh 'cat helm-values/values-prod.yaml | grep -A3 -B3 tag || echo "Tag not found in current format"'
+    //                     echo "Current frontend helm values:"
+    //                     sh 'cat helm-values/values-prod.yaml | grep -A3 -B3 tag || echo "Tag not found in current format"'
                         
                         
-                        sh """
-                            # Update tag field for frontend
-                            sed -i 's/^  tag.*/  tag: "${env.TAG_NAME}"/' helm-values/values-prod.yaml 
-                        """
+    //                     sh """
+    //                         # Update tag field for frontend
+    //                         sed -i 's/^  tag.*/  tag: "${env.TAG_NAME}"/' helm-values/values-prod.yaml 
+    //                     """
                         
                         
-                        echo "Updated frontend helm values:"
-                        sh 'cat helm-values/values-prod.yaml | grep -A3 -B3 tag'
+    //                     echo "Updated frontend helm values:"
+    //                     sh 'cat helm-values/values-prod.yaml | grep -A3 -B3 tag'
                         
                         
-                        sh 'git diff helm-values/values-prod.yaml || echo "No changes detected"'
+    //                     sh 'git diff helm-values/values-prod.yaml || echo "No changes detected"'
                         
-                        echo " Frontend Helm values updated successfully!"
-                    }
-                }
-            }
-        }
+    //                     echo " Frontend Helm values updated successfully!"
+    //                 }
+    //             }
+    //         }
+    //     }
         
-        stage('Push Frontend Config Changes') {
-            steps {
-                script {
-                    echo " Pushing frontend changes to config repository..."
+    //     stage('Push Frontend Config Changes') {
+    //         steps {
+    //             script {
+    //                 echo " Pushing frontend changes to config repository..."
                     
-                    dir('config-repo') {
+    //                 dir('config-repo') {
                      
-                        def gitStatus = sh(
-                            script: 'git status --porcelain',
-                            returnStdout: true
-                        ).trim()
+    //                     def gitStatus = sh(
+    //                         script: 'git status --porcelain',
+    //                         returnStdout: true
+    //                     ).trim()
                         
-                        if (gitStatus) {
-                            echo "Frontend changes detected, committing and pushing..."
+    //                     if (gitStatus) {
+    //                         echo "Frontend changes detected, committing and pushing..."
                             
-                            sh """
-                                git add .
-                                git commit -m " Update frontend image version to ${env.TAG_NAME}
+    //                         sh """
+    //                             git add .
+    //                             git commit -m " Update frontend image version to ${env.TAG_NAME}
                                 
-                                - Updated helm-values/values-prod.yaml
-                                - Image: ${env.IMAGE_NAME}:${env.TAG_NAME}
-                                - Build: ${env.BUILD_NUMBER}
-                                - Jenkins Job: ${env.JOB_NAME}
-                                - Frontend deployment update"
-                            """
+    //                             - Updated helm-values/values-prod.yaml
+    //                             - Image: ${env.IMAGE_NAME}:${env.TAG_NAME}
+    //                             - Build: ${env.BUILD_NUMBER}
+    //                             - Jenkins Job: ${env.JOB_NAME}
+    //                             - Frontend deployment update"
+    //                         """
                             
                             
-                            withCredentials([gitUsernamePassword(credentialsId: env.GITHUB_CREDENTIALS, gitToolName: 'Default')]) {
-                                sh 'git push origin main'
-                            }
+    //                         withCredentials([gitUsernamePassword(credentialsId: env.GITHUB_CREDENTIALS, gitToolName: 'Default')]) {
+    //                             sh 'git push origin main'
+    //                         }
                             
-                            echo " Frontend config changes pushed successfully!"
-                        } else {
-                            echo " No changes detected in frontend config repo"
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //                         echo " Frontend config changes pushed successfully!"
+    //                     } else {
+    //                         echo " No changes detected in frontend config repo"
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
     
     post {
         always {
