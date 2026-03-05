@@ -1,6 +1,6 @@
 import {getAccessToken} from "./tokenStore";
 
-const API_DOMAIN = "http://localhost:8080/api/v1/";
+const API_DOMAIN = "http://34.124.205.221:80/api/v1/";
 
 const getHeaders = () => {
     const token = getAccessToken();
