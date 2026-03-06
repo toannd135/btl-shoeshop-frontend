@@ -159,7 +159,7 @@ function ProductDetail() {
     return (
         <div>
             <div className="pro-breadcrumb" style={{ maxWidth: '1200px', margin: '20px auto', padding: '0 20px', color: '#666', fontSize: '14px' }}>
-                <Link to="/home" style={{ color: '#666', textDecoration: 'none' }}>Trang chủ</Link> 
+                <Link to="/" style={{ color: '#666', textDecoration: 'none' }}>Trang chủ</Link> 
                 <span style={{ margin: '0 10px' }}>/</span> 
                 <span>{product.name}</span>
             </div>

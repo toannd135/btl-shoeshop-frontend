@@ -17,6 +17,7 @@ import ResetPassword from "../pages/ResetPassword/index";
 import { Outlet } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { Navigate } from "react-router-dom";
 const ClientLayout = () => {
     return (
         <div className="client-layout">
@@ -58,17 +59,17 @@ export const routes = [
         element: <ClientLayout />,
         children: [
             {
-                path: "/home",
+                index: true,
                 element: <Home />
             },
             {
-                path: "/productDetail/:id",
+                path: "productDetail/:id",
                 element: <ProductDetail />
             },
         ]
     },
     {
-        path: "/",
+        path: "/admin",
         element: (
             <ProtectRoute allowedRoles={['ROLE_ADMIN']}>
                 <LayoutDefault />

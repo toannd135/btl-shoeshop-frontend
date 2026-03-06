@@ -39,9 +39,9 @@ function Login() {
             });
 
             if (user.roleCode === 'ADMIN' || user.roleCode === 'ROLE_ADMIN') {
-                navigate("/");
+                navigate("/admin");
             }
-            else navigate("/home");
+            else navigate("/");
         } catch (err) {
             notification.error({
                 message: "Đăng nhập thất bại!",

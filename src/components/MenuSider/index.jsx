@@ -7,36 +7,36 @@ function MenuSider() {
     const location = useLocation();
     const items = [
         {
-            label: <Link to="/">Trang chủ</Link>,
+            label: <Link to="/admin">Trang chủ</Link>,
             icon: <DashboardOutlined />,
-            key: '/',
+            key: '/admin',
         },
         {
-            label: <Link to="/user">Người dùng</Link>,
+            label: <Link to="/admin/user">Người dùng</Link>,
             icon: <UserOutlined />,
-            key: "/user",
+            key: "/admin/user",
         },
         {
-            label: <Link to="/permission">Phân quyền</Link>,
+            label: <Link to="/admin/permission">Phân quyền</Link>,
             icon: <AuditOutlined />,
-            key: "/permission",
+            key: "/admin/permission",
         },
         {
-            label: <Link to="/role">Vai trò</Link>,
+            label: <Link to="/admin/role">Vai trò</Link>,
             icon: <BarsOutlined />,
-            key: "/role",
+            key: "/admin/role",
         },
         {
-            label: <Link to="/category">Danh mục</Link>,
+            label: <Link to="/admin/category">Danh mục</Link>,
             icon: <BookOutlined />,
-            key: "/category"
+            key: "/admin/category"
         },
         {
-            label: <Link to="/product">Sản phẩm</Link>,
+            label: <Link to="/admin/product">Sản phẩm</Link>,
             icon: <AppstoreOutlined />,
-            key: "/product"
+            key: "/admin/product"
         }
-    ]
+    ];
     return (
         <>
 

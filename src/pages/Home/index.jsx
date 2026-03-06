@@ -198,7 +198,7 @@ const Home = () => {
 
             <ProductHighlight />
 
-            <Footer />
+            {/* <Footer /> */}
 
         </div>
     );
