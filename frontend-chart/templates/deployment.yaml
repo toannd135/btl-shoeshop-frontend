@@ -2,43 +2,49 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "frontend-chart.fullname" . }}
-  labels: {{ include "frontend-chart.selectorLabels" . | nindent 4}}
+  labels: {{ include "frontend-chart.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels: {{ include "frontend-chart.selectorLabels" . | nindent 6 }}
-  template: 
+  template:
     metadata:
       labels: {{ include "frontend-chart.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-      - name: {{ .Chart.Name }}
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }} 
-        ports:
-        - containerPort: 80
-          name: http
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
 
-        volumeMounts:
-        - name: nginx-config
-          mountPath: /etc/nginx/conf.d/default.conf
-          subPath: default.conf
-
-      volumes:
-      - name: nginx-config
-        configMap:
-          name: {{ include "frontend-chart.fullname" . }}-configmap
+          {{- if .Values.healthCheck.enable }}
+          livenessProbe: {{- toYaml .Values.healthCheck.livenessProbe | nindent 12 }}
+          readinessProbe: {{- toYaml .Values.healthCheck.readinessProbe | nindent 12 }}
+          {{- end }}
           
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/
+              
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ include "frontend-chart.fullname" . }}-nginx-config
+
+
       {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
       {{- end }}
-      
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      
+
       {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}    
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}
