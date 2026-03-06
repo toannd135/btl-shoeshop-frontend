@@ -14,22 +14,33 @@ import Home from "../pages/Home/index";
 import ForgotPassword from "../pages/Forgot-Password/index";
 import OTP from "../pages/OTP/index";
 import ResetPassword from "../pages/ResetPassword/index";
+import { Outlet } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+const ClientLayout = () => {
+    return (
+        <div className="client-layout">
+            <Header />
+            <main className="main-content">
+                <Outlet />
+            </main>
+            <Footer />
+        </div>
+    );
+};
+
 export const routes = [
     {
         path: "/login",
-        element: <Login/>
+        element: <Login />
     },
     {
         path: "/oauth2/redirect",
-        element: <OAuth2RedirectHandler/>
+        element: <OAuth2RedirectHandler />
     },
     {
         path: "/register",
-        element: <Register/>
-    },
-    {
-        path: "/home",
-        element: <Home/>
+        element: <Register />
     },
     {
         path: "/forgot-password",
@@ -44,14 +55,23 @@ export const routes = [
         element: <ResetPassword />
     },
     {
-        path: "/productDetail/:id",
-        element: <ProductDetail/>
+        element: <ClientLayout />,
+        children: [
+            {
+                path: "/home",
+                element: <Home />
+            },
+            {
+                path: "/productDetail/:id",
+                element: <ProductDetail />
+            },
+        ]
     },
     {
         path: "/",
         element: (
             <ProtectRoute allowedRoles={['ROLE_ADMIN']}>
-                <LayoutDefault/>
+                <LayoutDefault />
             </ProtectRoute>
         ),
         children: [
@@ -61,23 +81,23 @@ export const routes = [
             },
             {
                 path: "user",
-                element: <UserList/>,
+                element: <UserList />,
             },
             {
                 path: "permission",
-                element: <PermissionList/>,
+                element: <PermissionList />,
             },
             {
                 path: "role",
-                element: <RoleList/>,
+                element: <RoleList />,
             },
             {
                 path: "category",
-                element: <CateList/>
+                element: <CateList />
             },
             {
                 path: "product",
-                element: <ProductList/>
+                element: <ProductList />
             }
         ]
     }

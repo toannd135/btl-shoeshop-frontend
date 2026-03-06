@@ -1,7 +1,7 @@
 import { getAccessToken } from "./tokenStore";
 
 const API_DOMAIN = "http://localhost:8080/api/v1/";
-
+// const API_DOMAIN = import.meta.env.VITE_API_BASE_URL;
 const getHeaders = () => {
     const token = getAccessToken();
 

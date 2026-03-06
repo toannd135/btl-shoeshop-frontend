@@ -1,19 +1,23 @@
+.pro-container * {
+    font-family: inherit;
+}
+
 .pro-breadcrumb {
     max-width: 1200px;
     margin: 20px auto;
     padding: 0 20px;
-    color: #666;
+    color: #38434F;
     font-size: 14px;
 }
 
 .pro-breadcrumb a {
-    color: #666;
+    color: #38434F;
     text-decoration: none;
-    transition: color 0.2s;
+    transition: opacity 0.2s;
 }
 
 .pro-breadcrumb a:hover {
-    color: #111;
+    opacity: 0.8;
 }
 
 .pro-breadcrumb .divider {
@@ -28,7 +32,7 @@
     max-width: 1200px;
     margin: 40px auto;
     padding: 0 20px;
-    color: #333;
+    color: #38434F; /* Đã đổi màu chủ đạo */
     align-items: start;
 }
 
@@ -97,7 +101,7 @@
 }
 
 .pro-thumbnail.active {
-    border: 2px solid #000; 
+    border: 2px solid #38434F; 
 }
 
 .pro-right {
@@ -105,29 +109,33 @@
     flex-direction: column;
 }
 
+/* TÊN SẢN PHẨM - IN ĐẬM VÀ ĐỔI MÀU */
 .pro-name {
     font-size: 26px;
-    font-weight: 700;
+    font-weight: bold; /* In đậm */
     line-height: 1.3;
     margin: 0 0 12px 0;
-    color: #111;
+    color: #38434F; 
 }
 
+/* THƯƠNG HIỆU - IN ĐẬM VÀ ĐỔI MÀU */
 .pro-brand {
     font-size: 14px;
-    color: #555;
+    color: #38434F;
+    font-weight: bold; /* In đậm */
     display: flex;
     align-items: center;
 }
 
 .pro-brand strong {
-    color: #111;
+    color: #38434F;
     margin-left: 4px;
 }
 
 .pro-brand .divider {
     margin: 0 10px;
     color: #ccc;
+    font-weight: normal; /* Dấu gạch chia không cần in đậm */
 }
 
 .pro-price-box {
@@ -136,10 +144,11 @@
     border-bottom: 1px solid #eee;
 }
 
+/* GIÁ TIỀN - IN ĐẬM VÀ ĐỔI MÀU */
 .pro-price-current {
     font-size: 32px;
-    font-weight: 700;
-    color: #d70018; 
+    font-weight: bold; /* In đậm */
+    color: #38434F; /* Đã đổi sang màu yêu cầu */
 }
 
 .pro-coupon {
@@ -161,14 +170,14 @@
     margin: 0;
     font-size: 14px;
     line-height: 1.6;
-    color: #444;
+    color: #38434F;
 }
 
 .label {
     display: block;
     font-size: 15px;
     margin-bottom: 12px;
-    color: #333;
+    color: #38434F;
 }
 
 .pro-color {
@@ -192,7 +201,7 @@
 }
 
 .color-circle.active {
-    box-shadow: 0 0 0 1px #000;
+    box-shadow: 0 0 0 1px #38434F; /* Đổi màu viền active */
 }
 
 .pro-size {
@@ -216,17 +225,18 @@
     font-weight: 500;
     transition: all 0.2s ease;
     background-color: #fff;
+    color: #38434F;
 }
 
 .size-item:hover:not(.out-of-stock) {
-    border-color: #111;
-    color: #111;
+    border-color: #38434F;
+    color: #38434F;
 }
 
 .size-item.active {
-    background-color: #111;
+    background-color: #38434F;
     color: #fff;
-    border-color: #111;
+    border-color: #38434F;
 }
 
 .size-item.out-of-stock {
@@ -255,7 +265,7 @@
     border: none;
     padding: 10px 18px;
     font-size: 18px;
-    color: #555;
+    color: #38434F;
     cursor: pointer;
     transition: background 0.2s;
 }
@@ -274,7 +284,7 @@
     font-weight: 600;
     padding: 10px 0;
     outline: none;
-    color: #111;
+    color: #38434F;
 }
 
 .pro-action {
@@ -298,9 +308,9 @@
 }
 
 .btn-buy-now {
-    background-color: #fff;
-    color: #111;
-    border: 1px solid #111;
+    background-color: #DA291C;
+    color: #fff;
+    border: 1px solid #DA291C;
 }
 
 .btn-buy-now:hover:not(:disabled) {
@@ -308,13 +318,13 @@
 }
 
 .btn-add-cart {
-    background-color: #111;
-    color: #fff;
-    border: 1px solid #111;
+    background-color: transparent;
+    color: #38434F;
+    border: 1px solid #38434F;
 }
 
 .btn-add-cart:hover:not(:disabled) {
-    background-color: #333;
+    opacity: 0.9;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
@@ -337,6 +347,7 @@
     list-style: none; 
     display: flex;
     justify-content: space-between;
+    color: #38434F;
 }
 
 .pro-des summary::-webkit-details-marker {
@@ -347,7 +358,7 @@
     margin-top: 15px;
     font-size: 15px;
     line-height: 1.6;
-    color: #555;
+    color: #38434F;
 }
 
 @media (max-width: 900px) {
