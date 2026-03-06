@@ -1,90 +1,161 @@
-.home-header {
-    position: absolute;
-    width: 100%;
-    top: 0;
-    left: 0;
-    padding: 20px 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1000; 
-    background: rgba(16, 15, 15, 0.5);
+:root {
+    --header-height: 80px;
+    --text-color: black;
 }
 
-.home-logo {
+/* LOGO */
+.logo {
     font-size: 24px;
     font-weight: bold;
     color: red;
+    cursor: pointer;
 }
 
-.home-logo span {
-    color: white;
+.logo span {
+    color: black;
 }
 
-.home-nav {
+.header {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    height: var(--header-height);
+    padding: 0 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    z-index: 1000;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.04),
+        0 8px 25px rgba(0, 0, 0, 0.10),
+        0 20px 50px rgba(0, 0, 0, 0.06);
+}
+
+/* NAV */
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 35px;
+}
+
+.menu-item {
+    position: relative;
     display: flex;
     align-items: center;
 }
 
-.home-nav a {
-    margin: 0 15px;
+.nav a {
     text-decoration: none;
-    color: white;
+    color: var(--text-color);
     font-weight: 500;
-    transition: 0.3s;
+    font-size: 16px;
 }
 
-.home-nav a:hover {
+.nav a:hover {
     color: orange;
 }
 
-.nav-item-dropdown {
-    position: relative; 
-    display: inline-block;
+.arrow {
+    margin-left: 6px;
+    font-size: 12px;
 }
 
-.dropdown-content {
-    display: none; 
-    position: absolute; 
-    top: 100%; 
-    left: 15px; 
-    background-color: #222; 
-    min-width: 250px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); 
-    z-index: 1;
-    border-radius: 4px;
-    padding: 10px 0;
-}
-
-.nav-item-dropdown:hover .dropdown-content {
+/* HEADER ICONS */
+.header-icons {
     display: flex;
-    flex-direction: column; 
+    align-items: center;
+    gap: 20px;
 }
 
-.dropdown-content .dropdown-item {
-    color: white;
-    padding: 10px 20px;
+.header-icons .icon {
     text-decoration: none;
-    display: block;
-    margin: 0; 
-    white-space: nowrap; 
-    overflow: hidden;
-    text-overflow: ellipsis; 
-}
-
-.dropdown-content .dropdown-item:hover {
-    background-color: #444; 
-    color: orange;
-}
-
-.home-header-icons .home-icon {
-    margin-left: 20px;
-    text-decoration: none;
-    color: white;
+    color: var(--text-color);
     font-weight: 500;
-    transition: 0.3s;
 }
 
-.home-header-icons .home-icon:hover {
-    color: orange;
+/* MEGA MENU */
+.mega-menu {
+    position: fixed;
+    left: 0;
+    top: var(--header-height);
+    width: 100%;
+    background: white;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    padding: 40px 120px;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.mega-menu::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 0;
+    width: 100%;
+    height: 20px;
+}
+
+.menu-item:hover .mega-menu {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* MEGA COL */
+.mega-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mega-col h4 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.mega-col a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 15px;
+    line-height: 1.5;
+    transition: 0.2s;
+}
+
+.mega-col a:hover {
+    color: red;
+}
+
+.icon {
+    position: relative;
+    color: var(--text-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.icon:hover {
+    color: red;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: red;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./Home.css";
 import { Link } from "react-router-dom";
 
-import slide1 from "../../images/slide1.png";
-import slide2 from "../../images/slide2.png";
+import slide1 from "../../images/slider1.png";
+import slide2 from "../../images/slider2.png";
 // import slide3 from "../../images/slide3.png";
 // import slide4 from "../../images/slide4.png";
 
@@ -55,7 +55,7 @@ const Home = () => {
 
     useEffect(() => {
         const targetDate = new Date();
-        targetDate.setHours(targetDate.getHours() + 12); 
+        targetDate.setHours(targetDate.getHours() + 12);
 
         const timer = setInterval(() => {
             const now = new Date();
