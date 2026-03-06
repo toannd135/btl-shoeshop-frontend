@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiUser, FiShoppingCart } from 'react-icons/fi';
 import "./header.css";
+import logoShoes from '../../images/logoPtitShoesShoppng.png';
 import { getProductList } from "../../services/productService";
 import { getCurrentUser } from "../../utils/tokenStore";
 import { Dropdown, message } from "antd";
@@ -84,7 +85,11 @@ const Header = () => {
 
     return (
         <header className={`header-client ${show ? '' : 'hidden'}`}>
-            <div className="logo">PTIT<span style={{ color: 'black' }}>SNEAKER</span></div>
+            <div className="logo-container">
+                <a href="/">
+                    <img src={logoShoes} alt="PTIT Sneaker Logo" className="logo" />
+                </a>
+            </div>
             <nav className="nav">
 
                 <Link to="/home">Trang chủ</Link>

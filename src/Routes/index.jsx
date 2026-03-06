@@ -58,7 +58,7 @@ export const routes = [
         element: <ClientLayout />,
         children: [
             {
-                path: "/home",
+                path: "/",
                 element: <Home />
             },
             {
@@ -68,7 +68,7 @@ export const routes = [
         ]
     },
     {
-        path: "/",
+        path: "/admin",
         element: (
             <ProtectRoute allowedRoles={['ROLE_ADMIN']}>
                 <LayoutDefault />
