@@ -3,7 +3,7 @@ import logoShoes from '../../images/logoPtitShoesShoppng.png';
 import { message, notification } from "antd";
 import { useState } from "react";
 import { login } from "../../services/authService";
-import { setAccessToken } from "../../utils/tokenStore";
+import { setAccessToken, setCurrentUser } from "../../utils/tokenStore";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
@@ -30,6 +30,8 @@ function Login() {
             const { accessToken, user } = res.data;
 
             setAccessToken(accessToken);
+            setCurrentUser(user);
+            window.dispatchEvent(new Event("loginSuccess"));
 
             notification.success({
                 message: "Đăng nhập thành công!",

@@ -19,3 +19,7 @@ export const createUser = async (data) => {
     const response = await post("users", data);
     return response;
 }
+export const getUserById = async (userId) => {
+    const response = await get(`users/${userId}`);
+    return response;
+}

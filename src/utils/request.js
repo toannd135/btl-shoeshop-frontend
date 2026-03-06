@@ -22,7 +22,6 @@ const handleResponse = async (response) => {
     if (response.status === 204) {
         return null;
     }
-
     const contentType = response.headers.get("content-type");
 
     let result = null;
@@ -127,7 +126,6 @@ export const edit = async (path, body = {}) => {
 };
 
 export const getPage = async (path, params = {}) => {
-
     const cleanParams = Object.entries(params).reduce((acc, [k, v]) => {
         if (v !== undefined && v !== "") acc[k] = v;
         return acc;

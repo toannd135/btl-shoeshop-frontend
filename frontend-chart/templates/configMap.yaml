@@ -5,8 +5,17 @@ metadata:
 data:
   default.conf: |
     server {
-        listen 80;
-        server_name _;
+      listen 80;
+      server_name shoeshopecommerce.dpdns.org;
+      return 301 https://$host$request_uri;
+    }
+
+    server {
+        listen 443 ssl;
+        server_name api.shoeshopecommerce.dpdns.org;
+
+        ssl_certificate /etc/nginx/ssl/server.crt;
+        ssl_certificate_key /etc/nginx/ssl/server.key;
 
         location / {
             root   /usr/share/nginx/html;
