@@ -2,7 +2,7 @@ replicaCount: 2
 
 image:
   repository: "toannd135/shoeshop-frontend"
-  tag: "cfa26c4"
+  tag: "0f53edb"
   pullPolicy: IfNotPresent
 
 service:
