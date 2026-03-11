@@ -18,6 +18,10 @@ import { Outlet } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Navigate } from "react-router-dom";
+import CouponList from "../pages/Coupon/CouponList";
+import ProductsPage from "../pages/ProductsPage/ProductsPage";
+import Cart from "../pages/Cart";
+import Checkout from "../pages/Checkout/Checkout";
 const ClientLayout = () => {
     return (
         <div className="client-layout">
@@ -63,9 +67,21 @@ export const routes = [
                 element: <Home />
             },
             {
-                path: "productDetail/:id",
-                element: <ProductDetail />
+                path: "productsPage",
+                element: <ProductsPage/>
             },
+            {
+                path: "productDetail/:id",
+                element: <ProductDetail />,
+            },
+            {
+                path: "cart",
+                element: <Cart/>
+            },
+            {
+                path: "checkout",
+                element: <Checkout/>
+            }
         ]
     },
     {
@@ -99,6 +115,10 @@ export const routes = [
             {
                 path: "product",
                 element: <ProductList />
+            },
+            {
+                path: "coupon",
+                element: <CouponList/>
             }
         ]
     }

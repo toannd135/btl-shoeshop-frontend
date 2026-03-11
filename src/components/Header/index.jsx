@@ -7,6 +7,7 @@ import { getCurrentUser } from "../../utils/tokenStore";
 import { Dropdown, message } from "antd";
 import { logout } from "../../services/authService";
 import { clearAccessToken, clearCurrentUser } from "../../utils/tokenStore";
+import { getMyCart } from "../../services/cartService";
 
 const Header = () => {
     const navigate = useNavigate();
@@ -14,19 +15,49 @@ const Header = () => {
     const [show, setShow] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [userProfile, setUserProfile] = useState(null);
+    const [cartCount, setCartCount] = useState(0);
+
     const fetchUserFromMemory = () => {
         const user = getCurrentUser();
         setUserProfile(user);
     };
+
+    const fetchCartCount = async () => {
+        const user = getCurrentUser();
+        if (!user) {
+            setCartCount(0);
+            return;
+        }
+        try {
+            const res = await getMyCart();
+            const items = res.data?.items || [];
+            // Cộng dồn tổng số lượng sản phẩm
+            const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+            setCartCount(totalQuantity);
+        } catch (error) {
+            console.error("Lỗi lấy số lượng giỏ hàng:", error);
+        }
+    };
+
     useEffect(() => {
         fetchUserFromMemory();
-        window.addEventListener("loginSuccess", fetchUserFromMemory);
-        window.addEventListener("logoutSuccess", fetchUserFromMemory);
+        fetchCartCount();
+        window.addEventListener("loginSuccess", () => {
+            fetchUserFromMemory();
+            fetchCartCount();
+        });
+        window.addEventListener("logoutSuccess", () => {
+            fetchUserFromMemory();
+            setCartCount(0);
+        });
+        window.addEventListener("cartUpdated", fetchCartCount);
         return () => {
             window.removeEventListener("loginSuccess", fetchUserFromMemory);
             window.removeEventListener("logoutSuccess", fetchUserFromMemory);
+            window.removeEventListener("cartUpdated", fetchCartCount);
         };
     }, []);
+    
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -87,10 +118,10 @@ const Header = () => {
             <div className="logo">PTIT<span style={{ color: 'black' }}>SNEAKER</span></div>
             <nav className="nav">
 
-                <Link to="/home">Trang chủ</Link>
+                <Link to="/">Trang chủ</Link>
 
                 <div className="menu-item">
-                    <Link to="/products" className="menu-link">
+                    <Link to="/productsPage" className="menu-link">
                         Sản phẩm <span className="arrow">▼</span>
                     </Link>
 
@@ -180,7 +211,9 @@ const Header = () => {
 
                 <Link to="/cart" className="icon cart-icon">
                     <FiShoppingCart size={24} />
-                    <span className="cart-badge">0</span>
+                    {cartCount > 0 && (
+                        <span className="cart-badge">{cartCount}</span>
+                    )}
                 </Link>
             </div>
 

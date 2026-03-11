@@ -1,0 +1,234 @@
+/* Bao quát trang */
+.products-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 15px;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 40px;
+}
+
+/* Khu vực Voucher */
+.voucher-section {
+  margin-bottom: 50px;
+}
+
+.voucher-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.voucher-title span {
+  color: #f53d2d; /* Màu đỏ cho chữ giảm giá */
+  font-weight: normal;
+}
+
+.voucher-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.voucher-card {
+  border: 1px solid #ebebeb;
+  border-radius: 12px;
+  padding: 20px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.voucher-badge {
+  display: inline-block;
+  background-color: #ff8c00;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  width: fit-content;
+}
+
+.voucher-card h3 {
+  font-size: 18px;
+  margin: 0 0 8px 0;
+}
+
+.voucher-desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+  margin-bottom: 15px;
+  flex-grow: 1;
+}
+
+.voucher-date {
+  font-size: 12px;
+  color: #999;
+  border-bottom: 1px dashed #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.btn-copy {
+  background-color: #222;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.btn-copy:hover {
+  background-color: #000;
+}
+
+/* Bố cục chính: Sidebar + Product Grid */
+.main-content {
+  display: flex;
+  gap: 40px;
+}
+
+/* Sidebar Filter */
+.sidebar {
+  width: 250px;
+  flex-shrink: 0;
+}
+
+.filter-group {
+  margin-bottom: 30px;
+}
+
+.filter-group h3 {
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #555;
+}
+
+.filter-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.filter-label:hover {
+  color: #000;
+}
+
+/* Khu vực hiển thị sản phẩm */
+.products-area {
+  flex-grow: 1;
+}
+
+.products-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.products-header h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.sort-select {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  outline: none;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); 
+  gap: 15px; /* Thu nhỏ khoảng cách giữa các ô */
+}
+
+/* Thẻ Sản phẩm */
+.product-card {
+  cursor: pointer;
+}
+
+.product-image {
+  background-color: #f6f6f6;
+  border-radius: 8px; /* Bo góc nhẹ lại cho hợp form nhỏ */
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px; /* Giảm padding từ 20px xuống 10px để box bé lại */
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.product-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image img {
+  transform: scale(1.05);
+}
+
+.product-brand {
+  font-size: 10px;
+  color: #888;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.product-name {
+  font-size: 13px; /* Cỡ chữ nhỏ hơn */
+  color: #333;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+  height: 36px; /* Ép cứng chiều cao cho 2 dòng gọn gàng */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.product-price {
+  color: #f53d2d;
+  font-weight: bold;
+  font-size: 14px; /* Hạ size chữ của giá tiền */
+  margin-bottom: 8px;
+}
+
+.product-colors {
+  display: flex;
+  gap: 8px;
+}
+
+.color-swatch {
+  width: 18px; 
+  height: 18px;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+}
+

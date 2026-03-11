@@ -5,6 +5,7 @@ import MenuSider from '../../components/MenuSider';
 import { Outlet } from 'react-router-dom';
 import "./LayoutDefault.css";
 import logoPtitShoesShoppng from "../../images/logoPtitShoesShoppng.png";
+import logo_shoeshop_removebg_preview from "../../images/logo_shoeshop_removebg_preview.png";
 import Notify from '../../components/Notify';
 import Message from '../../components/Message';
 import Profile from '../../components/Profile';
@@ -19,7 +20,7 @@ function LayoutDefault() {
             <Header className="header">
                 <div className='header__left'>
                     <div className='header__logo'>
-                        <img src={logoPtitShoesShoppng} alt="logo" />
+                        <img src={logo_shoeshop_removebg_preview} alt="logo" />
                     </div>
 
                     <div className='header__collapse'>

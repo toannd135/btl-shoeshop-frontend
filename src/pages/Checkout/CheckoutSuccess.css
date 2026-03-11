@@ -1,0 +1,86 @@
+.success-page-container {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f4f8fa;
+  padding: 20px;
+}
+
+.success-card {
+  background: #fff;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+
+.icon-wrapper {
+  font-size: 60px;
+  margin-bottom: 20px;
+}
+
+.icon-wrapper.success {
+  color: #28a745;
+}
+
+.icon-wrapper.failed {
+  color: #dc3545;
+}
+
+.success-card h2 {
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.success-card p {
+  color: #666;
+  font-size: 15px;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.sub-text {
+  font-size: 13px !important;
+  color: #999 !important;
+  margin-top: 15px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.action-buttons button {
+  padding: 12px 25px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-view-order {
+  background-color: #fff;
+  color: #338dbc;
+  border: 1px solid #338dbc;
+}
+
+.btn-view-order:hover {
+  background-color: #f4f8fa;
+}
+
+.btn-continue {
+  background-color: #338dbc;
+  color: #fff;
+  border: 1px solid #338dbc;
+}
+
+.btn-continue:hover {
+  background-color: #2b77a0;
+}
