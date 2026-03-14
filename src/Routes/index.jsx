@@ -22,6 +22,8 @@ import CouponList from "../pages/Coupon/CouponList";
 import ProductsPage from "../pages/ProductsPage/ProductsPage";
 import Cart from "../pages/Cart";
 import Checkout from "../pages/Checkout/Checkout";
+import CheckoutSuccess from "../pages/Checkout/CheckoutSuccess";
+import OrderList from "../pages/OrderAdmin/OrderList";
 const ClientLayout = () => {
     return (
         <div className="client-layout">
@@ -81,6 +83,10 @@ export const routes = [
             {
                 path: "checkout",
                 element: <Checkout/>
+            },
+            {
+                path: "checkoutSuccess",
+                element: <CheckoutSuccess/>
             }
         ]
     },
@@ -119,6 +125,10 @@ export const routes = [
             {
                 path: "coupon",
                 element: <CouponList/>
+            },
+            {
+                path: "order",
+                element: <OrderList/>
             }
         ]
     }

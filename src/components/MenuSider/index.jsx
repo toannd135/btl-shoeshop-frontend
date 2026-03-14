@@ -40,6 +40,11 @@ function MenuSider() {
             label: <Link to="/admin/coupon">Mã giảm giá</Link>,
             icon: <AppstoreOutlined />,
             key: "/admin/coupon"
+        },
+        {
+            label: <Link to="/admin/order">Đơn hàng</Link>,
+            icon: <AppstoreOutlined />,
+            key: "/admin/order"
         }
     ];
     return (

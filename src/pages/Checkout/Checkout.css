@@ -213,7 +213,7 @@ body {
 }
 
 .product-list {
-  max-height: 380px;
+  max-height: 300px;
   overflow-y: auto;
   margin-bottom: 20px;
   padding-right: 5px;
@@ -310,13 +310,23 @@ body {
 }
 
 .btn-apply {
-  background-color: #c8d3db;
+  background-color: #338dbc;
   color: #fff;
   border: none;
   border-radius: 4px;
   padding: 0 20px;
   font-weight: 500;
-  cursor: not-allowed; /* Khi nào có value thì bạn viết logic css đổi thành pointer/màu xanh */
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-apply:hover {
+  background-color: #2b77a0; 
+}
+
+.btn-apply:disabled {
+  background-color: #c8d3db;
+  cursor: not-allowed;
 }
 
 .price-summary {

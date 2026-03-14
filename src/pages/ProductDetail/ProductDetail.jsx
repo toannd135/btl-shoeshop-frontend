@@ -9,6 +9,7 @@ import {
 import { getCouponList } from "../../services/couponService";
 import "./ProductDetail.css";
 import { getMyCart, addToCart } from "../../services/cartService";
+import { getAccessToken } from "../../utils/tokenStore";
 
 const getColorStyle = (colorString) => {
     if (!colorString) return "#ccc";
@@ -169,6 +170,11 @@ function ProductDetail() {
     const handleAddToCart = async () => {
         if (!activeVariant) return;
 
+        if (!getAccessToken()){
+            navigate("/login");
+            return;
+        }
+
         try {
             const payload = { // Hardcode theo Controller của bạn
                 variantId: activeVariant.productVariantId,
@@ -194,6 +200,7 @@ function ProductDetail() {
                 });
 
                 setShowSuccessModal(true);
+                window.dispatchEvent(new Event("cartUpdated"));
             }
         } catch (err) {
             console.error("Lỗi chi tiết khi thêm vào giỏ:", err); // <-- Thêm dòng này

@@ -6,6 +6,7 @@ import "./Checkout.css";
 import { useNavigate } from "react-router-dom";
 import { createPayment } from "../../services/paymentService";
 import { estimateShipping } from "../../services/shippingService";
+import { getCouponList } from "../../services/couponService";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -13,6 +14,9 @@ const Checkout = () => {
   const [subTotal, setSubTotal] = useState(0);
   const [shippingFee, setShippingFee] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [provinces, setProvinces] = useState([]);
+  const [wards, setWards] = useState([]);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -28,11 +32,47 @@ const Checkout = () => {
 
   const [paymentMethod, setPaymentMethod] = useState("COD");
 
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      try {
+        const response = await fetch("https://provinces.open-api.vn/api/v2/p/");
+        const data = await response.json();
+        setProvinces(data);
+      } catch (error) {
+        console.error("Lỗi fetch tỉnh thành:", error);
+      }
+    };
+    fetchProvinces();
+  }, []);
+
+  useEffect(() => {
+    const fetchWards = async () => {
+      if (formData.province) {
+        try {
+          const response = await fetch(`https://provinces.open-api.vn/api/v2/w/`);
+          const data = await response.json();
+          if (Array.isArray(data)) {
+            // Lọc ra các phường/xã có province_code trùng với mã tỉnh đang chọn
+            // Dùng == thay vì === phòng trường hợp 1 bên là chuỗi, 1 bên là số
+            const filteredWards = data.filter(w => w.province_code == formData.province);
+            setWards(filteredWards);
+          } else {
+            setWards(data.wards || []);
+          }
+        } catch (error) {
+          console.error("Lỗi fetch phường xã:", error);
+        }
+      } else {
+        setWards([]);
+      }
+    };
+    fetchWards();
+  }, [formData.province]);
+
   const fetchShippingFee = async () => {
     try {
       const payload = {
         toProvinceCode: formData.province,
-        toDistrictCode: formData.district,
         totalWeightInGrams: 1000
       }
       const response = await estimateShipping(payload);
@@ -89,6 +129,84 @@ const Checkout = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleApplyCoupon = async () => {
+    const codeInput = formData.couponCode?.trim();
+    if (!codeInput) {
+      alert("Vui lòng nhập mã giảm giá!");
+      return;
+    }
+
+    try {
+      // 1. Gọi API lấy danh sách mã giảm giá
+      // Lưu ý: Tối ưu nhất là backend có 1 hàm getCouponByCode(code), 
+      // nhưng nếu chưa có, mình dùng getCouponList rồi tìm kiếm bằng JS:
+      const response = await getCouponList();
+      const coupons = response.data || response || [];
+
+      // 2. Tìm mã người dùng nhập
+      const validCoupon = coupons.find(c => c.code === codeInput);
+
+      if (!validCoupon) {
+        setDiscountAmount(0);
+        alert("Mã giảm giá không tồn tại!");
+        return;
+      }
+
+      // 3. Kiểm tra các điều kiện hợp lệ
+      if (validCoupon.status !== "ACTIVE") {
+        setDiscountAmount(0);
+        alert("Mã giảm giá đã hết hạn hoặc không hoạt động!");
+        return;
+      }
+
+      if (validCoupon.minOrderValue && subTotal < validCoupon.minOrderValue) {
+        setDiscountAmount(0);
+        alert(`Đơn hàng của bạn chưa đạt mức tối thiểu ${validCoupon.minOrderValue.toLocaleString('vi-VN')}₫ để áp dụng mã này!`);
+        return;
+      }
+
+      // Tính năng nâng cao: Kiểm tra Date (Nếu cần thiết, phụ thuộc backend trả về Date chuẩn)
+      const now = new Date();
+      if (new Date(validCoupon.startsAt) > now || new Date(validCoupon.expiresAt) < now) {
+        setDiscountAmount(0);
+        alert("Mã giảm giá chưa đến thời gian áp dụng hoặc đã quá hạn!");
+        return;
+      }
+
+      // 4. Bắt đầu tính số tiền được giảm dựa theo Loại (discountType)
+      let calculatedDiscount = 0;
+
+      if (validCoupon.discountType === "FIXED_AMOUNT") {
+        // Giảm tiền mặt
+        calculatedDiscount = validCoupon.discountValue;
+
+      } else if (validCoupon.discountType === "PERCENTAGE") {
+        // Giảm phần trăm
+        calculatedDiscount = subTotal * (validCoupon.discountValue / 100);
+        // Kiểm tra xem có bị giới hạn bởi maxDiscount không
+        if (validCoupon.maxDiscount && calculatedDiscount > validCoupon.maxDiscount) {
+          calculatedDiscount = validCoupon.maxDiscount;
+        }
+
+      } else if (validCoupon.discountType === "FREE_SHIPPING") {
+        // Miễn phí vận chuyển (Giảm thẳng đúng bằng tiền ship)
+        calculatedDiscount = shippingFee;
+        // Nếu có maxDiscount cho freeship
+        if (validCoupon.maxDiscount && calculatedDiscount > validCoupon.maxDiscount) {
+          calculatedDiscount = validCoupon.maxDiscount;
+        }
+      }
+
+      // 5. Áp dụng vào state
+      setDiscountAmount(calculatedDiscount);
+      alert(`Áp dụng mã thành công! Bạn được giảm ${calculatedDiscount.toLocaleString('vi-VN')}₫`);
+
+    } catch (error) {
+      console.error("Lỗi áp dụng mã:", error);
+      alert("Có lỗi xảy ra khi kiểm tra mã giảm giá!");
+    }
+  };
+
   const handlePlaceOrder = async () => {
     // Thêm validate bắt buộc chọn tỉnh/thành để tính phí ship
     if (!formData.receiverName || !formData.receiverPhone || !formData.address || !formData.province) {
@@ -99,7 +217,16 @@ const Checkout = () => {
     setIsProcessing(true); // Disable nút bấm để tránh click 2 lần
 
     try {
-      const fullShippingAddress = `${formData.address}, ${formData.ward}, ${formData.district}, ${formData.province}`;
+      const selectedProvinceObj = provinces.find(p => p.code == formData.province);
+      const provinceDisplayName = selectedProvinceObj ? selectedProvinceObj.name : "";
+      const wardDisplayName = formData.ward || "";
+      const fullShippingAddress = [
+        formData.address, 
+        wardDisplayName, 
+        provinceDisplayName
+      ]
+      .filter(part => part && part.trim() !== "") 
+      .join(", ");
       const checkoutPayload = {
         receiverName: formData.receiverName,
         receiverPhone: formData.receiverPhone,
@@ -202,21 +329,34 @@ const Checkout = () => {
             />
 
             <div className="form-row-col">
-              <select name="province" onChange={handleInputChange} value={formData.province} className="input-field">
+              <select
+                name="province"
+                onChange={(e) => {
+                  handleInputChange(e);
+                  // Khi đổi tỉnh, reset lại huyện, xã
+                  setFormData(prev => ({ ...prev, province: e.target.value, ward: "" }));
+                }}
+                value={formData.province}
+                className="input-field"
+              >
                 <option value="">Tỉnh thành</option>
-                <option value="Hà Nội">Hà Nội</option>
-                <option value="Hồ Chí Minh">Hồ Chí Minh</option>
-                <option value="Bà Rịa-Vũng Tàu">Bà Rịa-Vũng Tàu</option>
+                {provinces.map(p => (
+                  // Lưu code làm value để gọi API cấp dưới dễ hơn
+                  <option key={p.code} value={p.code}>{p.name}</option>
+                ))}
               </select>
-              <select name="district" onChange={handleInputChange} value={formData.district} className="input-field">
-                <option value="">Quận huyện</option>
-                <option value="Quận 1">Quận 1</option>
-                <option value="Huyện Đất Đỏ">Huyện Đất Đỏ</option>
-              </select>
-              <select name="ward" onChange={handleInputChange} value={formData.ward} className="input-field">
+
+              <select
+                name="ward"
+                onChange={handleInputChange}
+                value={formData.ward}
+                className="input-field"
+                disabled={!formData.province}
+              >
                 <option value="">Phường xã</option>
-                <option value="Phường Bến Nghé">Phường Bến Nghé</option>
-                <option value="Xã Phước Hội">Xã Phước Hội</option>
+                {wards.map(w => (
+                  <option key={w.code} value={w.name}>{w.name}</option>
+                ))}
               </select>
             </div>
 
@@ -318,7 +458,7 @@ const Checkout = () => {
               onChange={handleInputChange}
               className="input-field discount-input"
             />
-            <button className="btn-apply">Áp dụng</button>
+            <button type="button" className="btn-apply" onClick={handleApplyCoupon}>Áp dụng</button>
           </div>
 
           <div className="price-summary">
@@ -330,11 +470,19 @@ const Checkout = () => {
               <span>Phí vận chuyển</span>
               <span>{shippingFee.toLocaleString('vi-VN')}₫</span>
             </div>
+            {discountAmount > 0 && (
+              <div className="price-row" style={{ color: '#e74c3c' }}>
+                <span>Giảm giá</span>
+                <span>-{discountAmount.toLocaleString('vi-VN')}₫</span>
+              </div>
+            )}
           </div>
 
           <div className="total-row">
             <span>Tổng cộng</span>
-            <span className="total-price">{finalTotal.toLocaleString('vi-VN')}₫</span>
+            <span className="total-price">
+              {Math.max(0, subTotal + shippingFee - discountAmount).toLocaleString('vi-VN')}₫
+            </span>
           </div>
 
           <div className="checkout-actions">
