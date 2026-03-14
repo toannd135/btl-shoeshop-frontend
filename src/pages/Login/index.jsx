@@ -12,13 +12,13 @@ function Login() {
         username: "",
         password: "",
     });
+    const [showPassword, setShowPassword] = useState(false);
+
     const handleChange = (e) => {
         const { id, value } = e.target;
-        setData({
-            ...data,
-            [id]: value
-        });
+        setData({ ...data, [id]: value });
     };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!data.username || !data.password) {
@@ -28,28 +28,26 @@ function Login() {
         try {
             const res = await login(data);
             const { accessToken, user } = res.data;
-
             setAccessToken(accessToken);
-
             notification.success({
                 message: "Đăng nhập thành công!",
                 description: `Chào mừng ${user.username} đã quay trở lại!`
             });
-
             if (user.roleCode === 'ADMIN' || user.roleCode === 'ROLE_ADMIN') {
                 navigate("/");
-            }
-            else navigate("/home");
+            } else navigate("/home");
         } catch (err) {
             notification.error({
                 message: "Đăng nhập thất bại!",
                 description: err?.message || "Sai tài khoản hoặc mật khẩu!"
             });
         }
-    }
-    const handleGoogleLogin = () =>{
-        window.location.href="http://localhost:8080/oauth2/authorization/google";
-    }
+    };
+
+    const handleGoogleLogin = () => {
+        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    };
+
     return (
         <div className="login-container">
             <div className="login-card">
@@ -73,13 +71,21 @@ function Login() {
                                 <label htmlFor="password">Mật khẩu</label>
                                 <a href="/forgot-password" className="forgot-password">Quên mật khẩu?</a>
                             </div>
-                            <input
-                                type="password"
-                                id="password"
-                                placeholder="Nhập mật khẩu"
-                                value={data.password}
-                                onChange={handleChange}
-                            />
+                            <div className="password-wrapper">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    id="password"
+                                    placeholder="Nhập mật khẩu"
+                                    value={data.password}
+                                    onChange={handleChange}
+                                />
+                                <span
+                                    className="password-toggle"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? "👁️" : "👁️‍🗨️"}
+                                </span>
+                            </div>
                         </div>
 
                         <button type="submit" className="btn-login">Đăng nhập</button>
@@ -103,15 +109,11 @@ function Login() {
                     </p>
                 </div>
                 <div className="login-image-section">
-                    <img
-                        src={logoShoes}
-                        alt="Shoes Shop Logo"
-                        className="shoes-logo"
-                    />
+                    <img src={logoShoes} alt="Shoes Shop Logo" className="shoes-logo" />
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default Login;
