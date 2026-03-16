@@ -24,6 +24,7 @@ import Cart from "../pages/Cart";
 import Checkout from "../pages/Checkout/Checkout";
 import CheckoutSuccess from "../pages/Checkout/CheckoutSuccess";
 import OrderList from "../pages/OrderAdmin/OrderList";
+import AccountPage from "../pages/Account/Account";
 const ClientLayout = () => {
     return (
         <div className="client-layout">
@@ -87,6 +88,10 @@ export const routes = [
             {
                 path: "checkoutSuccess",
                 element: <CheckoutSuccess/>
+            },
+            {
+                path: "account",
+                element: <AccountPage/>
             }
         ]
     },

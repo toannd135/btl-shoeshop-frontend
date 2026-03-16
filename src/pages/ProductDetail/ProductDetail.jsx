@@ -176,7 +176,7 @@ function ProductDetail() {
         }
 
         try {
-            const payload = { // Hardcode theo Controller của bạn
+            const payload = { 
                 variantId: activeVariant.productVariantId,
                 quantity: quantity
             };

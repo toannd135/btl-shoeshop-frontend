@@ -35,7 +35,7 @@ const Checkout = () => {
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
-        const response = await fetch("https://provinces.open-api.vn/api/v2/p/");
+        const response = await fetch(import.meta.env.VITE_PROVINCES_P);
         const data = await response.json();
         setProvinces(data);
       } catch (error) {
@@ -49,7 +49,7 @@ const Checkout = () => {
     const fetchWards = async () => {
       if (formData.province) {
         try {
-          const response = await fetch(`https://provinces.open-api.vn/api/v2/w/`);
+          const response = await fetch(import.meta.env.VITE_PROVINCES_W);
           const data = await response.json();
           if (Array.isArray(data)) {
             // Lọc ra các phường/xã có province_code trùng với mã tỉnh đang chọn

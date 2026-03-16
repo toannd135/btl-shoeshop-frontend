@@ -57,7 +57,7 @@ const Header = () => {
             window.removeEventListener("cartUpdated", fetchCartCount);
         };
     }, []);
-    
+
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -104,13 +104,21 @@ const Header = () => {
 
     const userMenuItems = [
         {
+            key: 'account',
+            label: (
+                <Link to="/account" style={{ fontWeight: 500, color: 'red', padding: '5px 10px' }}>
+                    Tài khoản
+                </Link>
+            )
+        },
+        {
             key: 'logout',
             label: (
                 <div onClick={handleLogout} style={{ fontWeight: 500, color: 'red', padding: '5px 10px' }}>
                     Đăng xuất
                 </div>
             ),
-        }
+        },
     ];
 
     return (
@@ -191,7 +199,7 @@ const Header = () => {
                     <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
                         <div className="icon" title={userProfile.username} style={{ cursor: 'pointer' }}>
                             <img
-                                src={userProfile.avatarImage || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTp3E05PU096A0sYK811kyRs0MwZNqZNpGOQ&s"}
+                                src={userProfile.avatarImage}
                                 alt="avatar"
                                 style={{
                                     width: '45px',
