@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiUser, FiShoppingCart, FiSearch, FiLogOut, FiSettings, FiUser as FiProfile } from 'react-icons/fi';
 import "./header.css";
-
+import logo from '../../images/logoPtitShoesShoppng.png';
 const Header = () => {
     // Tạm thời test, sau này thay bằng auth thực tế
     const isLoggedIn = true;
@@ -10,7 +10,9 @@ const Header = () => {
 
     return (
         <header className="header">
-            <div className="logo">PTIT<span style={{ color: 'black' }}>SNEAKER</span></div>
+            <div className="logo">
+                <img src={logo} alt="PTIT Shoe Shop logo" />
+            </div>
             <nav className="nav">
 
                 <Link to="/home">Trang chủ</Link>

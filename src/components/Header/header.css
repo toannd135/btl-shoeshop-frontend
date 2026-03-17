@@ -4,15 +4,10 @@
 }
 
 /* LOGO */
-.logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: red;
-    cursor: pointer;
-}
-
-.logo span {
-    color: black;
+.logo img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
 }
 
 .header {
