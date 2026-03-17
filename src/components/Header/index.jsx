@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiUser, FiShoppingCart } from 'react-icons/fi';
+import { FiUser, FiShoppingCart, FiSearch, FiLogOut, FiSettings, FiUser as FiProfile } from 'react-icons/fi';
 import "./header.css";
 import { getProductList } from "../../services/productService";
 import { getCurrentUser } from "../../utils/tokenStore";
@@ -16,7 +16,8 @@ const Header = () => {
     const [lastScrollY, setLastScrollY] = useState(0);
     const [userProfile, setUserProfile] = useState(null);
     const [cartCount, setCartCount] = useState(0);
-
+    const isLoggedIn = !!userProfile; 
+    const isAdmin = userProfile && (userProfile.roleCode === 'ADMIN' || userProfile.roleCode === 'ROLE_ADMIN');
     const fetchUserFromMemory = () => {
         const user = getCurrentUser();
         setUserProfile(user);
@@ -101,6 +102,8 @@ const Header = () => {
         message.success("Đăng xuất thành công");
         navigate("/login");
     };
+// Tạm thời test, sau này thay bằng auth thực tế
+
 
     const userMenuItems = [
         {
@@ -111,6 +114,19 @@ const Header = () => {
                 </Link>
             )
         },
+        ...(isAdmin ? [
+            {
+                key: 'admin',
+                label: (
+                    <Link to="/admin" style={{ fontWeight: 500, padding: '5px 10px' }}>
+                        Trang quản trị
+                    </Link>
+                )
+            }
+        ] : []),
+        {
+            type: 'divider', // Thêm đường kẻ ngang phân cách
+        },
         {
             key: 'logout',
             label: (
@@ -120,6 +136,7 @@ const Header = () => {
             ),
         },
     ];
+    
 
     return (
         <header className={`header-client ${show ? '' : 'hidden'}`}>
@@ -185,7 +202,6 @@ const Header = () => {
                             <Link to="/style/chunky">Sneaker đế dày</Link>
                             <Link to="/style/vintage">Sneaker Retro</Link>
                         </div>
-
                     </div>
                 </div>
 
@@ -195,6 +211,10 @@ const Header = () => {
             </nav>
 
             <div className="header-client-icons">
+                <Link to="/search" className="icon">
+                    <FiSearch size={24} />
+                </Link>
+
                 {userProfile ? (
                     <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
                         <div className="icon" title={userProfile.username} style={{ cursor: 'pointer' }}>
@@ -217,15 +237,61 @@ const Header = () => {
                     </Link>
                 )}
 
+
+                {/* <div className="header-icons">
+
+               
+                <Link to="/search" className="icon">
+                    <FiSearch size={24} />
+                </Link>
+
+          
+                <div className="user-menu">
+                    <span className="icon">
+                        <FiUser size={24} />
+                    </span>
+
+                    <div className="user-dropdown">
+                        {isLoggedIn ? (
+                            <>
+                                <Link to="/profile" className="dropdown-item">
+                                    <FiProfile size={16} />
+                                    Thông tin cá nhân
+                                </Link>
+
+                                {isAdmin && (
+                                    <Link to="/admin" className="dropdown-item">
+                                        <FiSettings size={16} />
+                                        Trang quản trị
+                                    </Link>
+                                )}
+
+                                <div className="dropdown-divider" />
+
+                                <button className="dropdown-item dropdown-logout">
+                                    <FiLogOut size={16} />
+                                    Đăng xuất
+                                </button>
+                            </>
+                        ) : (
+                            <Link to="/login" className="dropdown-item">
+                                <FiUser size={16} />
+                                Đăng nhập
+                            </Link>
+                        )}
+                    </div>
+                </div> */}
+
+                {/* Cart */}
                 <Link to="/cart" className="icon cart-icon">
                     <FiShoppingCart size={24} />
                     {cartCount > 0 && (
                         <span className="cart-badge">{cartCount}</span>
                     )}
                 </Link>
-            </div>
 
-        </header>
+            </div>
+        </header >
     );
 };
 
