@@ -51,7 +51,7 @@ const Header = () => {
                         </div>
 
                         <div className="mega-col">
-                            <h4>Phong Cách</h4>
+                            <h4>Chương trình đặc biệt</h4>
                             <Link to="/style/low">Sneaker cổ thấp</Link>
                             <Link to="/style/high">Sneaker cổ cao</Link>
                             <Link to="/style/mid">Sneaker cổ trung</Link>
