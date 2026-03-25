@@ -27,6 +27,8 @@ import ProductHighlight from "../../components/ProductHighlight/ProductHighlight
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import ProductList from "../../components/ProductList";
+import ChatBot from "../../components/ChatBot";
+import ScrollToTop from "../../components/ScrollToTop";
 const Home = () => {
     const slides = [
         { image: slide1 },
@@ -200,6 +202,10 @@ const Home = () => {
             <ProductHighlight />
 
             <ProductList />
+
+            <ChatBot />
+
+            <ScrollToTop />
 
             <Footer />
 
