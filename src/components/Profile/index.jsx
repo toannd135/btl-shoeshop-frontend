@@ -3,6 +3,7 @@ import "./Profile.css";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../services/authService";
 import { clearAccessToken, getCurrentUser } from "../../utils/tokenStore";
+import { useEffect, useState } from "react";
 
 function Profile() {
     const [userProfile, setUserProfile] = useState(null);
