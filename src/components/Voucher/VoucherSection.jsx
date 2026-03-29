@@ -1,35 +1,35 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import VoucherCard from "./VoucherCard";
 import "./voucher.css";
-
-const voucherData = [
-    {
-        code: "EGA50",
-        description: "Giảm 15% cho đơn hàng tối thiểu 500k",
-        expired: true
-    },
-    {
-        code: "EGAT10",
-        description: "Giảm 10% cho đơn hàng tối thiểu 500k",
-        expired: false
-    },
-    {
-        code: "FREESHIP",
-        description: "Miễn phí vận chuyển",
-        expired: false
-    },
-    {
-        code: "EGA500K",
-        description: "Giảm 500k cho đơn hàng từ 2 triệu",
-        expired: false
-    }
-];
+import { message } from "antd"; 
+import { getCouponList } from "../../services/couponService"; 
 
 const VoucherSection = () => {
 
-    // Hiện tại chỉ console log
+    const [coupons, setCoupons] = useState([]);
+
+    useEffect(() => {
+        const fetchCoupons = async () => {
+            try {
+                const res = await getCouponList();
+                const dataList = res.data?.content || res.data?.data || res.data || res || [];
+                setCoupons(dataList);
+            } catch (error) {
+                console.error("Lỗi lấy danh sách coupon:", error);
+            }
+        };
+
+        fetchCoupons();
+    }, []);
+
     const handleCopy = (code) => {
-        console.log("Click voucher:", code);
+        navigator.clipboard.writeText(code)
+            .then(() => {
+                message.success(`Đã sao chép mã: ${code}`);
+            })
+            .catch(() => {
+                message.error("Trình duyệt của bạn không hỗ trợ sao chép tự động!");
+            });
     };
 
     return (
@@ -39,15 +39,23 @@ const VoucherSection = () => {
             </h2>
 
             <div className="voucher-list">
-                {voucherData.map((item, index) => (
-                    <VoucherCard
-                        key={index}
-                        code={item.code}
-                        description={item.description}
-                        expired={item.expired}
-                        onCopy={handleCopy}
-                    />
-                ))}
+                {coupons.length > 0 ? (
+                    coupons.map((item, index) => {
+                        const isExpired = item.quantity !== undefined ? item.quantity <= 0 : item.expired;
+
+                        return (
+                            <VoucherCard
+                                key={item.id || index}
+                                code={item.code}
+                                description={item.description || `Giảm giá siêu hời với mã ${item.code}`} 
+                                expired={isExpired}
+                                onCopy={handleCopy}
+                            />
+                        );
+                    })
+                ) : (
+                    <p>Đang tải ưu đãi...</p> 
+                )}
             </div>
         </section>
     );

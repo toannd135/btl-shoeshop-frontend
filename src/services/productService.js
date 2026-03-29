@@ -43,3 +43,20 @@ export const updateProduct = async (id, formData) => {
 export const deleteProduct = async (id) => {
     return await del(`products/${id}`);
 };
+
+export const getFilteredProducts = async (params) => {
+    const searchParams = new URLSearchParams();
+    
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== '') {
+            if (Array.isArray(value)) {
+                value.forEach(item => searchParams.append(key, item));
+            } else {
+                searchParams.append(key, value);
+            }
+        }
+    });
+
+    const queryString = searchParams.toString();
+    return await get(`products/search?${queryString}`); 
+};

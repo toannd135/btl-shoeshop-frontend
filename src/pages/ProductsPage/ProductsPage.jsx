@@ -4,11 +4,15 @@ import { CopyOutlined } from '@ant-design/icons';
 import { getProductList, getProductVariants } from "../../services/productService";
 import { getCateList } from "../../services/cateService";
 import { getCouponList } from "../../services/couponService";
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const { Title, Text, Paragraph } = Typography;
 
 const ProductsPage = () => {
+    const [searchParams] = useSearchParams();
+    const brandFilter = searchParams.get('brand');
+    const categoryFilter = searchParams.get('categoryId');
+    const genderFilter = searchParams.get('gender');
     // --- 1. STATES LƯU TRỮ DỮ LIỆU TỪ API ---
     const [allProducts, setAllProducts] = useState([]); // Chứa TẤT CẢ sản phẩm gốc
     const [categories, setCategories] = useState([]);

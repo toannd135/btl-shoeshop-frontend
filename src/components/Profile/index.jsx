@@ -2,9 +2,19 @@ import { Button, Dropdown, message } from "antd";
 import "./Profile.css";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../services/authService";
-import { clearAccessToken } from "../../utils/tokenStore";
+import { clearAccessToken, getCurrentUser } from "../../utils/tokenStore";
 
 function Profile() {
+    const [userProfile, setUserProfile] = useState(null);
+    const fetchUserFromMemory = () => {
+        const user = getCurrentUser();
+        setUserProfile(user);
+    };
+    useEffect(() => {
+        fetchUserFromMemory();
+    });
+
+
     const navigate = useNavigate();
     const handleLogout = async () => {
         try {

@@ -35,7 +35,7 @@ const ProductHighlight = () => {
             <div className="highlight-container">
                 {products.map((item, index) => (
                     <Link
-                        to={`/product`}
+                        to={`/productsPage`}
                         className="highlight-card"
                         key={index}
                     >

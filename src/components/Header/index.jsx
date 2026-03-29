@@ -1,23 +1,47 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiUser, FiShoppingCart, FiSearch, FiLogOut, FiSettings, FiUser as FiProfile } from 'react-icons/fi';
+import { FiUser, FiShoppingCart, FiSearch, FiLogOut, FiSettings, FiX, FiUser as FiProfile } from 'react-icons/fi';
 import "./header.css";
-import { getProductList } from "../../services/productService";
-import { getCurrentUser } from "../../utils/tokenStore";
-import { Dropdown, message } from "antd";
-import { logout } from "../../services/authService";
-import { clearAccessToken, clearCurrentUser } from "../../utils/tokenStore";
+
+// Giả sử file chứa getCateList của bạn tên là categoryService
+import { getCateList } from "../../services/cateService";
+import { getProductList, getFilteredProducts, getProductVariants } from "../../services/productService";
 import { getMyCart } from "../../services/cartService";
+import { logout } from "../../services/authService";
+import { getCurrentUser, clearAccessToken, clearCurrentUser } from "../../utils/tokenStore";
+import { Dropdown, message } from "antd";
+
+import logo from '../../images/logoPtitShoesShoppng.png';
 
 const Header = () => {
     const navigate = useNavigate();
-    const [products, setProducts] = useState([]);
+
+    // --- STATE CHO NAVBAR ---
     const [show, setShow] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [userProfile, setUserProfile] = useState(null);
     const [cartCount, setCartCount] = useState(0);
-    const isLoggedIn = !!userProfile; 
+
+    // --- STATE CHO TÌM KIẾM ---
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+    const [totalSearchElements, setTotalSearchElements] = useState(0);
+
+    // --- STATE CHO MEGA MENU ---
+    const [categories, setCategories] = useState([]);
+    const [brands, setBrands] = useState([]);
+
+    // Khai báo Enum Gender
+    const genders = [
+        { code: 'MALE', label: 'Sneaker Nam' },
+        { code: 'FEMALE', label: 'Sneaker Nữ' },
+        { code: 'OTHER', label: 'Sneaker Unisex/Khác' }
+    ];
+
+    const isLoggedIn = !!userProfile;
     const isAdmin = userProfile && (userProfile.roleCode === 'ADMIN' || userProfile.roleCode === 'ROLE_ADMIN');
+
     const fetchUserFromMemory = () => {
         const user = getCurrentUser();
         setUserProfile(user);
@@ -32,7 +56,6 @@ const Header = () => {
         try {
             const res = await getMyCart();
             const items = res.data?.items || [];
-            // Cộng dồn tổng số lượng sản phẩm
             const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
             setCartCount(totalQuantity);
         } catch (error) {
@@ -40,6 +63,7 @@ const Header = () => {
         }
     };
 
+    // Khởi tạo Auth & Cart
     useEffect(() => {
         fetchUserFromMemory();
         fetchCartCount();
@@ -59,19 +83,32 @@ const Header = () => {
         };
     }, []);
 
+    // Fetch dữ liệu cho Mega Menu (Categories và Brands)
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchMenuData = async () => {
             try {
-                const res = await getProductList();
-                const dataList = res.data || res;
-                setProducts(dataList.slice(0, 10));
+                // 1. Lấy danh sách Categories
+                const cateRes = await getCateList();
+                console.log(cateRes);
+                const cateList = cateRes.data?.data || cateRes.data || cateRes || [];
+                setCategories(cateList);
+
+                // 2. Lấy danh sách Product để bóc tách Brand
+                const prodRes = await getProductList();
+                const dataList = prodRes.data?.data || prodRes.data || prodRes || [];
+
+                // Trích xuất các brand (loại bỏ các giá trị null/undefined và trùng lặp)
+                const uniqueBrands = [...new Set(dataList.map(item => item.brand).filter(Boolean))];
+                setBrands(uniqueBrands);
+
             } catch (error) {
-                console.error("Lỗi lấy danh sách sản phẩm cho menu:", error);
+                console.error("Lỗi lấy dữ liệu menu:", error);
             }
         };
-        fetchProducts();
+        fetchMenuData();
     }, []);
 
+    // Hiệu ứng cuộn trang ẩn hiện Navbar
     useEffect(() => {
         const controlNavbar = () => {
             if (typeof window !== 'undefined') {
@@ -88,22 +125,65 @@ const Header = () => {
             window.removeEventListener('scroll', controlNavbar);
         };
     }, [lastScrollY]);
+
     const handleLogout = async () => {
         try {
             await logout();
         } catch (error) {
             console.log("Logout API failed, clearing client anyway");
         }
-
         clearAccessToken();
         clearCurrentUser();
         window.dispatchEvent(new Event("logoutSuccess"));
-
         message.success("Đăng xuất thành công");
         navigate("/login");
     };
-// Tạm thời test, sau này thay bằng auth thực tế
 
+    const formatPrice = (basePrice) => {
+        if (!basePrice) return "0";
+        return basePrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "đ";
+    };
+
+    // Tìm kiếm
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(async () => {
+            if (searchTerm.trim() !== "") {
+                try {
+                    const res = await getFilteredProducts({ keyword: searchTerm });
+                    const apiResponseData = res.data;
+                    const dataList = apiResponseData.items || [];
+                    const top5Products = dataList.slice(0, 5);
+                    const productsWithMinPrice = await Promise.all(
+                        top5Products.map(async (product) => {
+                            try {
+                                const productId = product.productId || product.id;
+                                const variantRes = await getProductVariants(productId);
+                                const variants = variantRes.data?.data || variantRes.data || variantRes || [];
+
+                                let minPrice = 0;
+                                if (variants && variants.length > 0) {
+                                    minPrice = Math.min(...variants.map(v => v.basePrice || 0));
+                                }
+                                return { ...product, minPrice };
+                            } catch (err) {
+                                console.error(`Lỗi lấy biến thể cho sản phẩm ${product.id}:`, err);
+                                return { ...product, minPrice: 0 };
+                            }
+                        })
+                    );
+                    setSearchResults(productsWithMinPrice);
+                    setTotalSearchElements(apiResponseData?.totalElements || dataList.length);
+                } catch (error) {
+                    console.error("Lỗi tìm kiếm:", error);
+                }
+            } else {
+                setSearchResults([]);
+                setTotalSearchElements(0);
+            }
+        }, 500);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTerm]);
 
     const userMenuItems = [
         {
@@ -125,7 +205,7 @@ const Header = () => {
             }
         ] : []),
         {
-            type: 'divider', // Thêm đường kẻ ngang phân cách
+            type: 'divider',
         },
         {
             key: 'logout',
@@ -136,11 +216,12 @@ const Header = () => {
             ),
         },
     ];
-    
 
     return (
         <header className={`header-client ${show ? '' : 'hidden'}`}>
-            <div className="logo">PTIT<span style={{ color: 'black' }}>SNEAKER</span></div>
+            <Link to='/' className="logo">
+                <img src={logo} alt="PTIT Shoe Shop logo" />
+            </Link>
             <nav className="nav">
 
                 <Link to="/">Trang chủ</Link>
@@ -151,56 +232,46 @@ const Header = () => {
                     </Link>
 
                     <div className="mega-menu">
-                        <div className="mega-col dynamic-col">
-                            <h4>Mới Cập Nhật</h4>
-                            {products.length > 0 ? (
-                                products.map((item) => (
-                                    <Link
-                                        key={item.productId || item.id}
-                                        to={`/productDetail/${item.productId || item.id}`}
-                                    >
-                                        {item.name}
-                                    </Link>
-                                ))
-                            ) : (
-                                <span>Đang tải...</span>
-                            )}
-                        </div>
-
-                        <div className="mega-col">
-                            <h4>Đối tượng</h4>
-                            <Link to="/products/nam">Sneaker Nam</Link>
-                            <Link to="/products/nu">Sneaker Nữ</Link>
-                            <Link to="/products/unisex">Sneaker Unisex</Link>
-                            <Link to="/products/kids">Sneaker Trẻ Em</Link>
-                            <Link to="/products/couple">Sneaker Couple</Link>
-                        </div>
-
                         <div className="mega-col">
                             <h4>Thương hiệu</h4>
-                            <Link to="/brand/nike">Nike</Link>
-                            <Link to="/brand/adidas">ADIDAS</Link>
-                            <Link to="/brand/puma">PUMA</Link>
-                            <Link to="/brand/crocs">CROCS</Link>
-                            <Link to="/brand/fitflop">FITFLOP</Link>
+                            <div className="mega-col-links">
+                                {brands.length > 0 ? (
+                                    brands.map((brand, index) => (
+                                        <Link key={index} to={`/productsPage?brand=${brand}`}>
+                                            {brand}
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <span>Đang tải...</span>
+                                )}
+                            </div>
                         </div>
 
                         <div className="mega-col">
-                            <h4>Nhu Cầu Sử Dụng</h4>
-                            <Link to="/use/school">Sneaker đi học – đi làm</Link>
-                            <Link to="/use/run">Sneaker chạy bộ</Link>
-                            <Link to="/use/gym">Sneaker tập gym</Link>
-                            <Link to="/use/sport">Sneaker chơi thể thao</Link>
-                            <Link to="/use/street">Sneaker đi chơi – dạo phố</Link>
+                            <h4>Nhu cầu sử dụng</h4>
+                            <div className="mega-col-links">
+                                {categories.length > 0 ? (
+                                    categories.map((cate) => (
+                                        <Link key={cate.categoryId || cate.id} to={`/productsPage?categoryId=${cate.categoryId || cate.id}`}>
+                                            {cate.categoryName || cate.name}
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <span>Đang tải...</span>
+                                )}
+                            </div>
                         </div>
 
+                        {/* --- Cột 3: ĐỐI TƯỢNG (GENDER) --- */}
                         <div className="mega-col">
-                            <h4>Phong Cách</h4>
-                            <Link to="/style/low">Sneaker cổ thấp</Link>
-                            <Link to="/style/high">Sneaker cổ cao</Link>
-                            <Link to="/style/mid">Sneaker cổ trung</Link>
-                            <Link to="/style/chunky">Sneaker đế dày</Link>
-                            <Link to="/style/vintage">Sneaker Retro</Link>
+                            <h4>Đối tượng</h4>
+                            <div className="mega-col-links">
+                                {genders.map((gender) => (
+                                    <Link key={gender.code} to={`/productsPage?gender=${gender.code}`}>
+                                        {gender.label}
+                                    </Link>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -211,9 +282,67 @@ const Header = () => {
             </nav>
 
             <div className="header-client-icons">
-                <Link to="/search" className="icon">
+                <div className="icon" style={{ cursor: 'pointer' }} onClick={() => setIsSearchOpen(true)}>
                     <FiSearch size={24} />
-                </Link>
+                </div>
+                {isSearchOpen && (
+                    <div className="search-modal-overlay">
+                        <div className="search-modal-content">
+                            <div className="search-modal-header">
+                                <h3>TÌM KIẾM</h3>
+                                <button className="close-search-btn" onClick={() => setIsSearchOpen(false)}>
+                                    <FiX size={30} />
+                                </button>
+                            </div>
+
+                            <div className="search-input-wrapper">
+                                <input
+                                    type="text"
+                                    placeholder="Tìm kiếm sản phẩm..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    autoFocus
+                                />
+                                <FiSearch className="search-input-icon" size={20} color="#ccc" />
+                            </div>
+
+                            {searchResults.length > 0 && (
+                                <div className="search-results-list">
+                                    {searchResults.map((item) => (
+                                        <div
+                                            className="search-result-item"
+                                            key={item.productId || item.id}
+                                            onClick={() => {
+                                                setIsSearchOpen(false);
+                                                navigate(`/productDetail/${item.productId || item.id}`);
+                                            }}
+                                        >
+                                            <div className="search-item-info">
+                                                <div className="search-item-name">{item.name} - {item.brand || "Brand"}</div>
+                                                <div className="search-item-price">{formatPrice(item.minPrice)}</div>
+                                            </div>
+                                            <div className="search-item-image">
+                                                <img src={item.imageUrl || "placeholder.png"} alt={item.name} />
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    {totalSearchElements > 5 && (
+                                        <div
+                                            className="search-view-more"
+                                            onClick={() => {
+                                                setIsSearchOpen(false);
+                                                navigate(`/search?keyword=${searchTerm}`);
+                                            }}
+                                        >
+                                            Xem thêm {totalSearchElements - 5} sản phẩm
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 {userProfile ? (
                     <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
@@ -237,61 +366,17 @@ const Header = () => {
                     </Link>
                 )}
 
-
-                {/* <div className="header-icons">
-
-               
-                <Link to="/search" className="icon">
-                    <FiSearch size={24} />
-                </Link>
-
-          
-                <div className="user-menu">
-                    <span className="icon">
-                        <FiUser size={24} />
-                    </span>
-
-                    <div className="user-dropdown">
-                        {isLoggedIn ? (
-                            <>
-                                <Link to="/profile" className="dropdown-item">
-                                    <FiProfile size={16} />
-                                    Thông tin cá nhân
-                                </Link>
-
-                                {isAdmin && (
-                                    <Link to="/admin" className="dropdown-item">
-                                        <FiSettings size={16} />
-                                        Trang quản trị
-                                    </Link>
-                                )}
-
-                                <div className="dropdown-divider" />
-
-                                <button className="dropdown-item dropdown-logout">
-                                    <FiLogOut size={16} />
-                                    Đăng xuất
-                                </button>
-                            </>
-                        ) : (
-                            <Link to="/login" className="dropdown-item">
-                                <FiUser size={16} />
-                                Đăng nhập
-                            </Link>
-                        )}
-                    </div>
-                </div> */}
-
                 {/* Cart */}
-                <Link to="/cart" className="icon cart-icon">
-                    <FiShoppingCart size={24} />
-                    {cartCount > 0 && (
-                        <span className="cart-badge">{cartCount}</span>
-                    )}
-                </Link>
-
+                {isLoggedIn && (
+                    <Link to="/cart" className="icon cart-icon">
+                        <FiShoppingCart size={24} />
+                        {cartCount > 0 && (
+                            <span className="cart-badge">{cartCount}</span>
+                        )}
+                    </Link>
+                )}
             </div>
-        </header >
+        </header>
     );
 };
 

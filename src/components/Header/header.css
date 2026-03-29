@@ -9,15 +9,10 @@
 }
 
 /* LOGO */
-.logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: red;
-    cursor: pointer;
-}
-
-.logo span {
-    color: black;
+.logo img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
 }
 
 /* HEADER CÓ THÊM HIỆU ỨNG TRANSITION CỦA BẠN */
@@ -68,7 +63,7 @@
 }
 
 .nav a:hover {
-    color: orange;
+    color: red;
 }
 
 .arrow {
@@ -97,8 +92,8 @@
     width: 100%;
     background: white;
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* Đổi từ 4 sang 5 */
-    gap: 30px;
+    grid-template-columns: repeat(3, 1fr); /* Đổi từ 4 sang 5 */
+    gap: 50px;
     padding: 40px 100px;
     opacity: 0;
     visibility: hidden;
@@ -124,7 +119,7 @@
 .mega-col {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
 }
 
 .mega-col h4 {
@@ -143,6 +138,28 @@
 }
 
 .mega-col a:hover {
+    color: red;
+}
+
+.mega-col-links {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 cột con đều nhau */
+    gap: 12px 20px; /* Khoảng cách: Dọc 12px - Ngang 20px */
+}
+
+.mega-col-links a,
+.mega-col-links span {
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 15px;
+    line-height: 1.5;
+    transition: 0.2s;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
+
+.mega-col-links a:hover {
     color: red;
 }
 
@@ -263,4 +280,134 @@
 .dropdown-logout:hover {
     background: #fff0f0;
     color: red;
+}
+
+/* --- SEARCH MODAL OVERLAY --- */
+.search-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    display: flex;
+    justify-content: flex-end; /* Hiển thị modal vuốt từ phải sang hoặc căn phải */
+}
+
+.search-modal-content {
+    background-color: #fff;
+    width: 500px; /* Chiều rộng của khung tìm kiếm */
+    max-width: 100%;
+    height: 100%;
+    padding: 30px;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    overflow-y: auto;
+}
+
+.search-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.search-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+}
+
+.close-search-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+}
+
+.search-input-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.search-input-wrapper input {
+    width: 100%;
+    padding: 15px 40px 15px 15px;
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    outline: none;
+}
+
+.search-input-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* --- SEARCH RESULTS LIST --- */
+.search-results-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.search-result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px dotted #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.search-result-item:hover {
+    background-color: #fafafa;
+}
+
+/* THÔNG TIN TRÁI */
+.search-item-info {
+    flex: 1;
+    padding-right: 15px;
+}
+
+.search-item-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+    text-transform: uppercase; /* Giống trong ảnh mẫu */
+}
+
+.search-item-price {
+    font-size: 14px;
+    color: #666;
+}
+
+/* ẢNH PHẢI */
+.search-item-image {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+}
+
+.search-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.search-view-more {
+    text-align: center;
+    padding: 20px 0;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+}
+
+.search-view-more:hover {
+    text-decoration: underline;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
     getProductById,
@@ -22,6 +22,16 @@ const getColorStyle = (colorString) => {
     };
     return colorMap[colorString.toUpperCase()] || "#ccc";
 };
+
+const fakeSuggestedProducts = [
+    { id: 101, name: "Giày Thể Thao Nam Năng Động", price: 550000, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" },
+    { id: 102, name: "Giày Chạy Bộ Nữ Siêu Nhẹ", price: 650000, image: "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=400&q=80" },
+    { id: 103, name: "Giày Sneaker Cổ Thấp Thời Trang", price: 450000, image: "https://images.unsplash.com/photo-1514989940723-e8e51635b782?w=400&q=80" },
+    { id: 104, name: "Giày Vải Canvas Trẻ Trung", price: 350000, image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=400&q=80" },
+    { id: 105, name: "Giày Lười Nam Tiện Lợi", price: 500000, image: "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=400&q=80" },
+    { id: 106, name: "Giày Boot Nam Cổ Cao Cực Chất", price: 850000, image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=400&q=80" },
+    { id: 107, name: "Giày Cao Gót Nữ Thanh Lịch", price: 400000, image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80" }
+];
 
 // Hàm hỗ trợ format tiền
 const formatMoneyK = (value) => {
@@ -94,6 +104,24 @@ function ProductDetail() {
     const [coupons, setCoupons] = useState([]);
     const [showAllCoupons, setShowAllCoupons] = useState(false); // Mở danh sách mã (Ảnh 3)
     const [selectedCoupon, setSelectedCoupon] = useState(null);  // Mở chi tiết mã (Ảnh 2)
+
+    const sliderRef = useRef(null);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (sliderRef.current) {
+                const slider = sliderRef.current;
+                const scrollAmount = 260;
+                if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 10) {
+                    slider.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                }
+            }
+        }, 1500); 
+
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         const fetchInitialData = async () => {
@@ -170,13 +198,13 @@ function ProductDetail() {
     const handleAddToCart = async () => {
         if (!activeVariant) return;
 
-        if (!getAccessToken()){
+        if (!getAccessToken()) {
             navigate("/login");
             return;
         }
 
         try {
-            const payload = { 
+            const payload = {
                 variantId: activeVariant.productVariantId,
                 quantity: quantity
             };
@@ -612,6 +640,25 @@ function ProductDetail() {
 
                 </div>
             </div>
+
+            <div className="suggested-wrapper">
+                <h2 className="suggested-title">Có thể bạn sẽ thích</h2>
+
+                <div className="suggested-list" ref={sliderRef}>
+                    {fakeSuggestedProducts.map((prod) => (
+                        <div className="suggested-card" key={prod.id} onClick={() => alert("Chuyển hướng đến: " + prod.name)}>
+                            <div className="suggested-img-box">
+                                <img src={prod.image} alt={prod.name} />
+                            </div>
+                            <div className="suggested-info">
+                                <h4 className="suggested-name">{prod.name}</h4>
+                                <p className="suggested-price">{prod.price.toLocaleString('vi-VN')}đ</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
         </div>
     );
 }
