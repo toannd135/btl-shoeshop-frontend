@@ -65,7 +65,7 @@ function CateUpdate({ open, onClose, category, parentCategories }) {
                 <Form.Item
                     label="Danh mục cha"
                     name="parentId"
-                    rules={[{ required: true, message: "Vui lòng chọn danh mục cha!" }]}
+                    rules={[{ required: false}]}
                 >
                     <Select placeholder="Chọn danh mục cha">
                         {parentCategories.map(parent => (

@@ -1,4 +1,4 @@
-import { get, post, edit, dele } from "../utils/request"; // Đường dẫn tuỳ thuộc vào cấu trúc dự án của bạn
+import { get, post, edit, dele } from "../utils/request"; 
 
 const API_PATH = "addresses";
 

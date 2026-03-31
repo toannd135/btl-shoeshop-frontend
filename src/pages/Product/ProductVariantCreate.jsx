@@ -1,12 +1,22 @@
 import { Modal, Form, Input, InputNumber, Select, Button, message, Row, Col, ColorPicker, Upload } from "antd";
 import { SafetyCertificateOutlined, UploadOutlined } from "@ant-design/icons";
 import { createProductVariant, createVariantImage } from "../../services/productService";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import "./ProductVariantCreate.css"; 
 
 function ProductVariantCreate({ open, onClose, productId, onReload }) {
     const [form] = Form.useForm();
     const [fileList, setFileList] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    // Tạo URL preview cho ảnh đầu tiên (tránh memory leak)
+    const previewImage = useMemo(() => {
+        if (fileList.length > 0 && fileList[0].originFileObj) {
+            return URL.createObjectURL(fileList[0].originFileObj);
+        }
+        return null;
+    }, [fileList]);
+
     const handleSubmit = async (values) => {
         setLoading(true);
         try {
@@ -20,17 +30,26 @@ function ProductVariantCreate({ open, onClose, productId, onReload }) {
                 basePrice: values.basePrice,
                 status: values.status || "ACTIVE"
             };
+            
+            // 1. Tạo Variant trước
             const res = await createProductVariant(productId, payload);
             const newVariantId = res.data?.productVariantId || res.productVariantId;
+            
+            // 2. Nếu có ảnh, upload TẤT CẢ ảnh bằng Promise.all
             if (fileList.length > 0 && newVariantId) {
-                const formData = new FormData();
-                formData.append("image", fileList[0].originFileObj);
-                formData.append("isPrimary", true);
-                formData.append("status", "ACTIVE");
+                const uploadPromises = fileList.map((file, index) => {
+                    const formData = new FormData();
+                    formData.append("image", file.originFileObj);
+                    // Ảnh đầu tiên (index 0) sẽ là ảnh primary
+                    formData.append("isPrimary", index === 0); 
+                    
+                    return createVariantImage(productId, newVariantId, formData);
+                });
 
-                await createVariantImage(productId, newVariantId, formData);
+                await Promise.all(uploadPromises);
             }
-            message.success("Tạo biến thể thành công!");
+
+            message.success("Tạo biến thể và tải ảnh thành công!");
             form.resetFields();
             setFileList([]);
             onReload();
@@ -99,21 +118,37 @@ function ProductVariantCreate({ open, onClose, productId, onReload }) {
                         <Form.Item label="Hình ảnh (Tùy chọn)">
                             <Upload
                                 beforeUpload={() => false} 
-                                maxCount={1}
-                                listType="picture"
+                                multiple={true} // Cho phép chọn nhiều file
+                                showUploadList={false} // Ẩn cái list mặc định của Ant Design
                                 fileList={fileList}
                                 onChange={({ fileList: newFileList }) => setFileList(newFileList)}
                                 accept="image/*"
                             >
-                                <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+                                <Button icon={<UploadOutlined />}>Chọn nhiều ảnh</Button>
                             </Upload>
+
+                            {/* UI HIỂN THỊ KIỂU MESSENGER */}
+                            {fileList.length > 0 && (
+                                <div className="messenger-image-preview">
+                                    <img 
+                                        src={previewImage} 
+                                        alt="preview" 
+                                        className="preview-img" 
+                                    />
+                                    {fileList.length > 1 && (
+                                        <div className="preview-overlay">
+                                            +{fileList.length - 1}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </Form.Item>
                     </Col>
                 </Row>
 
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-                    <Button onClick={onClose}>Hủy</Button>
-                    <Button type="primary" htmlType="submit">Lưu lại</Button>
+                    <Button onClick={onClose} disabled={loading}>Hủy</Button>
+                    <Button type="primary" htmlType="submit" loading={loading}>Lưu lại</Button>
                 </div>
             </Form>
         </Modal>

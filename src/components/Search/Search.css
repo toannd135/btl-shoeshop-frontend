@@ -1,37 +1,176 @@
+/* NÚT SEARCH TRÊN HEADER MẶC ĐỊNH */
 .header__search {
     display: flex;
     align-items: center;
-    width: 280px;
+    width: 200px; /* Thu gọn lại thành nút bấm */
     height: 40px;
     background: #f5f5f5;
     border-radius: 5px;
     padding: 0 12px;
-    overflow: hidden;
+    cursor: pointer;
     transition: all 0.3s ease;
+}
+
+.header__search:hover {
+    background: #e0e0e0;
 }
 
 .search__icon {
-    font-size: 20px;
-    color: #999;
-    flex-shrink: 0;
-    cursor: pointer;
+    font-size: 18px;
+    color: #666;
 }
 
-.search__input {
-    border: none;
-    outline: none;
-    background: transparent;
+.search__placeholder {
     margin-left: 8px;
-    width: 280px;
-    height: 40px;
-    opacity: 0;
-    transition: all 0.3s ease;
+    color: #888;
+    font-size: 14px;
+}
+
+/* ================================= */
+/* MODAL TÌM KIẾM (Ảnh 1)            */
+/* ================================= */
+.search-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    display: flex;
+    justify-content: flex-end; /* Ép form tìm kiếm sang lề phải */
+}
+
+/* Khung trắng bên phải */
+.search-modal-container {
+    background-color: #fff;
+    width: 400px;
+    max-width: 100%;
+    height: 100%;
+    padding: 25px 30px;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+.search-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.search-modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.search-close-icon {
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+}
+
+.search-modal-input-box {
+    position: relative;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    height: 45px;
+    margin-bottom: 20px;
+}
+
+.search-modal-input-box input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
     font-size: 14px;
     color: #333;
 }
 
-.header__search:hover .search__input {
-    width: 280px;
-    height: 40px;
-    opacity: 1;
+.search-modal-icon {
+    color: #999;
+    font-size: 18px;
+}
+
+/* ================================= */
+/* KẾT QUẢ TÌM KIẾM (Ảnh 2)          */
+/* ================================= */
+.search-results-list {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Kẻ gạch đứt bên dưới mỗi sản phẩm */
+.search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px dotted #ccc; 
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background-color: #fafafa;
+}
+
+.search-item-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.search-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.search-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.search-item-name {
+    font-size: 14px;
+    color: #333;
+    font-weight: 400;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Cắt tên nếu quá 2 dòng */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.search-item-price {
+    font-size: 14px;
+    color: #888; /* Màu xám theo hình mẫu */
+}
+
+.search-loading {
+    text-align: center;
+    margin-top: 20px;
+    color: #888;
+    font-size: 14px;
 }

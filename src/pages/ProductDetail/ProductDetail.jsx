@@ -5,11 +5,10 @@ import {
     getProductVariants,
     getVariantImages
 } from "../../services/productService";
-// IMPORT API COUPON CỦA BẠN VÀO ĐÂY
 import { getCouponList } from "../../services/couponService";
 import "./ProductDetail.css";
 import { getMyCart, addToCart } from "../../services/cartService";
-import { getAccessToken } from "../../utils/tokenStore";
+import { getAccessToken, getCurrentUser } from "../../utils/tokenStore";
 
 const getColorStyle = (colorString) => {
     if (!colorString) return "#ccc";
@@ -127,19 +126,16 @@ function ProductDetail() {
         const fetchInitialData = async () => {
             try {
                 setLoading(true);
-                const [productData, variantsData, couponsData] = await Promise.all([
+                
+                // 1. LẤY SẢN PHẨM VÀ BIẾN THỂ (Bắt buộc phải có)
+                const [productData, variantsData] = await Promise.all([
                     getProductById(productId),
-                    getProductVariants(productId),
-                    getCouponList() // Fetch coupons
+                    getProductVariants(productId)
                 ]);
 
-                setProduct(productData.data || []);
-                const variantsList = variantsData.data || [];
+                setProduct(productData.data || productData || []);
+                const variantsList = variantsData.data || variantsData || [];
                 setVariants(variantsList);
-
-                if (couponsData && couponsData.data) {
-                    setCoupons(couponsData.data);
-                }
 
                 if (variantsList.length > 0) {
                     const uniqueColors = [...new Set(variantsList.map(v => v.color))];
@@ -152,8 +148,23 @@ function ProductDetail() {
                     setSelectedSize(initialVariantsOfColor[0].size);
                     setActiveVariant(initialVariantsOfColor[0]);
                 }
+
+                // 2. LẤY MÃ GIẢM GIÁ ĐỘC LẬP (Lỗi thì bỏ qua, không làm sập trang)
+                try {
+                    const couponsData = await getCouponList();
+                    // Xử lý thông minh: Quét cả .data.content, .data hoặc chính nó
+                    const fetchedCoupons = couponsData?.data?.content || couponsData?.data || couponsData || [];
+                    
+                    if (Array.isArray(fetchedCoupons)) {
+                        setCoupons(fetchedCoupons);
+                    }
+                } catch (couponError) {
+                    console.error("Lỗi tải mã giảm giá, bỏ qua hiển thị coupon:", couponError);
+                    setCoupons([]); // Đưa về rỗng để ẩn UI đi
+                }
+
             } catch (err) {
-                console.error("Lỗi khi tải dữ liệu:", err);
+                console.error("Lỗi khi tải dữ liệu sản phẩm:", err);
                 setError("Không thể tải thông tin sản phẩm lúc này.");
             } finally {
                 setLoading(false);
@@ -203,8 +214,15 @@ function ProductDetail() {
             return;
         }
 
+        const user = getCurrentUser();
+        if (!user) {
+            alert("Không lấy được thông tin người dùng, vui lòng đăng nhập lại!");
+            return;
+        }
+
         try {
             const payload = {
+                userId: user.userId,
                 variantId: activeVariant.productVariantId,
                 quantity: quantity
             };
@@ -212,9 +230,7 @@ function ProductDetail() {
             const response = await addToCart(payload);
 
             if (response.statusCode === 200) {
-                // Sau khi thêm thành công, gọi API lấy lại giỏ hàng để hiện thông tin lên Modal
                 const cartData = await getMyCart();
-                // Tính toán tổng tiền và số lượng từ cartData.data
                 const items = cartData.data?.items || [];
                 const total = items.reduce(
                     (sum, item) =>
@@ -266,6 +282,22 @@ function ProductDetail() {
     const handleQuantityChange = (type) => {
         if (type === "decrease" && quantity > 1) setQuantity(quantity - 1);
         if (type === "increase" && quantity < (activeVariant?.quantity || 1)) setQuantity(quantity + 1);
+    };
+
+    const handleThumbnailClick = (img) => {
+        setSelectedImage(img.imageURL);
+        if (img.productVariantId) {
+            const matchedVariant = variants.find(v => v.productVariantId === img.productVariantId);
+            
+            if (matchedVariant) {
+                if (selectedColor !== matchedVariant.color) {
+                    setSelectedColor(matchedVariant.color);
+                }
+                setSelectedSize(matchedVariant.size);
+                setActiveVariant(matchedVariant);
+                setQuantity(1);
+            }
+        }
     };
 
     const handleCopyCode = (code) => {
@@ -347,7 +379,7 @@ function ProductDetail() {
                             <div
                                 key={img.imageId || index}
                                 className={`pro-thumbnail ${selectedImage === img.imageURL ? 'active' : ''}`}
-                                onClick={() => setSelectedImage(img.imageURL)}
+                                onClick={() => handleThumbnailClick(img)}
                             >
                                 <img src={img.imageURL} alt="Thumbnail" />
                             </div>

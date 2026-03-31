@@ -3,9 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { FiUser, FiShoppingCart, FiSearch, FiLogOut, FiSettings, FiX, FiUser as FiProfile } from 'react-icons/fi';
 import "./header.css";
 
-// Giả sử file chứa getCateList của bạn tên là categoryService
 import { getCateList } from "../../services/cateService";
-import { getProductList, getFilteredProducts, getProductVariants } from "../../services/productService";
+import { getFilteredProducts, getProductVariants } from "../../services/productService";
 import { getMyCart } from "../../services/cartService";
 import { logout } from "../../services/authService";
 import { getCurrentUser, clearAccessToken, clearCurrentUser } from "../../utils/tokenStore";
@@ -28,16 +27,8 @@ const Header = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [totalSearchElements, setTotalSearchElements] = useState(0);
 
-    // --- STATE CHO MEGA MENU ---
+    // --- STATE CATEGORY ---
     const [categories, setCategories] = useState([]);
-    const [brands, setBrands] = useState([]);
-
-    // Khai báo Enum Gender
-    const genders = [
-        { code: 'MALE', label: 'Sneaker Nam' },
-        { code: 'FEMALE', label: 'Sneaker Nữ' },
-        { code: 'OTHER', label: 'Sneaker Unisex/Khác' }
-    ];
 
     const isLoggedIn = !!userProfile;
     const isAdmin = userProfile && (userProfile.roleCode === 'ADMIN' || userProfile.roleCode === 'ROLE_ADMIN');
@@ -63,7 +54,6 @@ const Header = () => {
         }
     };
 
-    // Khởi tạo Auth & Cart
     useEffect(() => {
         fetchUserFromMemory();
         fetchCartCount();
@@ -83,24 +73,13 @@ const Header = () => {
         };
     }, []);
 
-    // Fetch dữ liệu cho Mega Menu (Categories và Brands)
+    // Fetch dữ liệu Categories
     useEffect(() => {
         const fetchMenuData = async () => {
             try {
-                // 1. Lấy danh sách Categories
                 const cateRes = await getCateList();
-                console.log(cateRes);
                 const cateList = cateRes.data?.data || cateRes.data || cateRes || [];
                 setCategories(cateList);
-
-                // 2. Lấy danh sách Product để bóc tách Brand
-                const prodRes = await getProductList();
-                const dataList = prodRes.data?.data || prodRes.data || prodRes || [];
-
-                // Trích xuất các brand (loại bỏ các giá trị null/undefined và trùng lặp)
-                const uniqueBrands = [...new Set(dataList.map(item => item.brand).filter(Boolean))];
-                setBrands(uniqueBrands);
-
             } catch (error) {
                 console.error("Lỗi lấy dữ liệu menu:", error);
             }
@@ -121,9 +100,7 @@ const Header = () => {
             }
         };
         window.addEventListener('scroll', controlNavbar);
-        return () => {
-            window.removeEventListener('scroll', controlNavbar);
-        };
+        return () => window.removeEventListener('scroll', controlNavbar);
     }, [lastScrollY]);
 
     const handleLogout = async () => {
@@ -159,14 +136,12 @@ const Header = () => {
                                 const productId = product.productId || product.id;
                                 const variantRes = await getProductVariants(productId);
                                 const variants = variantRes.data?.data || variantRes.data || variantRes || [];
-
                                 let minPrice = 0;
                                 if (variants && variants.length > 0) {
                                     minPrice = Math.min(...variants.map(v => v.basePrice || 0));
                                 }
                                 return { ...product, minPrice };
                             } catch (err) {
-                                console.error(`Lỗi lấy biến thể cho sản phẩm ${product.id}:`, err);
                                 return { ...product, minPrice: 0 };
                             }
                         })
@@ -184,6 +159,12 @@ const Header = () => {
 
         return () => clearTimeout(delayDebounceFn);
     }, [searchTerm]);
+
+    // --- TÁCH DANH MỤC GỐC VÀ CON ---
+    // Danh mục gốc: Những danh mục có parentId là null, hoặc mảng rỗng []
+    const rootCategories = categories.filter(cate =>
+        !cate.parentId || (Array.isArray(cate.parentId) && cate.parentId.length === 0)
+    );
 
     const userMenuItems = [
         {
@@ -204,9 +185,7 @@ const Header = () => {
                 )
             }
         ] : []),
-        {
-            type: 'divider',
-        },
+        { type: 'divider' },
         {
             key: 'logout',
             label: (
@@ -222,63 +201,51 @@ const Header = () => {
             <Link to='/' className="logo">
                 <img src={logo} alt="PTIT Shoe Shop logo" />
             </Link>
+
             <nav className="nav">
+                <Link to="/sale" className="nav-highlight">Khuyến mãi</Link>
 
-                <Link to="/">Trang chủ</Link>
+                {["Nam", "Nữ", "Bé trai", "Bé gái"].map((menuName, index) => {
+                    const parentCate = categories.find(
+                        c => c.categoryName?.toLowerCase() === menuName.toLowerCase()
+                    );
+                    let childCategories = [];
+                    if (parentCate) {
+                        const parentId = parentCate.categoryId || parentCate.id;
+                        childCategories = categories.filter(child => {
+                            if (Array.isArray(child.parentId)) return child.parentId.includes(parentId);
+                            return child.parentId === parentId;
+                        });
+                    }
 
-                <div className="menu-item">
-                    <Link to="/productsPage" className="menu-link">
-                        Sản phẩm <span className="arrow">▼</span>
-                    </Link>
+                    return (
+                        <div className="menu-item" key={index}>
+                            {/* Nút danh mục gốc (Có thể truyền tên hoặc ID lên URL tùy backend của mày) */}
+                            <Link
+                                to={`/productsPage?categoryName=${menuName}`}
+                                className="menu-link"
+                            >
+                                {menuName} {childCategories.length > 0 && <span className="arrow">▼</span>}
+                            </Link>
 
-                    <div className="mega-menu">
-                        <div className="mega-col">
-                            <h4>Thương hiệu</h4>
-                            <div className="mega-col-links">
-                                {brands.length > 0 ? (
-                                    brands.map((brand, index) => (
-                                        <Link key={index} to={`/productsPage?brand=${brand}`}>
-                                            {brand}
+                            {/* DROPDOWN CHỨA CÁC DANH MỤC CON (Chỉ hiện khi có data con) */}
+                            {childCategories.length > 0 && (
+                                <div className="simple-dropdown">
+                                    {childCategories.map(child => (
+                                        <Link
+                                            key={child.categoryId || child.id}
+                                            to={`/productsPage?categoryId=${child.categoryId || child.id}`}
+                                        >
+                                            {child.categoryName}
                                         </Link>
-                                    ))
-                                ) : (
-                                    <span>Đang tải...</span>
-                                )}
-                            </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
+                    );
+                })}
 
-                        <div className="mega-col">
-                            <h4>Nhu cầu sử dụng</h4>
-                            <div className="mega-col-links">
-                                {categories.length > 0 ? (
-                                    categories.map((cate) => (
-                                        <Link key={cate.categoryId || cate.id} to={`/productsPage?categoryId=${cate.categoryId || cate.id}`}>
-                                            {cate.categoryName || cate.name}
-                                        </Link>
-                                    ))
-                                ) : (
-                                    <span>Đang tải...</span>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* --- Cột 3: ĐỐI TƯỢNG (GENDER) --- */}
-                        <div className="mega-col">
-                            <h4>Đối tượng</h4>
-                            <div className="mega-col-links">
-                                {genders.map((gender) => (
-                                    <Link key={gender.code} to={`/productsPage?gender=${gender.code}`}>
-                                        {gender.label}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <Link to="/sale">Khuyến mãi</Link>
                 <Link to="/blog">Blog</Link>
-
             </nav>
 
             <div className="header-client-icons">
@@ -287,6 +254,7 @@ const Header = () => {
                 </div>
                 {isSearchOpen && (
                     <div className="search-modal-overlay">
+                        {/* Nội dung search giữ nguyên */}
                         <div className="search-modal-content">
                             <div className="search-modal-header">
                                 <h3>TÌM KIẾM</h3>
@@ -366,7 +334,6 @@ const Header = () => {
                     </Link>
                 )}
 
-                {/* Cart */}
                 {isLoggedIn && (
                     <Link to="/cart" className="icon cart-icon">
                         <FiShoppingCart size={24} />

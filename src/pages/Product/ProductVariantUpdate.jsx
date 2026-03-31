@@ -1,12 +1,14 @@
 import { Modal, Form, Input, InputNumber, Select, Button, message, Row, Col, ColorPicker, Upload } from "antd";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { updateProductVariant, createVariantImage } from "../../services/productService";
+import "./ProductVariantCreate.css"; // Dùng chung file CSS với form Create để lấy style giao diện Messenger
 
 function ProductVariantUpdate({ open, onClose, productId, variant, onReload }) {
     const [form] = Form.useForm();
     const [fileList, setFileList] = useState([]);
     const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         if (open && variant) {
             form.setFieldsValue({
@@ -22,13 +24,25 @@ function ProductVariantUpdate({ open, onClose, productId, variant, onReload }) {
                     uid: '-1',
                     name: 'image.png',
                     status: 'done',
-                    url: variant.imageURL,
+                    url: variant.imageURL, // Ảnh cũ có URL từ server
                 }]);
             } else {
                 setFileList([]);
             }
         }
     }, [open, variant, form]);
+
+    // Tạo URL preview cho ảnh đầu tiên (hỗ trợ cả ảnh cũ từ server và ảnh mới thêm)
+    const previewImage = useMemo(() => {
+        if (fileList.length > 0) {
+            const firstFile = fileList[0];
+            if (firstFile.originFileObj) {
+                return URL.createObjectURL(firstFile.originFileObj); // Ảnh mới chọn
+            }
+            return firstFile.url; // Ảnh cũ đã có trên server
+        }
+        return null;
+    }, [fileList]);
 
     const handleSubmit = async (values) => {
         setLoading(true);
@@ -43,13 +57,25 @@ function ProductVariantUpdate({ open, onClose, productId, variant, onReload }) {
                 basePrice: values.basePrice,
                 status: values.status
             };
+            
+            // 1. Cập nhật thông tin biến thể
             await updateProductVariant(productId, variant.productVariantId, payload);
-            if (fileList.length > 0 && fileList[0].originFileObj) {
-                const formData = new FormData();
-                formData.append("image", fileList[0].originFileObj);
-                formData.append("isPrimary", true);
-                await createVariantImage(productId, variant.productVariantId, formData);
+            
+            // 2. Lọc ra những file MỚI được chọn (có originFileObj) để gọi API upload
+            const newFiles = fileList.filter(file => file.originFileObj);
+
+            if (newFiles.length > 0) {
+                const uploadPromises = newFiles.map((file, index) => {
+                    const formData = new FormData();
+                    formData.append("image", file.originFileObj);
+                    // Đặt isPrimary = true cho ảnh mới upload đầu tiên
+                    formData.append("isPrimary", index === 0); 
+                    return createVariantImage(productId, variant.productVariantId, formData);
+                });
+
+                await Promise.all(uploadPromises);
             }
+
             message.success("Cập nhật biến thể thành công!");
             onReload();
             onClose();
@@ -114,24 +140,40 @@ function ProductVariantUpdate({ open, onClose, productId, variant, onReload }) {
                         </Form.Item>
                     </Col>
                     <Col span={12}>
-                        <Form.Item label="Đổi hình ảnh">
+                        <Form.Item label="Cập nhật hình ảnh">
                             <Upload
                                 beforeUpload={() => false}
-                                maxCount={1}
-                                listType="picture"
+                                multiple={true}
+                                showUploadList={false} // Ẩn danh sách mặc định
                                 fileList={fileList}
                                 onChange={({ fileList: newFileList }) => setFileList(newFileList)}
                                 accept="image/*"
                             >
-                                <Button icon={<UploadOutlined />}>Chọn ảnh mới</Button>
+                                <Button icon={<UploadOutlined />}>Thêm ảnh mới</Button>
                             </Upload>
+
+                            {/* UI HIỂN THỊ KIỂU MESSENGER */}
+                            {fileList.length > 0 && (
+                                <div className="messenger-image-preview">
+                                    <img 
+                                        src={previewImage} 
+                                        alt="preview" 
+                                        className="preview-img" 
+                                    />
+                                    {fileList.length > 1 && (
+                                        <div className="preview-overlay">
+                                            +{fileList.length - 1}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </Form.Item>
                     </Col>
                 </Row>
 
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-                    <Button onClick={onClose}>Hủy</Button>
-                    <Button type="primary" htmlType="submit">Lưu cập nhật</Button>
+                    <Button onClick={onClose} disabled={loading}>Hủy</Button>
+                    <Button type="primary" htmlType="submit" loading={loading}>Lưu cập nhật</Button>
                 </div>
             </Form>
         </Modal>
