@@ -60,3 +60,7 @@ export const getFilteredProducts = async (params) => {
     const queryString = searchParams.toString();
     return await get(`products/search?${queryString}`); 
 };
+
+export const getRecommendedProducts = async () => {
+    return await get("recommend-products"); 
+};
