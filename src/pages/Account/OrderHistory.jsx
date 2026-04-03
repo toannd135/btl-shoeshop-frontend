@@ -5,13 +5,11 @@ import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select; 
 
-const OrderHistory = () => {
+const OrderHistory = ({ highlightOrderId }) => {
     const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
-
     const [currentStatus, setCurrentStatus] = useState(null);
-
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [loadingDetail, setLoadingDetail] = useState(false);
@@ -59,6 +57,12 @@ const OrderHistory = () => {
     const handleTableChange = (newPagination) => {
         fetchOrders(newPagination.current, pagination.pageSize, currentStatus);
     };
+
+    useEffect(() => {
+        if (highlightOrderId) {
+            handleViewDetail(highlightOrderId);
+        }
+    }, [highlightOrderId]);
 
     const handleViewDetail = async (orderId) => {
         setIsModalVisible(true);

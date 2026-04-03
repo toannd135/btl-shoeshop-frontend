@@ -13,13 +13,23 @@ const ProductsPage = () => {
     const brandFilter = searchParams.get('brand');
     const categoryFilter = searchParams.get('categoryId');
     const genderFilter = searchParams.get('gender');
+
     // --- 1. STATES LƯU TRỮ DỮ LIỆU TỪ API ---
-    const [allProducts, setAllProducts] = useState([]); // Chứa TẤT CẢ sản phẩm gốc
+    const [allProducts, setAllProducts] = useState([]); 
     const [categories, setCategories] = useState([]);
     const [coupons, setCoupons] = useState([]);
+    
+    // States cho các danh sách filter động
     const [dynamicBrands, setDynamicBrands] = useState([]);
+    const [dynamicColors, setDynamicColors] = useState([]); // THÊM MỚI
+    const [dynamicSizes, setDynamicSizes] = useState([]);   // THÊM MỚI
+
+    // Toggles hiển thị "Xem thêm"
     const [showAllBrands, setShowAllBrands] = useState(false);
     const [showAllCategories, setShowAllCategories] = useState(false);
+    const [showAllColors, setShowAllColors] = useState(false); // THÊM MỚI
+    const [showAllSizes, setShowAllSizes] = useState(false);   // THÊM MỚI
+
     const DISPLAY_LIMIT = 5;
 
     // --- 2. STATES CHO BỘ LỌC, SẮP XẾP & PHÂN TRANG ---
@@ -27,13 +37,14 @@ const ProductsPage = () => {
         price: [],
         brands: [],
         categories: [],
-        gender: []
+        gender: [],
+        colors: [], // THÊM MỚI
+        sizes: []   // THÊM MỚI
     });
     const [sortOption, setSortOption] = useState('default');
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 12; // Hiển thị 12 sản phẩm / 1 trang (3 dòng)
+    const pageSize = 12;
 
-    // Cấu hình dữ liệu cứng cho các bộ lọc
     const priceRanges = [
         { label: 'Giá dưới 1.000.000đ', value: '0-1000000' },
         { label: '1.000.000đ - 2.000.000đ', value: '1000000-2000000' },
@@ -66,7 +77,6 @@ const ProductsPage = () => {
                 const brands = [...new Set(rawProducts.map(p => p.brand).filter(Boolean))];
                 setDynamicBrands(brands);
 
-                // Fetch variants gộp vào product
                 const productsWithVariants = await Promise.all(
                     rawProducts.map(async (product) => {
                         try {
@@ -74,18 +84,28 @@ const ProductsPage = () => {
                             const variants = variantRes?.data || variantRes || [];
                             let minPrice = 0;
                             let colors = [];
+                            let sizes = []; // THÊM MỚI
+                            
                             if (variants.length > 0) {
                                 minPrice = Math.min(...variants.map(v => v.basePrice));
                                 colors = [...new Set(variants.map(v => v.color).filter(Boolean))];
+                                sizes = [...new Set(variants.map(v => v.size).filter(Boolean))]; // Lấy tất cả size của SP này
                             }
-                            return { ...product, minPrice, colors };
+                            // Gắn cả sizes vào product object
+                            return { ...product, minPrice, colors, sizes }; 
                         } catch (err) {
-                            return { ...product, minPrice: 0, colors: [] };
+                            return { ...product, minPrice: 0, colors: [], sizes: [] };
                         }
                     })
                 );
-                // Lưu vào allProducts (danh sách gốc không bao giờ bị thay đổi)
+                
                 setAllProducts(productsWithVariants);
+
+                // THÊM MỚI: Tính toán danh sách Màu Sắc và Kích Thước DUY NHẤT trên toàn bộ cửa hàng
+                const globalColors = [...new Set(productsWithVariants.flatMap(p => p.colors))];
+                const globalSizes = [...new Set(productsWithVariants.flatMap(p => p.sizes))].sort((a, b) => Number(a) - Number(b)); // Sắp xếp size tăng dần
+                setDynamicColors(globalColors);
+                setDynamicSizes(globalSizes);
 
             } catch (error) {
                 message.error("Lỗi khi tải dữ liệu từ API!");
@@ -94,11 +114,11 @@ const ProductsPage = () => {
         fetchData();
     }, []);
 
-    // --- 4. LOGIC LỌC & SẮP XẾP (Chạy tự động mỗi khi filter, sort, hoặc data thay đổi) ---
+    // --- 4. LOGIC LỌC & SẮP XẾP ---
     const processedProducts = useMemo(() => {
         let result = [...allProducts];
 
-        // Lọc theo khoảng giá
+        // Lọc Giá
         if (filters.price.length > 0) {
             result = result.filter(p => {
                 return filters.price.some(range => {
@@ -108,19 +128,29 @@ const ProductsPage = () => {
             });
         }
 
-        // Lọc theo Hãng
+        // Lọc Hãng
         if (filters.brands.length > 0) {
             result = result.filter(p => filters.brands.includes(p.brand));
         }
 
-        // Lọc theo Loại sản phẩm
+        // Lọc Loại
         if (filters.categories.length > 0) {
             result = result.filter(p => filters.categories.includes(p.categoryId));
         }
 
-        // Lọc theo Giới tính
+        // Lọc Giới tính
         if (filters.gender.length > 0) {
             result = result.filter(p => filters.gender.includes(p.gender));
+        }
+
+        // THÊM MỚI: Lọc Màu sắc (Chỉ cần SP có chứa ít nhất 1 màu trong mảng filter)
+        if (filters.colors.length > 0) {
+            result = result.filter(p => p.colors && p.colors.some(c => filters.colors.includes(c)));
+        }
+
+        // THÊM MỚI: Lọc Kích thước (Chỉ cần SP có chứa ít nhất 1 size trong mảng filter)
+        if (filters.sizes.length > 0) {
+            result = result.filter(p => p.sizes && p.sizes.some(s => filters.sizes.includes(s)));
         }
 
         // Sắp xếp
@@ -144,18 +174,16 @@ const ProductsPage = () => {
                 result.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
                 break;
             default:
-                break; // Mặc định giữ nguyên gốc
+                break;
         }
 
         return result;
     }, [allProducts, filters, sortOption]);
 
-    // Khi bộ lọc hoặc sắp xếp thay đổi -> tự động đưa người dùng về trang 1
     useEffect(() => {
         setCurrentPage(1);
     }, [filters, sortOption]);
 
-    // Cắt mảng sản phẩm theo trang hiện tại để hiển thị
     const currentProducts = processedProducts.slice(
         (currentPage - 1) * pageSize,
         currentPage * pageSize
@@ -186,17 +214,14 @@ const ProductsPage = () => {
 
         validCoupons.forEach(c => {
             let discount = 0;
-
             if (c.discountType === "PERCENTAGE") {
                 discount = price * (Number(c.discountValue) / 100);
-
                 if (c.maxDiscount) {
                     discount = Math.min(discount, Number(c.maxDiscount));
                 }
             } else {
                 discount = Number(c.discountValue);
             }
-
             if (discount > bestDiscount) {
                 bestDiscount = discount;
                 bestCoupon = c;
@@ -264,10 +289,8 @@ const ProductsPage = () => {
 
             {/* MAIN CONTENT: Sidebar + Products */}
             <Row gutter={40}>
-
                 {/* SIDEBAR BỘ LỌC */}
                 <Col span={6}>
-                    {/* Lọc: Khoảng Giá */}
                     <div style={{ marginBottom: 24 }}>
                         <Title level={5}>Mức giá</Title>
                         <Checkbox.Group
@@ -280,16 +303,12 @@ const ProductsPage = () => {
                     <div style={{ marginBottom: 24 }}>
                         <Title level={5}>Hãng sản xuất</Title>
                         <Checkbox.Group
-                            options={showAllBrands ? dynamicBrands : dynamicBrands.slice(0, DISPLAY_LIMIT)}
+                            options={showAllBrands ? dynamicBrands.map(b => ({label: b, value: b})) : dynamicBrands.slice(0, DISPLAY_LIMIT).map(b => ({label: b, value: b}))}
                             style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
                             onChange={(checkedValues) => setFilters({ ...filters, brands: checkedValues })}
                         />
                         {dynamicBrands.length > DISPLAY_LIMIT && (
-                            <Button
-                                type="link"
-                                style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }}
-                                onClick={() => setShowAllBrands(!showAllBrands)}
-                            >
+                            <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }} onClick={() => setShowAllBrands(!showAllBrands)}>
                                 {showAllBrands ? 'Thu gọn' : `Xem thêm (${dynamicBrands.length - DISPLAY_LIMIT})`}
                             </Button>
                         )}
@@ -304,14 +323,9 @@ const ProductsPage = () => {
                             {(showAllCategories ? categories : categories.slice(0, DISPLAY_LIMIT)).map(cate => (
                                 <Checkbox key={cate.categoryId} value={cate.categoryId}>{cate.categoryName}</Checkbox>
                             ))}
-
                         </Checkbox.Group>
                         {categories.length > DISPLAY_LIMIT && (
-                            <Button
-                                type="link"
-                                style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }}
-                                onClick={() => setShowAllCategories(!showAllCategories)}
-                            >
+                            <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }} onClick={() => setShowAllCategories(!showAllCategories)}>
                                 {showAllCategories ? 'Thu gọn' : `Xem thêm (${categories.length - DISPLAY_LIMIT})`}
                             </Button>
                         )}
@@ -325,6 +339,40 @@ const ProductsPage = () => {
                             onChange={(checkedValues) => setFilters({ ...filters, gender: checkedValues })}
                         />
                     </div>
+
+                    {/* THÊM MỚI: UI Bộ lọc Màu sắc */}
+                    {dynamicColors.length > 0 && (
+                        <div style={{ marginBottom: 24 }}>
+                            <Title level={5}>Màu sắc</Title>
+                            <Checkbox.Group
+                                options={showAllColors ? dynamicColors.map(c => ({label: c, value: c})) : dynamicColors.slice(0, DISPLAY_LIMIT).map(c => ({label: c, value: c}))}
+                                style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+                                onChange={(checkedValues) => setFilters({ ...filters, colors: checkedValues })}
+                            />
+                            {dynamicColors.length > DISPLAY_LIMIT && (
+                                <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }} onClick={() => setShowAllColors(!showAllColors)}>
+                                    {showAllColors ? 'Thu gọn' : `Xem thêm (${dynamicColors.length - DISPLAY_LIMIT})`}
+                                </Button>
+                            )}
+                        </div>
+                    )}
+
+                    {/* THÊM MỚI: UI Bộ lọc Kích thước */}
+                    {dynamicSizes.length > 0 && (
+                        <div style={{ marginBottom: 24 }}>
+                            <Title level={5}>Kích thước (Size)</Title>
+                            <Checkbox.Group
+                                options={showAllSizes ? dynamicSizes.map(s => ({label: `Size ${s}`, value: s})) : dynamicSizes.slice(0, DISPLAY_LIMIT).map(s => ({label: `Size ${s}`, value: s}))}
+                                style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+                                onChange={(checkedValues) => setFilters({ ...filters, sizes: checkedValues })}
+                            />
+                            {dynamicSizes.length > DISPLAY_LIMIT && (
+                                <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }} onClick={() => setShowAllSizes(!showAllSizes)}>
+                                    {showAllSizes ? 'Thu gọn' : `Xem thêm (${dynamicSizes.length - DISPLAY_LIMIT})`}
+                                </Button>
+                            )}
+                        </div>
+                    )}
                 </Col>
 
                 {/* KHU VỰC HIỂN THỊ SẢN PHẨM */}
@@ -360,20 +408,12 @@ const ProductsPage = () => {
                                             <Card
                                                 hoverable
                                                 cover={
-                                                    // Bỏ padding, thêm overflow hidden để ảnh không bị tràn góc bo
                                                     <div style={{ background: '#f6f6f6', aspectRatio: '1/1', overflow: 'hidden', position: "relative" }}>
                                                         {discountInfo && (
                                                             <div style={{
-                                                                position: "absolute",
-                                                                top: 8,
-                                                                left: 8,
-                                                                background: "#ff4d4f",
-                                                                color: "white",
-                                                                padding: "2px 6px",
-                                                                fontSize: 12,
-                                                                fontWeight: 600,
-                                                                borderRadius: 4,
-                                                                zIndex: 2
+                                                                position: "absolute", top: 8, left: 8, background: "#ff4d4f",
+                                                                color: "white", padding: "2px 6px", fontSize: 12,
+                                                                fontWeight: 600, borderRadius: 4, zIndex: 2
                                                             }}>
                                                                 {discountInfo.coupon.discountType === "PERCENTAGE"
                                                                     ? `-${discountInfo.coupon.discountValue}%`
@@ -384,37 +424,21 @@ const ProductsPage = () => {
                                                         <img
                                                             alt={product.name}
                                                             src={product.imageUrl}
-                                                            // Đổi objectFit thành cover và set 100% để ảnh lấp đầy khung
                                                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                         />
                                                     </div>
                                                 }
-                                                // Giảm padding tổng thể để box trông gọn hơn
                                                 bodyStyle={{ padding: '8px 10px' }}
                                             >
-                                                {/* Brand: Thêm display block và ép margin bottom nhỏ lại */}
                                                 <Text type="secondary" style={{ fontSize: 10, textTransform: 'uppercase', display: 'block', marginBottom: 2 }}>
                                                     {product.brand}
                                                 </Text>
 
-                                                {/* Tên SP: Bỏ margin top, ép margin bottom xuống còn 6px */}
                                                 <Paragraph ellipsis={{ rows: 2 }} style={{ margin: "2px 0 4px 0", fontSize: 13, fontWeight: 500, lineHeight: 1.3 }}>
                                                     {product.name}
                                                 </Paragraph>
 
-                                                {/* Bọc Giá và Màu chung 1 div flex để chúng nằm ngang hàng nhau */}
-                                                <div
-                                                    style={{
-                                                        display: "grid",
-                                                        gridTemplateColumns: "1fr auto",
-                                                        gridTemplateRows: "auto auto",
-                                                        columnGap: 8,
-                                                        rowGap: 1,
-                                                        alignItems: "center",
-                                                        marginTop: -2
-                                                    }}
-                                                >
-
+                                                <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gridTemplateRows: "auto auto", columnGap: 8, rowGap: 1, alignItems: "center", marginTop: -2 }}>
                                                     {/* GIÁ SAU KHI GIẢM */}
                                                     <div style={{ color: "#f53d2d", fontWeight: "bold", fontSize: 14 }}>
                                                         {discountInfo
@@ -423,62 +447,31 @@ const ProductsPage = () => {
                                                     </div>
 
                                                     {/* MÀU HÀNG 1 */}
-                                                    <div
-                                                        style={{
-                                                            display: "grid",
-                                                            gridTemplateColumns: "repeat(4, 14px)",
-                                                            gap: 4
-                                                        }}
-                                                    >
+                                                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 14px)", gap: 4 }}>
                                                         {product.colors?.slice(0, 4).map((colorStr, idx) => (
-                                                            <div
-                                                                key={idx}
-                                                                style={{
-                                                                    width: 14,
-                                                                    height: 14,
-                                                                    borderRadius: "50%",
-                                                                    border: "1px solid #ddd",
-                                                                    backgroundColor: colorStr
-                                                                }}
-                                                            />
+                                                            <div key={idx} style={{
+                                                                width: 14, height: 14, borderRadius: "50%",
+                                                                border: "1px solid #ddd", backgroundColor: colorStr
+                                                            }} />
                                                         ))}
                                                     </div>
 
                                                     {/* GIÁ CŨ */}
                                                     {discountInfo && (
-                                                        <div
-                                                            style={{
-                                                                fontSize: 12,
-                                                                textDecoration: "line-through",
-                                                                color: "#999"
-                                                            }}
-                                                        >
+                                                        <div style={{ fontSize: 12, textDecoration: "line-through", color: "#999" }}>
                                                             {formatPrice(product.minPrice)}
                                                         </div>
                                                     )}
 
                                                     {/* MÀU HÀNG 2 */}
-                                                    <div
-                                                        style={{
-                                                            display: "grid",
-                                                            gridTemplateColumns: "repeat(4, 14px)",
-                                                            gap: 4
-                                                        }}
-                                                    >
+                                                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 14px)", gap: 4 }}>
                                                         {product.colors?.slice(4, 8).map((colorStr, idx) => (
-                                                            <div
-                                                                key={idx}
-                                                                style={{
-                                                                    width: 14,
-                                                                    height: 14,
-                                                                    borderRadius: "50%",
-                                                                    border: "1px solid #ddd",
-                                                                    backgroundColor: colorStr
-                                                                }}
-                                                            />
+                                                            <div key={idx} style={{
+                                                                width: 14, height: 14, borderRadius: "50%",
+                                                                border: "1px solid #ddd", backgroundColor: colorStr
+                                                            }} />
                                                         ))}
                                                     </div>
-
                                                 </div>
                                             </Card>
                                         </Link>
@@ -492,7 +485,6 @@ const ProductsPage = () => {
                         </div>
                     )}
 
-                    {/* PHÂN TRANG: Tự động tính tổng dựa trên số sản phẩm sau khi lọc */}
                     {processedProducts.length > 0 && (
                         <div style={{ textAlign: 'center', marginTop: 40 }}>
                             <Pagination

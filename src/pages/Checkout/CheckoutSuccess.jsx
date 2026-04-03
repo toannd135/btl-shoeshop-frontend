@@ -94,7 +94,17 @@ const CheckoutSuccess = () => {
         {/* NÚT ĐIỀU HƯỚNG (Chỉ hiện khi đã xử lý xong) */}
         {paymentStatus !== 'processing' && (
           <div className="action-buttons">
-            <button className="btn-view-order" onClick={() => navigate(`/account/orders/${orderId}`)}>
+            <button
+              className="btn-view-order"
+              onClick={() => {
+                navigate('/account', {
+                  state: {
+                    activeTab: 'orders',
+                    orderId: realOrderId
+                  }
+                });
+              }}
+            >
               Xem đơn hàng
             </button>
             <button className="btn-continue" onClick={() => navigate('/')}>
