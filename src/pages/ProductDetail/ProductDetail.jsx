@@ -222,7 +222,6 @@ function ProductDetail() {
 
         try {
             const payload = {
-                userId: user.userId,
                 variantId: activeVariant.productVariantId,
                 quantity: quantity
             };

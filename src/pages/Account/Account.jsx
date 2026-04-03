@@ -1,12 +1,26 @@
 import React, { useState } from 'react';
 import './Account.css';
+import { useLocation } from 'react-router-dom';
 import AccountInfo from './AccountInfo';
 import ChangePassword from './ChangePassword';
 import OrderHistory from "./OrderHistory";
 import AddressList from "./AddressList";
 
 function AccountPage() {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('info');
+  const [highlightOrderId, setHighlightOrderId] = useState(null);
+
+  useEffect(() => {
+    if (location.state) {
+      if (location.state.activeTab) {
+        setActiveTab(location.state.activeTab); 
+      }
+      if (location.state.orderId) {
+        setHighlightOrderId(location.state.orderId); 
+      }
+    }
+  }, [location.state]);
 
   const getTabName = () => {
     switch (activeTab) {
@@ -25,7 +39,7 @@ function AccountPage() {
       case 'password':
         return <ChangePassword />; 
       case 'orders':
-        return <OrderHistory />; 
+        return <OrderHistory highlightOrderId={highlightOrderId} />; 
       case 'addresses':
         return <AddressList/>
       default:
