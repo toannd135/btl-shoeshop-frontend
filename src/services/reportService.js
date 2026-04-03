@@ -22,3 +22,7 @@ export const getTopSpendersReport = async (params = {}) => {
     const response = await getPage("admin/reports/customers/top-spenders", params);
     return response;
 };
+
+export const getTopSellingProducts = async () => {
+    return await get("admin/analytics/top-selling-products");
+};

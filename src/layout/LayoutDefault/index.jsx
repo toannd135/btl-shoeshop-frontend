@@ -12,14 +12,15 @@ import Profile from '../../components/Profile';
 import Search from '../../components/Search';
 import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 function LayoutDefault() {
     const [collapse, setCollapse] = useState(false);
-
+    const navigate = useNavigate();
     return (
         <Layout className="layout-default">
             <Header className="header">
                 <div className='header__left'>
-                    <div className='header__logo'>
+                    <div className='header__logo' onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
                         <img src={logo_shoeshop_removebg_preview} alt="logo" />
                     </div>
 
