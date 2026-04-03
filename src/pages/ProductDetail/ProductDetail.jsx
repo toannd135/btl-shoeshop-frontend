@@ -3,7 +3,8 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import {
     getProductById,
     getProductVariants,
-    getVariantImages
+    getVariantImages,
+    getRecommendedProducts
 } from "../../services/productService";
 import { getCouponList } from "../../services/couponService";
 import "./ProductDetail.css";
@@ -21,16 +22,6 @@ const getColorStyle = (colorString) => {
     };
     return colorMap[colorString.toUpperCase()] || "#ccc";
 };
-
-const fakeSuggestedProducts = [
-    { id: 101, name: "Giày Thể Thao Nam Năng Động", price: 550000, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" },
-    { id: 102, name: "Giày Chạy Bộ Nữ Siêu Nhẹ", price: 650000, image: "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=400&q=80" },
-    { id: 103, name: "Giày Sneaker Cổ Thấp Thời Trang", price: 450000, image: "https://images.unsplash.com/photo-1514989940723-e8e51635b782?w=400&q=80" },
-    { id: 104, name: "Giày Vải Canvas Trẻ Trung", price: 350000, image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=400&q=80" },
-    { id: 105, name: "Giày Lười Nam Tiện Lợi", price: 500000, image: "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=400&q=80" },
-    { id: 106, name: "Giày Boot Nam Cổ Cao Cực Chất", price: 850000, image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=400&q=80" },
-    { id: 107, name: "Giày Cao Gót Nữ Thanh Lịch", price: 400000, image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80" }
-];
 
 // Hàm hỗ trợ format tiền
 const formatMoneyK = (value) => {
@@ -77,6 +68,50 @@ const formatDate = (dateString) => {
     return date.toLocaleDateString("vi-VN");
 };
 
+const SuggestedProductCard = ({ prod }) => {
+    const navigate = useNavigate();
+    const [price, setPrice] = useState(0);
+
+    useEffect(() => {
+        const fetchVariantPrice = async () => {
+            try {
+                const res = await getProductVariants(prod.productId);
+                const variantsList = res?.data || res || [];
+                
+                if (variantsList.length > 0) {
+                    setPrice(variantsList[0].basePrice || 0);
+                }
+            } catch (err) {
+                console.error("Lỗi lấy giá sản phẩm gợi ý:", err);
+            }
+        };
+
+        if (prod?.productId) {
+            fetchVariantPrice();
+        }
+    }, [prod.productId]);
+
+    return (
+        <div
+            className="suggested-card"
+            onClick={() => navigate(`/product/${prod.productId}`)}
+        >
+            <div className="suggested-img-box">
+                <img
+                    src={prod.imageUrl}
+                    alt={prod.name}
+                />
+            </div>
+            <div className="suggested-info">
+                <h4 className="suggested-name">{prod.name}</h4>
+                <p className="suggested-price">
+                    {price > 0 ? `${price.toLocaleString('vi-VN')}đ` : "Đang cập nhật"}
+                </p>
+            </div>
+        </div>
+    );
+};
+
 function ProductDetail() {
     const { id: productId } = useParams();
     const navigate = useNavigate();
@@ -105,6 +140,7 @@ function ProductDetail() {
     const [selectedCoupon, setSelectedCoupon] = useState(null);  // Mở chi tiết mã (Ảnh 2)
 
     const sliderRef = useRef(null);
+    const [suggestedProducts, setSuggestedProducts] = useState([]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -117,7 +153,7 @@ function ProductDetail() {
                     slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
                 }
             }
-        }, 1500); 
+        }, 1500);
 
         return () => clearInterval(interval);
     }, []);
@@ -126,16 +162,19 @@ function ProductDetail() {
         const fetchInitialData = async () => {
             try {
                 setLoading(true);
-                
+
                 // 1. LẤY SẢN PHẨM VÀ BIẾN THỂ (Bắt buộc phải có)
-                const [productData, variantsData] = await Promise.all([
+                const [productData, variantsData, recommendData] = await Promise.all([
                     getProductById(productId),
-                    getProductVariants(productId)
-                ]);
+                    getProductVariants(productId),
+                    getRecommendedProducts()
+                ].map(p => p.catch(e => e)));
 
                 setProduct(productData.data || productData || []);
                 const variantsList = variantsData.data || variantsData || [];
                 setVariants(variantsList);
+                const recList = recommendData.data || [];
+                setSuggestedProducts(recList);
 
                 if (variantsList.length > 0) {
                     const uniqueColors = [...new Set(variantsList.map(v => v.color))];
@@ -154,7 +193,7 @@ function ProductDetail() {
                     const couponsData = await getCouponList();
                     // Xử lý thông minh: Quét cả .data.content, .data hoặc chính nó
                     const fetchedCoupons = couponsData?.data?.content || couponsData?.data || couponsData || [];
-                    
+
                     if (Array.isArray(fetchedCoupons)) {
                         setCoupons(fetchedCoupons);
                     }
@@ -287,7 +326,7 @@ function ProductDetail() {
         setSelectedImage(img.imageURL);
         if (img.productVariantId) {
             const matchedVariant = variants.find(v => v.productVariantId === img.productVariantId);
-            
+
             if (matchedVariant) {
                 if (selectedColor !== matchedVariant.color) {
                     setSelectedColor(matchedVariant.color);
@@ -675,19 +714,15 @@ function ProductDetail() {
             <div className="suggested-wrapper">
                 <h2 className="suggested-title">Có thể bạn sẽ thích</h2>
 
-                <div className="suggested-list" ref={sliderRef}>
-                    {fakeSuggestedProducts.map((prod) => (
-                        <div className="suggested-card" key={prod.id} onClick={() => alert("Chuyển hướng đến: " + prod.name)}>
-                            <div className="suggested-img-box">
-                                <img src={prod.image} alt={prod.name} />
-                            </div>
-                            <div className="suggested-info">
-                                <h4 className="suggested-name">{prod.name}</h4>
-                                <p className="suggested-price">{prod.price.toLocaleString('vi-VN')}đ</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                {suggestedProducts.length === 0 ? (
+                    <p style={{ textAlign: "center", color: "#666" }}>Chưa có sản phẩm gợi ý nào.</p>
+                ) : (
+                    <div className="suggested-list" ref={sliderRef}>
+                        {suggestedProducts.map((prod) => (
+                            <SuggestedProductCard key={prod.productId} prod={prod} />
+                        ))}
+                    </div>
+                )}
             </div>
 
         </div>
