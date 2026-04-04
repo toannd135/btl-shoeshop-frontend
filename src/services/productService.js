@@ -68,3 +68,7 @@ export const getFilteredProducts = async (params) => {
 export const getRecommendedProducts = async () => {
     return await get("recommend-products"); 
 };
+
+export const getTopProducts = async () => {
+    return await get("products/top");
+};
