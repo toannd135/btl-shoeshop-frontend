@@ -145,7 +145,7 @@ function Dashboard() {
                             <Text type="secondary" strong style={{ fontSize: 12 }}>TỔNG KHÁCH HÀNG</Text>
                             <Avatar shape="square" size="small" style={{ backgroundColor: '#f3f4f6', color: '#374151' }} icon={<UsergroupAddOutlined />} />
                         </div>
-                        <Title level={1} style={{ color: '#4f46e5', marginTop: 10, marginBottom: 10 }}>
+                        <Title level={2} style={{ color: '#4f46e5', marginTop: 10, marginBottom: 10 }}>
                             {customerOverview.totalCustomers?.toLocaleString()}
                         </Title>
                         <Space>
@@ -161,7 +161,7 @@ function Dashboard() {
                             <Text type="secondary" strong style={{ fontSize: 12 }}>KHÁCH HÀNG MỚI</Text>
                             <Avatar shape="square" size="small" style={{ backgroundColor: '#fdf4ff', color: '#c026d3' }} icon={<StarOutlined />} />
                         </div>
-                        <Title level={1} style={{ color: '#8b5cf6', marginTop: 10, marginBottom: 10 }}>
+                        <Title level={2} style={{ color: '#8b5cf6', marginTop: 10, marginBottom: 10 }}>
                             {customerOverview.newCustomersThisMonth?.toLocaleString()}
                         </Title>
                         <Space>
@@ -177,7 +177,7 @@ function Dashboard() {
                             <Text type="secondary" strong style={{ fontSize: 12 }}>ĐÃ MUA HÀNG</Text>
                             <Avatar shape="square" size="small" style={{ backgroundColor: '#e0f2fe', color: '#0284c7' }} icon={<ShoppingCartOutlined />} />
                         </div>
-                        <Title level={1} style={{ color: '#0ea5e9', marginTop: 10, marginBottom: 10 }}>
+                        <Title level={2} style={{ color: '#0ea5e9', marginTop: 10, marginBottom: 10 }}>
                             {customerOverview.customersWithOrders?.toLocaleString()}
                         </Title>
                         <Space>
@@ -193,7 +193,7 @@ function Dashboard() {
                             <Text type="secondary" strong style={{ fontSize: 12 }}>TỔNG DOANH THU</Text>
                             <Avatar shape="square" size="small" style={{ backgroundColor: '#fef3c7', color: '#d97706' }} icon={<DollarCircleOutlined />} />
                         </div>
-                        <Title level={1} style={{ color: '#ea580c', marginTop: 10, marginBottom: 10 }}>
+                        <Title level={2} style={{ color: '#ea580c', marginTop: 10, marginBottom: 10 }}>
                             {totalRevenueCalc?.toLocaleString()}
                         </Title>
                         <Space>
@@ -205,7 +205,7 @@ function Dashboard() {
             </Row>
 
             <Row gutter={[20, 20]} style={{ marginTop: 20 }}>
-                <Col xs={24} lg={16}>
+                <Col xs={24} lg={14}>
                     <Card
                         loading={loading}
                         style={{ height: "450px", borderRadius: 16, border: 'none', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}
@@ -242,7 +242,7 @@ function Dashboard() {
                     </Card>
                 </Col>
 
-                <Col xs={24} lg={8}>
+                <Col xs={24} lg={10}>
                     <Card
                         loading={loading}
                         style={{ height: "450px", borderRadius: 16, border: 'none', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', overflowY: 'auto' }}
@@ -256,7 +256,7 @@ function Dashboard() {
                                 <List.Item style={{ borderBottom: 'none', padding: '12px 0' }}>
                                     <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, minWidth: 0 }}>
-                                            <Text type="secondary" strong>{index + 1}</Text>
+                                            <Text type="secondary" strong style={{ minWidth: '20px', flexShrink: 0, textAlign: 'center' }}>{index + 1}</Text>
                                             <Avatar src={item.imageUrl} shape="square" size={40} style={{ backgroundColor: '#f3f4f6', flexShrink: 0 }} />
                                             <div style={{ minWidth: 0 }}>
                                                 <Text strong style={{ display: 'block', fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

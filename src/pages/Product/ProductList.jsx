@@ -101,9 +101,18 @@ function ProductList() {
     };
     const categoryMap = useMemo(() => {
         const map = {};
+        const cateObjMap = {};
         categories.forEach(cate => {
-            map[cate.categoryId] = cate.categoryName;
+            cateObjMap[cate.categoryId] = cate;
         });
+        categories.forEach(cate => {
+            let displayName = cate.categoryName;
+            if (cate.parentId && cateObjMap[cate.parentId]) {
+                displayName = `${cate.categoryName} - ${cateObjMap[cate.parentId].categoryName}`;
+            }
+            map[cate.categoryId] = displayName;
+        });
+        
         return map;
     }, [categories]);
 
