@@ -1,237 +1,82 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProductCard from "../ProductCard";
+import { getTopProducts, getProductVariants } from "../../services/productService";
+import { getCateList } from "../../services/cateService"; // Gọi thêm API lấy danh mục
 import "./ProductList.css";
 
-// Tab THỜI TRANG
-import anh1 from "../../images/ProductList1.png";
-import anh2 from "../../images/ProductList2.png";
-import anh3 from "../../images/ProductList3.png";
-import anh4 from "../../images/ProductList4.png";
-import anh5 from "../../images/ProductList5.png";
-import anh6 from "../../images/ProductList6.png";
-import anh7 from "../../images/ProductList7.png";
-import anh8 from "../../images/ProductList8.png";
-import anh9 from "../../images/ProductList9.png";
-import anh10 from "../../images/ProductList10.png";
-
-// Tab LUYỆN TẬP
-import anh11 from "../../images/ProductList11.png";
-import anh12 from "../../images/ProductList12.png";
-import anh13 from "../../images/ProductList13.png";
-import anh14 from "../../images/ProductList14.png";
-import anh15 from "../../images/ProductList15.png";
-import anh16 from "../../images/ProductList16.png";
-import anh17 from "../../images/ProductList17.png";
-import anh18 from "../../images/ProductList18.png";
-import anh19 from "../../images/ProductList19.png";
-import anh20 from "../../images/ProductList20.png";
-
-// Tab CHẠY BỘ
-import anh21 from "../../images/ProductList21.png";
-import anh22 from "../../images/ProductList22.png";
-import anh23 from "../../images/ProductList23.png";
-import anh24 from "../../images/ProductList24.png";
-import anh25 from "../../images/ProductList25.png";
-import anh26 from "../../images/ProductList1.png";
-import anh27 from "../../images/ProductList2.png";
-import anh28 from "../../images/ProductList3.png";
-import anh29 from "../../images/ProductList4.png";
-import anh30 from "../../images/ProductList5.png";
-
-const tabs = ["THỜI TRANG", "LUYỆN TẬP", "CHẠY BỘ"];
-
-const allProducts = [
-    // ===== THỜI TRANG =====
-    {
-        id: 1, tab: "THỜI TRANG",
-        image: anh1, brand: "UNDER ARMOUR",
-        name: "Giày Chạy Bộ Nam Under Armour Hovr Sonic 6",
-        price: 1845000, originalPrice: 3690000, discount: 50, color: "#ccc",
-    },
-    {
-        id: 2, tab: "THỜI TRANG",
-        image: anh2, brand: "UNDER ARMOUR",
-        name: "Giày Chạy Bộ Nữ Under Armour Hovr Sonic 6",
-        price: 1845000, originalPrice: 3690000, discount: 50, color: "#e63946",
-    },
-    {
-        id: 3, tab: "THỜI TRANG",
-        image: anh3, brand: "UNDER ARMOUR",
-        name: "Giày Sneaker Unisex Under Armour Forge 96 Leather Reissue",
-        price: 1600000, originalPrice: 3200000, discount: 50, color: "#f0f0f0",
-    },
-    {
-        id: 4, tab: "THỜI TRANG",
-        image: anh4, brand: "UNDER ARMOUR",
-        name: "Giày Luyện Tập Nữ Under Armour Tribase Reign 6",
-        price: 1690000, originalPrice: 3380000, discount: 50, color: "#222",
-    },
-    {
-        id: 5, tab: "THỜI TRANG",
-        image: anh5, brand: "UNDER ARMOUR",
-        name: "Giày Chạy Bộ Unisex Under Armour Phantom 3 Se Black History Month",
-        price: 2310000, originalPrice: 4620000, discount: 50, color: "#222",
-    },
-    {
-        id: 6, tab: "THỜI TRANG",
-        image: anh6, brand: "UNDER ARMOUR",
-        name: "Giày Thời Trang Nam Under Armour Charged",
-        price: 1500000, originalPrice: 3000000, discount: 50, color: "#6b4f3a",
-    },
-    {
-        id: 7, tab: "THỜI TRANG",
-        image: anh7, brand: "UNDER ARMOUR",
-        name: "Giày Luyện Tập Nam Under Armour HOVR Rise 4",
-        price: 1750000, originalPrice: 3500000, discount: 50, color: "#1d3557",
-    },
-    {
-        id: 8, tab: "THỜI TRANG",
-        image: anh8, brand: "UNDER ARMOUR",
-        name: "Giày Chạy Bộ Nữ Under Armour Infinite Pro",
-        price: 1900000, originalPrice: 3800000, discount: 50, color: "#f0ece0",
-    },
-    {
-        id: 9, tab: "THỜI TRANG",
-        image: anh9, brand: "UNDER ARMOUR",
-        name: "Giày Chạy Bộ Nam Under Armour Flow Velociti Wind",
-        price: 2100000, originalPrice: 4200000, discount: 50, color: "#a8d5a2",
-    },
-    {
-        id: 10, tab: "THỜI TRANG",
-        image: anh10, brand: "UNDER ARMOUR",
-        name: "Giày Thời Trang Unisex Under Armour Charged Assert 9",
-        price: 1400000, originalPrice: 2800000, discount: 50, color: "#1d3557",
-    },
-
-    // ===== LUYỆN TẬP =====
-    {
-        id: 11, tab: "LUYỆN TẬP",
-        image: anh11, brand: "PUMA",
-        name: "Giày Sneaker Unisex Puma Ca Pro Suede Fs Archive - Trắng",
-        price: 1539000, originalPrice: 2790000, discount: 46, color: "#f0f0f0",
-    },
-    {
-        id: 12, tab: "LUYỆN TẬP",
-        image: anh12, brand: "NIKE",
-        name: "Giày Đá Bóng Dành Cho Mọi Loại Sân Nam Nike Mercurial Vapor 16 Academy",
-        price: 1445000, originalPrice: 2889000, discount: 50, color: "#e8e800",
-    },
-    {
-        id: 13, tab: "LUYỆN TẬP",
-        image: anh13, brand: "ADIDAS",
-        name: "Giày Sneaker Nam Adidas Vl Court 3.0 - Xanh Dương",
-        price: 850000, originalPrice: 1700000, discount: 50, color: "#1d6fa4",
-    },
-    {
-        id: 14, tab: "LUYỆN TẬP",
-        image: anh14, brand: "UNDER ARMOUR",
-        name: "Giày Sneaker Unisex Under Armour Forge 96 Leather Reissue",
-        price: 1600000, originalPrice: 3200000, discount: 50, color: "#f0f0f0",
-    },
-    {
-        id: 15, tab: "LUYỆN TẬP",
-        image: anh15, brand: "UNDER ARMOUR",
-        name: "Giày Luyện Tập Nữ Under Armour Tribase Reign 6",
-        price: 1690000, originalPrice: 3380000, discount: 50, color: "#222",
-    },
-    {
-        id: 16, tab: "LUYỆN TẬP",
-        image: anh16, brand: "UNDER ARMOUR",
-        name: "Giày Sneaker Unisex Under Armour Fat Tire Venture Pro",
-        price: 1750000, originalPrice: 3500000, discount: 50, color: "#6b4f3a",
-    },
-    {
-        id: 17, tab: "LUYỆN TẬP",
-        image: anh17, brand: "NIKE",
-        name: "Giày Sneaker Bé Trai Nike Court Borough Low Recraft (Ps) - Trắng",
-        price: 1200000, originalPrice: 2400000, discount: 50, color: "#f0f0f0",
-    },
-    {
-        id: 18, tab: "LUYỆN TẬP",
-        image: anh18, brand: "UNDER ARMOUR",
-        name: "Giày Luyện Tập Nam Under Armour Flow Dynamic Intelliknit Black Hydro",
-        price: 1825000, originalPrice: 3650000, discount: 50, color: "#1a1a2e",
-    },
-    {
-        id: 19, tab: "LUYỆN TẬP",
-        image: anh19, brand: "NIKE",
-        name: "Giày Sneaker Nữ Nike Blazer Low Platform - Trắng",
-        price: 1470000, originalPrice: 2940000, discount: 50, color: "#f0f0f0",
-    },
-    {
-        id: 20, tab: "LUYỆN TẬP",
-        image: anh20, brand: "UNDER ARMOUR",
-        name: "Giày Sneaker Unisex Under Armour Hovr Apparition Irid",
-        price: 1690000, originalPrice: 3380000, discount: 50, color: "#1d3557",
-    },
-
-    // ===== CHẠY BỘ =====
-    {
-        id: 21, tab: "CHẠY BỘ",
-        image: anh21, brand: "ON RUNNING",
-        name: "Giày Chạy Bộ Nam On Running Cloudeclipse - Xám",
-        price: 2969000, originalPrice: 5390000, discount: 46, color: "#aaa",
-    },
-    {
-        id: 22, tab: "CHẠY BỘ",
-        image: anh22, brand: "MIZUNO",
-        name: "Giày Chạy Bộ Nam Mizuno Wave Inspire 20 2E - Xanh Dương",
-        price: 1695000, originalPrice: 3390000, discount: 50, color: "#1d6fa4",
-    },
-    {
-        id: 23, tab: "CHẠY BỘ",
-        image: anh23, brand: "NIKE",
-        name: "Giày Chạy Bộ Nam Nike Air Zoom Pegasus 41 - Xám",
-        price: 1945000, originalPrice: 3890000, discount: 50, color: "#aaa",
-    },
-    {
-        id: 24, tab: "CHẠY BỘ",
-        image: anh24, brand: "MIZUNO",
-        name: "Giày Chạy Bộ Nữ Mizuno Wave Sky 8 - Trắng",
-        price: 2145000, originalPrice: 4290000, discount: 50, color: "#f0f0f0",
-    },
-    {
-        id: 25, tab: "CHẠY BỘ",
-        image: anh25, brand: "MIZUNO",
-        name: "Giày Chạy Bộ Nữ Mizuno Wave Skyrise 5 - Xanh Lá",
-        price: 1495000, originalPrice: 2990000, discount: 50, color: "#4caf50",
-    },
-    {
-        id: 26, tab: "CHẠY BỘ",
-        image: anh26, brand: "ADIDAS",
-        name: "Giày Chạy Bộ Nữ Adidas Duramo Speed - Xanh Dương",
-        price: 1500000, originalPrice: 3000000, discount: 50, color: "#1d6fa4",
-    },
-    {
-        id: 27, tab: "CHẠY BỘ",
-        image: anh27, brand: "MIZUNO",
-        name: "Giày Chạy Bộ Nữ Mizuno Wave Rider 28 - Xanh Dương",
-        price: 1650000, originalPrice: 3300000, discount: 50, color: "#1d6fa4",
-    },
-    {
-        id: 28, tab: "CHẠY BỘ",
-        image: anh28, brand: "NIKE",
-        name: "Giày Chạy Bộ Nam Nike Zoomx Streakfly - Trắng",
-        price: 2580000, originalPrice: 5160000, discount: 50, color: "#f0f0f0",
-    },
-    {
-        id: 29, tab: "CHẠY BỘ",
-        image: anh29, brand: "ADIDAS",
-        name: "Giày Chạy Bộ Nữ Adidas Adizero Sl2 - Nhiều Màu",
-        price: 1500000, originalPrice: 3000000, discount: 50, color: "#00bcd4",
-    },
-    {
-        id: 30, tab: "CHẠY BỘ",
-        image: anh30, brand: "UNDER ARMOUR",
-        name: "Giày Chạy Bộ Nam Under Armour Hovr Sonic 6",
-        price: 1845000, originalPrice: 3690000, discount: 50, color: "#ccc",
-    },
-];
-
 const ProductList = () => {
-    const [activeTab, setActiveTab] = useState("THỜI TRANG");
+    const [products, setProducts] = useState([]);
+    const [tabs, setTabs] = useState([]);
+    const [activeTab, setActiveTab] = useState("");
+    const [loading, setLoading] = useState(true);
 
-    const filtered = allProducts.filter((p) => p.tab === activeTab);
+    useEffect(() => {
+        const fetchTopProductsAndDetails = async () => {
+            try {
+                const [resTop, resCate] = await Promise.all([
+                    getTopProducts(),
+                    getCateList()
+                ]);
+
+                const topData = resTop.data || resTop || [];
+                const categories = resCate.data || resCate || [];
+                const cateMap = {};
+                categories.forEach(c => {
+                    cateMap[c.categoryId] = c.categoryName;
+                });
+
+                const productsWithDetails = await Promise.all(
+                    topData.map(async (p) => {
+                        let basePrice = 0;
+                        try {
+                            const varRes = await getProductVariants(p.productId || p.id);
+                            const variants = varRes.data || varRes.content || varRes || [];
+                            const activeVariants = variants.filter(v => v.status === "ACTIVE" || v.status === "AVAILABLE");
+                            if (activeVariants.length > 0) {
+                                const minVar = activeVariants.reduce((min, v) => 
+                                    Number(v.basePrice) < Number(min.basePrice) ? v : min
+                                );
+                                basePrice = Number(minVar.basePrice);
+                            }
+                        } catch (err) {
+                            console.error("Lỗi lấy giá cho SP:", p.productId);
+                        }
+
+                        return {
+                            id: p.productId || p.id,
+                            name: p.name || p.productName,
+                            brand: p.brand || "THƯƠNG HIỆU",
+                            image: p.imageUrl || "https://placehold.co/300x300?text=No+Image",
+                            price: basePrice, 
+                            originalPrice: basePrice,
+                            category: cateMap[p.categoryId] || "NỔI BẬT" 
+                        };
+                    })
+                );
+
+                console.log("Danh sách SP cuối cùng thu được:", productsWithDetails);
+                const finalProducts = productsWithDetails; 
+                setProducts(finalProducts);
+                const uniqueTabs = Array.from(new Set(finalProducts.map(p => p.category)));
+                if (uniqueTabs.length > 0) {
+                    setTabs(uniqueTabs);
+                    setActiveTab(uniqueTabs[0]); 
+                } else {
+                    setTabs(["NỔI BẬT"]);
+                    setActiveTab("NỔI BẬT");
+                }
+                
+            } catch (error) {
+                console.error("Lỗi khi tải top products:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTopProductsAndDetails();
+    }, []);
+
+    const filtered = products.filter((p) => p.category === activeTab || tabs.length === 0);
 
     return (
         <section className="product-list-section">
@@ -239,23 +84,36 @@ const ProductList = () => {
                 Mua sắm <span>theo nhu cầu</span>
             </h2>
 
-            <div className="tabs">
-                {tabs.map((tab) => (
-                    <button
-                        key={tab}
-                        className={`tab-btn ${activeTab === tab ? "active" : ""}`}
-                        onClick={() => setActiveTab(tab)}
-                    >
-                        {tab}
-                    </button>
-                ))}
-            </div>
+            {loading ? (
+                <p style={{ textAlign: "center", padding: "20px" }}>Đang kết nối dữ liệu sản phẩm...</p>
+            ) : (
+                <>
+                    {/* CHỈ HIỂN THỊ THÀNH TAB KHI CÓ TỪ 2 DANH MỤC TRỞ LÊN */}
+                    {tabs.length > 1 && (
+                        <div className="tabs">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab}
+                                    className={`tab-btn ${activeTab === tab ? "active" : ""}`}
+                                    onClick={() => setActiveTab(tab)}
+                                >
+                                    {tab.toUpperCase()}
+                                </button>
+                            ))}
+                        </div>
+                    )}
 
-            <div className="product-grid">
-                {filtered.map((product) => (
-                    <ProductCard key={product.id} {...product} />
-                ))}
-            </div>
+                    <div className="product-grid">
+                        {filtered.length > 0 ? (
+                            filtered.map((product) => (
+                                <ProductCard key={product.id} {...product} />
+                            ))
+                        ) : (
+                            <p style={{ textAlign: "center", width: "100%" }}>Chưa có sản phẩm nào ở mục này.</p>
+                        )}
+                    </div>
+                </>
+            )}
         </section>
     );
 };

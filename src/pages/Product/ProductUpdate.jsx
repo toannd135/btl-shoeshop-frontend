@@ -52,7 +52,7 @@ function ProductUpdate({ open, onClose, product, onReload }) {
             if (values.status) formData.append("status", values.status);
 
             if (imageFile) {
-                formData.append("image", imageFile); 
+                formData.append("image", imageFile);
             }
 
             await updateProduct(product.productId, formData);
@@ -122,14 +122,21 @@ function ProductUpdate({ open, onClose, product, onReload }) {
                 <div style={{ display: "flex", gap: 16 }}>
                     <Form.Item label="Danh mục (Category)" name="categoryId" style={{ flex: 1 }}>
                         <Select
+                            showSearch
+                            optionFilterProp="label"
                             options={categories
-                                .filter(c => c.parentId != null) 
-                                .map(c => ({
-                                    value: c.categoryId,
-                                    label: c.categoryName 
-                                }))
+                                .filter(c => c.status === 'ACTIVE')
+                                .map(c => {
+                                    const isParent = c.parentId == null;
+                                    return {
+                                        value: c.categoryId,
+                                        label: isParent 
+                                            ? `${c.categoryName} - Danh mục cha` 
+                                            : `${c.categoryName} - Danh mục con`,
+                                    };
+                                })
                             }
-                            placeholder="Chọn danh mục con"
+                            placeholder="Chọn danh mục"
                         />
                     </Form.Item>
                     <Form.Item label="Giới tính" name="gender" style={{ flex: 1 }}>

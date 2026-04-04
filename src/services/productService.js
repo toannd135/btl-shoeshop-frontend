@@ -32,6 +32,10 @@ export const createVariantImage = async (productId, variantId, formData) => {
     return await sendForm(`products/${productId}/variants/${variantId}/images`, "POST", formData);
 };
 
+export const deleteVariantImage = async (productId, variantId, imageId) => {
+    return await del(`products/${productId}/variants/${variantId}/images/${imageId}`);
+};
+
 export const createProduct = async (formData) => {
     return await sendForm("products", "POST", formData);
 };
@@ -63,4 +67,8 @@ export const getFilteredProducts = async (params) => {
 
 export const getRecommendedProducts = async () => {
     return await get("recommend-products"); 
+};
+
+export const getTopProducts = async () => {
+    return await get("products/top");
 };

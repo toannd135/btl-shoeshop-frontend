@@ -114,34 +114,28 @@ function ProductVariantCreate({ open, onClose, productId, onReload }) {
                             <InputNumber style={{ width: '100%' }} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => value.replace(/\$\s?|(,*)/g, '')} />
                         </Form.Item>
                     </Col>
-                    <Col span={12}>
+                    <Col span={24}>
                         <Form.Item label="Hình ảnh (Tùy chọn)">
                             <Upload
-                                beforeUpload={() => false} 
-                                multiple={true} // Cho phép chọn nhiều file
-                                showUploadList={false} // Ẩn cái list mặc định của Ant Design
+                                listType="picture-card" // Chuyển sang dạng lưới ô vuông
                                 fileList={fileList}
+                                beforeUpload={() => false} 
+                                multiple={true} 
                                 onChange={({ fileList: newFileList }) => setFileList(newFileList)}
                                 accept="image/*"
+                                onRemove={(file) => {
+                                    // Chức năng xóa ảnh ngay lúc đang chọn (chưa upload)
+                                    const newFileList = fileList.filter(item => item.uid !== file.uid);
+                                    setFileList(newFileList);
+                                }}
                             >
-                                <Button icon={<UploadOutlined />}>Chọn nhiều ảnh</Button>
+                                {fileList.length >= 8 ? null : (
+                                    <div>
+                                        <UploadOutlined />
+                                        <div style={{ marginTop: 8 }}>Chọn ảnh</div>
+                                    </div>
+                                )}
                             </Upload>
-
-                            {/* UI HIỂN THỊ KIỂU MESSENGER */}
-                            {fileList.length > 0 && (
-                                <div className="messenger-image-preview">
-                                    <img 
-                                        src={previewImage} 
-                                        alt="preview" 
-                                        className="preview-img" 
-                                    />
-                                    {fileList.length > 1 && (
-                                        <div className="preview-overlay">
-                                            +{fileList.length - 1}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
                         </Form.Item>
                     </Col>
                 </Row>
