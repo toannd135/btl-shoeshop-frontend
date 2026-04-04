@@ -127,12 +127,16 @@ function ProductUpdate({ open, onClose, product, onReload }) {
                             options={categories
                                 .filter(c => c.status === 'ACTIVE')
                                 .map(c => {
-                                    const isParent = c.parentId == null;
+                                    let labelDisplay = c.categoryName;
+                                    if (c.parentId) {
+                                        const parentCate = categories.find(p => p.categoryId === c.parentId);
+                                        if (parentCate) {
+                                            labelDisplay = `${c.categoryName} - ${parentCate.categoryName}`;
+                                        }
+                                    }
                                     return {
                                         value: c.categoryId,
-                                        label: isParent 
-                                            ? `${c.categoryName} - Danh mục cha` 
-                                            : `${c.categoryName} - Danh mục con`,
+                                        label: labelDisplay
                                     };
                                 })
                             }

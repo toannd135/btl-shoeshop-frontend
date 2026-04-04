@@ -1,30 +1,50 @@
 import React from "react";
 import "./ProductCard.css";
+import { Link } from "react-router-dom";
 
-const ProductCard = ({ image, brand, name, price, originalPrice, discount, color }) => {
+const ProductCard = ({ id, image, brand, name, price, originalPrice, discount, colors }) => {
     return (
-        <div className="product-card">
-            {discount && <span className="badge">-{discount}%</span>}
-            <div className="product-image">
-                <img src={image} alt={name} />
-            </div>
-            <div className="product-info">
-                <p className="product-brand">{brand}</p>
-                <p className="product-name">{name}</p>
-                <div className="product-bottom">
-                    <div className="product-price">
-                        <span className="price-sale">{price.toLocaleString("vi-VN")}₫</span>
-                        <span className="price-original">{originalPrice.toLocaleString("vi-VN")}₫</span>
-                    </div>
-                    {color && (
-                        <span
-                            className="product-color"
-                            style={{ backgroundColor: color }}
+        <Link
+            to={`/productDetail/${id}`}
+            className="product-card"
+        >
+            {discount && (
+                <div className="flash-badge">-{discount}%</div>
+            )}
+
+            <img
+                src={image}
+                alt={name}
+                className="flash-product-img"
+                onError={(e) => { e.target.style.display = "none"; }}
+            />
+
+            <h4>{brand?.toUpperCase() ?? ""}</h4>
+
+            <p>{name}</p>
+
+            <span className="price">
+                {price?.toLocaleString("vi-VN")}đ
+            </span>
+
+            {originalPrice && originalPrice > price && (
+                <span className="original-price">
+                    {originalPrice?.toLocaleString("vi-VN")}đ
+                </span>
+            )}
+
+            {colors?.length > 0 && (
+                <div className="color-dots">
+                    {colors.slice(0, 6).map((colorStr, idx) => (
+                        <div
+                            key={idx}
+                            className="color-dot"
+                            style={{ backgroundColor: colorStr }}
                         />
-                    )}
+                    ))}
                 </div>
-            </div>
-        </div>
+            )}
+        </Link>
     );
 };
 

@@ -43,8 +43,8 @@ const ProductList = () => {
                         }
 
                         return {
-                            id: p.productId || p.id,
-                            name: p.name || p.productName,
+                            id: p.productId,
+                            name: p.name,
                             brand: p.brand || "THƯƠNG HIỆU",
                             image: p.imageUrl || "https://placehold.co/300x300?text=No+Image",
                             price: basePrice, 
@@ -106,7 +106,7 @@ const ProductList = () => {
                     <div className="product-grid">
                         {filtered.length > 0 ? (
                             filtered.map((product) => (
-                                <ProductCard key={product.id} {...product} />
+                                <ProductCard key={product.productId} {...product} />
                             ))
                         ) : (
                             <p style={{ textAlign: "center", width: "100%" }}>Chưa có sản phẩm nào ở mục này.</p>

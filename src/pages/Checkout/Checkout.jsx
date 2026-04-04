@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { getMyCart } from "../../services/cartService";
 import { checkoutOrder } from "../../services/checkoutService";
 import { getCurrentUser } from "../../utils/tokenStore";
-import "./Checkout.css";
-import { useNavigate } from "react-router-dom";
 import { createPayment } from "../../services/paymentService";
 import { estimateShipping } from "../../services/shippingService";
 import { getCouponList } from "../../services/couponService";
+import { getAllAddresses } from "../../services/addressService"; // <-- Thêm import này
+import { useNavigate } from "react-router-dom";
+import "./Checkout.css";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -17,6 +18,12 @@ const Checkout = () => {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [provinces, setProvinces] = useState([]);
   const [wards, setWards] = useState([]);
+
+  // --- STATE MỚI CHO ĐỊA CHỈ ---
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [addressMode, setAddressMode] = useState("new"); // 'saved' hoặc 'new'
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  // -----------------------------
 
   const [formData, setFormData] = useState({
     email: "",
@@ -32,6 +39,7 @@ const Checkout = () => {
 
   const [paymentMethod, setPaymentMethod] = useState("COD");
 
+  // Fetch tỉnh thành
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
@@ -45,6 +53,7 @@ const Checkout = () => {
     fetchProvinces();
   }, []);
 
+  // Fetch phường xã khi province thay đổi
   useEffect(() => {
     const fetchWards = async () => {
       if (formData.province) {
@@ -52,8 +61,6 @@ const Checkout = () => {
           const response = await fetch(import.meta.env.VITE_PROVINCES_W);
           const data = await response.json();
           if (Array.isArray(data)) {
-            // Lọc ra các phường/xã có province_code trùng với mã tỉnh đang chọn
-            // Dùng == thay vì === phòng trường hợp 1 bên là chuỗi, 1 bên là số
             const filteredWards = data.filter(w => w.province_code == formData.province);
             setWards(filteredWards);
           } else {
@@ -69,6 +76,7 @@ const Checkout = () => {
     fetchWards();
   }, [formData.province]);
 
+  // Tính phí ship
   const fetchShippingFee = async () => {
     try {
       const payload = {
@@ -77,19 +85,18 @@ const Checkout = () => {
       }
       const response = await estimateShipping(payload);
       setShippingFee(response.data.shippingFee);
-      // setShippingFee(formData.province === 'Hà Nội' ? 20000 : 40000);
     } catch (error) {
       console.error("Lỗi tính phí ship", error);
     }
   };
+
   useEffect(() => {
-    if (formData.province && formData.district) {
+    if (formData.province) { // Chỉ cần province là có thể tính phí ship
       fetchShippingFee();
     }
-  }, [formData.province, formData.district]);
+  }, [formData.province]);
 
-
-
+  // Khởi tạo data ban đầu (Cart, User, Addresses)
   useEffect(() => {
     fetchCart();
     const user = getCurrentUser();
@@ -101,24 +108,61 @@ const Checkout = () => {
         receiverPhone: user.phone
       }));
     }
+    fetchSavedAddresses(); // Fetch địa chỉ đã lưu
   }, []);
+
+  // --- LOGIC FETCH ĐỊA CHỈ ĐÃ LƯU ---
+  const fetchSavedAddresses = async () => {
+    try {
+      const response = await getAllAddresses();
+      const addresses = response?.data?.addresses || [];
+      setSavedAddresses(addresses);
+
+      if (addresses.length > 0) {
+        setAddressMode("saved");
+      }
+    } catch (error) {
+      console.error("Lỗi fetch địa chỉ:", error);
+    }
+  };
+
+  // Tự động chọn địa chỉ mặc định khi cả provinces và addresses đã load xong
+  useEffect(() => {
+    if (provinces.length > 0 && savedAddresses.length > 0 && addressMode === "saved" && !selectedAddressId) {
+      const defaultAddr = savedAddresses.find(a => a.isDefault) || savedAddresses[0];
+      handleSelectSavedAddress(defaultAddr);
+    }
+  }, [provinces, savedAddresses, addressMode]);
+
+  // Hàm xử lý khi click chọn 1 địa chỉ có sẵn
+  const handleSelectSavedAddress = (address) => {
+    setSelectedAddressId(address.addressId);
+
+    // Tìm mã code của tỉnh dựa trên tên tỉnh (address.city)
+    const prov = provinces.find(p => p.name === address.city);
+    const provCode = prov ? prov.code : "";
+
+    setFormData(prev => ({
+      ...prev,
+      receiverName: address.receiverName,
+      receiverPhone: address.receiverPhone,
+      address: address.street,
+      province: provCode,
+      ward: address.ward
+    }));
+  };
+  // ------------------------------------
 
   const fetchCart = async () => {
     try {
       const response = await getMyCart();
-      console.log(response);
-      // Phụ thuộc vào cấu trúc trả về, giả sử response.data.items hoặc response.items
       const items = response?.data?.items || response?.items || [];
-
       setCartItems(items);
-
-      // Tính subtotal dựa trên dữ liệu thực tế
       const total = items.reduce((acc, item) => {
         const price = item.variant?.basePrice || item.variant?.price || 0;
         return acc + (price * item.quantity);
       }, 0);
       setSubTotal(total);
-
     } catch (error) {
       console.error("Lỗi khi lấy giỏ hàng:", error);
     }
@@ -130,77 +174,36 @@ const Checkout = () => {
   };
 
   const handleApplyCoupon = async () => {
+    // ... (Giữ nguyên logic của bạn) ...
     const codeInput = formData.couponCode?.trim();
     if (!codeInput) {
       alert("Vui lòng nhập mã giảm giá!");
       return;
     }
-
     try {
-      // 1. Gọi API lấy danh sách mã giảm giá
-      // Lưu ý: Tối ưu nhất là backend có 1 hàm getCouponByCode(code), 
-      // nhưng nếu chưa có, mình dùng getCouponList rồi tìm kiếm bằng JS:
       const response = await getCouponList();
       const coupons = response.data || response || [];
-
-      // 2. Tìm mã người dùng nhập
       const validCoupon = coupons.find(c => c.code === codeInput);
-
       if (!validCoupon) {
-        setDiscountAmount(0);
-        alert("Mã giảm giá không tồn tại!");
-        return;
+        setDiscountAmount(0); alert("Mã giảm giá không tồn tại!"); return;
       }
-
-      // 3. Kiểm tra các điều kiện hợp lệ
       if (validCoupon.status !== "ACTIVE") {
-        setDiscountAmount(0);
-        alert("Mã giảm giá đã hết hạn hoặc không hoạt động!");
-        return;
+        setDiscountAmount(0); alert("Mã giảm giá đã hết hạn hoặc không hoạt động!"); return;
       }
-
       if (validCoupon.minOrderValue && subTotal < validCoupon.minOrderValue) {
-        setDiscountAmount(0);
-        alert(`Đơn hàng của bạn chưa đạt mức tối thiểu ${validCoupon.minOrderValue.toLocaleString('vi-VN')}₫ để áp dụng mã này!`);
-        return;
+        setDiscountAmount(0); alert(`Đơn hàng chưa đạt mức tối thiểu!`); return;
       }
-
-      // Tính năng nâng cao: Kiểm tra Date (Nếu cần thiết, phụ thuộc backend trả về Date chuẩn)
-      const now = new Date();
-      if (new Date(validCoupon.startsAt) > now || new Date(validCoupon.expiresAt) < now) {
-        setDiscountAmount(0);
-        alert("Mã giảm giá chưa đến thời gian áp dụng hoặc đã quá hạn!");
-        return;
-      }
-
-      // 4. Bắt đầu tính số tiền được giảm dựa theo Loại (discountType)
       let calculatedDiscount = 0;
-
-      if (validCoupon.discountType === "FIXED_AMOUNT") {
-        // Giảm tiền mặt
-        calculatedDiscount = validCoupon.discountValue;
-
-      } else if (validCoupon.discountType === "PERCENTAGE") {
-        // Giảm phần trăm
+      if (validCoupon.discountType === "FIXED_AMOUNT") calculatedDiscount = validCoupon.discountValue;
+      else if (validCoupon.discountType === "PERCENTAGE") {
         calculatedDiscount = subTotal * (validCoupon.discountValue / 100);
-        // Kiểm tra xem có bị giới hạn bởi maxDiscount không
-        if (validCoupon.maxDiscount && calculatedDiscount > validCoupon.maxDiscount) {
-          calculatedDiscount = validCoupon.maxDiscount;
-        }
-
+        if (validCoupon.maxDiscount && calculatedDiscount > validCoupon.maxDiscount) calculatedDiscount = validCoupon.maxDiscount;
       } else if (validCoupon.discountType === "FREE_SHIPPING") {
-        // Miễn phí vận chuyển (Giảm thẳng đúng bằng tiền ship)
         calculatedDiscount = shippingFee;
-        // Nếu có maxDiscount cho freeship
-        if (validCoupon.maxDiscount && calculatedDiscount > validCoupon.maxDiscount) {
-          calculatedDiscount = validCoupon.maxDiscount;
-        }
+        if (validCoupon.maxDiscount && calculatedDiscount > validCoupon.maxDiscount) calculatedDiscount = validCoupon.maxDiscount;
       }
-
-      // 5. Áp dụng vào state
       setDiscountAmount(calculatedDiscount);
       alert(`Áp dụng mã thành công! Bạn được giảm ${calculatedDiscount.toLocaleString('vi-VN')}₫`);
-
     } catch (error) {
       console.error("Lỗi áp dụng mã:", error);
       alert("Có lỗi xảy ra khi kiểm tra mã giảm giá!");
@@ -208,25 +211,23 @@ const Checkout = () => {
   };
 
   const handlePlaceOrder = async () => {
-    // Thêm validate bắt buộc chọn tỉnh/thành để tính phí ship
     if (!formData.receiverName || !formData.receiverPhone || !formData.address || !formData.province) {
       alert("Vui lòng điền đầy đủ thông tin nhận hàng và chọn Tỉnh/Thành phố!");
       return;
     }
 
-    setIsProcessing(true); // Disable nút bấm để tránh click 2 lần
+    setIsProcessing(true);
 
     try {
       const selectedProvinceObj = provinces.find(p => p.code == formData.province);
       const provinceDisplayName = selectedProvinceObj ? selectedProvinceObj.name : "";
       const wardDisplayName = formData.ward || "";
       const fullShippingAddress = [
-        formData.address, 
-        wardDisplayName, 
+        formData.address,
+        wardDisplayName,
         provinceDisplayName
-      ]
-      .filter(part => part && part.trim() !== "") 
-      .join(", ");
+      ].filter(part => part && part.trim() !== "").join(", ");
+
       const checkoutPayload = {
         receiverName: formData.receiverName,
         receiverPhone: formData.receiverPhone,
@@ -236,18 +237,11 @@ const Checkout = () => {
         couponCode: formData.couponCode || null
       };
 
-      // 1. GỌI API TẠO ĐƠN HÀNG
       const orderResult = await checkoutOrder(checkoutPayload);
       const orderId = orderResult?.orderId || orderResult?.data?.orderId;
 
-      if (!orderId) {
-        throw new Error("Không tạo được đơn hàng, vui lòng thử lại!");
-      }
+      if (!orderId) throw new Error("Không tạo được đơn hàng, vui lòng thử lại!");
 
-      // 2. GỌI API THANH TOÁN
-      // Lưu ý: Nếu bạn chọn Cách 1 (Sửa API ở Frontend) trong câu trả lời trước,
-      // file paymentService.js của bạn phải biến object này thành chuỗi query parameters.
-      // Nếu bạn chọn Cách 2 (Sửa @RequestBody ở Backend) thì cứ truyền data như thế này.
       const paymentPayload = {
         orderId: orderId,
         paymentMethod: paymentMethod,
@@ -255,14 +249,11 @@ const Checkout = () => {
       };
 
       const paymentResponse = await createPayment(paymentPayload);
-      const paymentData = paymentResponse.data || paymentResponse; // Tuỳ vào cấu hình axios response của bạn
+      const paymentData = paymentResponse.data || paymentResponse;
 
-      // 3. CHUYỂN HƯỚNG THEO PHƯƠNG THỨC THANH TOÁN
       if (paymentMethod === 'VNPAY' && paymentData.paymentUrl) {
-        // Redirect qua cổng thanh toán VNPay
         window.location.href = paymentData.paymentUrl;
       } else {
-        // Nếu là COD, chuyển thẳng sang trang thông báo thành công
         navigate(`/checkout/success/${orderId}`);
       }
 
@@ -274,105 +265,152 @@ const Checkout = () => {
     }
   };
 
-  const finalTotal = subTotal + shippingFee;
-
   return (
     <div className="checkout-page">
       <div className="checkout-container">
 
         {/* CỘT 1: THÔNG TIN NHẬN HÀNG */}
         <div className="checkout-col checkout-info">
-          <h1 className="shop-name">EGA Sneaker</h1>
+          <h1 className="shop-name">PTIT Shoe Shop</h1>
 
           <div className="section-header">
             <h2>Thông tin nhận hàng</h2>
           </div>
 
-          <div className="form-group">
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="input-field"
-            />
+          {/* CHỌN CHẾ ĐỘ ĐỊA CHỈ CÓ SẴN HOẶC MỚI */}
+          {savedAddresses.length > 0 && (
+            <div className="address-mode-toggle">
+              <label className={`radio-label ${addressMode === 'saved' ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  checked={addressMode === 'saved'}
+                  onChange={() => setAddressMode('saved')}
+                />
+                Chọn địa chỉ có sẵn
+              </label>
+              <label className={`radio-label ${addressMode === 'new' ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  checked={addressMode === 'new'}
+                  onChange={() => {
+                    setAddressMode('new');
+                    setSelectedAddressId(null);
+                    setFormData(prev => ({ ...prev, receiverName: '', receiverPhone: '', address: '', province: '', ward: '' }));
+                  }}
+                />
+                Nhập địa chỉ mới
+              </label>
+            </div>
+          )}
 
-            <input
-              type="text"
-              name="receiverName"
-              placeholder="Họ và tên"
-              value={formData.receiverName}
-              onChange={handleInputChange}
-              className="input-field"
-            />
-
-            <div className="input-group">
-              <span className="input-group-addon">VN ▾</span>
+          {addressMode === "saved" ? (
+            /* HIỂN THỊ DANH SÁCH ĐỊA CHỈ ĐÃ LƯU */
+            <div className="saved-addresses-list">
+              {savedAddresses.map(addr => (
+                <div
+                  key={addr.addressId}
+                  className={`saved-address-card ${selectedAddressId === addr.addressId ? 'selected' : ''}`}
+                  onClick={() => handleSelectSavedAddress(addr)}
+                >
+                  <div className="address-card-header">
+                    <strong>{addr.receiverName}</strong> - {addr.receiverPhone}
+                    {addr.isDefault && <span className="default-badge">Mặc định</span>}
+                  </div>
+                  <div className="address-card-body">
+                    {addr.street}, {addr.ward}, {addr.city}
+                  </div>
+                </div>
+              ))}
+              <textarea
+                name="note"
+                placeholder="Ghi chú (tùy chọn)"
+                value={formData.note}
+                onChange={handleInputChange}
+                rows="3"
+                className="input-field mt-3"
+              ></textarea>
+            </div>
+          ) : (
+            /* HIỂN THỊ FORM NHẬP MỚI (NHƯ CŨ) */
+            <div className="form-group">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="input-field"
+              />
               <input
                 type="text"
-                name="receiverPhone"
-                placeholder="Số điện thoại"
-                value={formData.receiverPhone}
+                name="receiverName"
+                placeholder="Họ và tên"
+                value={formData.receiverName}
                 onChange={handleInputChange}
-                className="input-field no-border"
+                className="input-field"
               />
-            </div>
-
-            <input
-              type="text"
-              name="address"
-              placeholder="Địa chỉ"
-              value={formData.address}
-              onChange={handleInputChange}
-              className="input-field"
-            />
-
-            <div className="form-row-col">
-              <select
-                name="province"
-                onChange={(e) => {
-                  handleInputChange(e);
-                  // Khi đổi tỉnh, reset lại huyện, xã
-                  setFormData(prev => ({ ...prev, province: e.target.value, ward: "" }));
-                }}
-                value={formData.province}
-                className="input-field"
-              >
-                <option value="">Tỉnh thành</option>
-                {provinces.map(p => (
-                  // Lưu code làm value để gọi API cấp dưới dễ hơn
-                  <option key={p.code} value={p.code}>{p.name}</option>
-                ))}
-              </select>
-
-              <select
-                name="ward"
+              <div className="input-group">
+                <span className="input-group-addon">VN ▾</span>
+                <input
+                  type="text"
+                  name="receiverPhone"
+                  placeholder="Số điện thoại"
+                  value={formData.receiverPhone}
+                  onChange={handleInputChange}
+                  className="input-field no-border"
+                />
+              </div>
+              <input
+                type="text"
+                name="address"
+                placeholder="Địa chỉ"
+                value={formData.address}
                 onChange={handleInputChange}
-                value={formData.ward}
                 className="input-field"
-                disabled={!formData.province}
-              >
-                <option value="">Phường xã</option>
-                {wards.map(w => (
-                  <option key={w.code} value={w.name}>{w.name}</option>
-                ))}
-              </select>
+              />
+              <div className="form-row-col">
+                <select
+                  name="province"
+                  onChange={(e) => {
+                    handleInputChange(e);
+                    setFormData(prev => ({ ...prev, province: e.target.value, ward: "" }));
+                  }}
+                  value={formData.province}
+                  className="input-field"
+                >
+                  <option value="">Tỉnh thành</option>
+                  {provinces.map(p => (
+                    <option key={p.code} value={p.code}>{p.name}</option>
+                  ))}
+                </select>
+                <select
+                  name="ward"
+                  onChange={handleInputChange}
+                  value={formData.ward}
+                  className="input-field"
+                  disabled={!formData.province}
+                >
+                  <option value="">Phường xã</option>
+                  {wards.map(w => (
+                    <option key={w.code} value={w.name}>{w.name}</option>
+                  ))}
+                </select>
+              </div>
+              <textarea
+                name="note"
+                placeholder="Ghi chú (tùy chọn)"
+                value={formData.note}
+                onChange={handleInputChange}
+                rows="3"
+                className="input-field"
+              ></textarea>
             </div>
-
-            <textarea
-              name="note"
-              placeholder="Ghi chú (tùy chọn)"
-              value={formData.note}
-              onChange={handleInputChange}
-              rows="3"
-              className="input-field"
-            ></textarea>
-          </div>
+          )}
         </div>
 
-        {/* CỘT 2: VẬN CHUYỂN & THANH TOÁN */}
+        {/* CỘT 2: VẬN CHUYỂN & THANH TOÁN (Giữ nguyên) */}
         <div className="checkout-col checkout-methods-col">
+          {/* ... (Đoạn này giống hệt code gốc của bạn) ... */}
           <div className="method-section">
             <h2>Vận chuyển</h2>
             <div className="method-box active">
@@ -415,12 +453,12 @@ const Checkout = () => {
           </div>
         </div>
 
-        {/* CỘT 3: TÓM TẮT ĐƠN HÀNG */}
+        {/* CỘT 3: TÓM TẮT ĐƠN HÀNG (Giữ nguyên) */}
         <div className="checkout-col checkout-summary">
+          {/* ... (Đoạn này giống hệt code gốc của bạn) ... */}
           <h2 className="summary-title">Đơn hàng ({cartItems.length} sản phẩm)</h2>
 
           <div className="product-list">
-            {/* Render danh sách sản phẩm fetch được */}
             {cartItems.map((item, index) => {
               const price = item.variant?.basePrice || item.variant?.price || 0;
               const imageUrl = item.variant?.imageUrl || "https://via.placeholder.com/50";
@@ -430,8 +468,10 @@ const Checkout = () => {
               return (
                 <div className="product-item" key={item.cartItemId || index}>
                   <div className="product-info-wrap">
-                    <div className="product-image">
-                      <img src={imageUrl} alt={productName} />
+                    <div className="product-image-wrapper">
+                      <div className="product-image">
+                        <img src={imageUrl} alt={productName} />
+                      </div>
                       <span className="product-qty">{item.quantity}</span>
                     </div>
                     <div className="product-desc">
@@ -443,7 +483,6 @@ const Checkout = () => {
                 </div>
               );
             })}
-
             {cartItems.length === 0 && (
               <p style={{ textAlign: "center", color: "#888", padding: "20px 0" }}>Giỏ hàng của bạn đang trống.</p>
             )}

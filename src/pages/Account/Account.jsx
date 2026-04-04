@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Account.css';
 import { useLocation } from 'react-router-dom';
 import AccountInfo from './AccountInfo';
