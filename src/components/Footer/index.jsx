@@ -1,6 +1,8 @@
 import React from "react";
 import "./footer.css";
-
+import visa from "../../images/visa.png";
+import zalopay from "../../images/zalo.png";
+import cod from "../../images/shipping.png";
 const Footer = () => {
     return (
         <footer className="footer">
@@ -8,7 +10,7 @@ const Footer = () => {
 
                 {/* BRAND */}
                 <div className="footer-col">
-                    <h2 className="logo">PTIT<span>SNEAKER</span></h2>
+                    <h2 className="logo">SHOE<span>Shop</span></h2>
                     <p>
                         Chuyên cung cấp giày sneaker chính hãng,
                         cam kết chất lượng và giá tốt nhất.
@@ -61,16 +63,22 @@ const Footer = () => {
                         <button>Gửi</button>
                     </div>
 
-                    <div className="payment">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="visa" />
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" alt="master" />
+                    <div className="payment-section">
+                        <h4>Phương Thức Thanh Toán</h4>
+
+                        <div className="payment">
+                            <img src={visa} alt="visa" />
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" alt="mastercard" />
+                            <img src={zalopay} alt="zalopay" />
+                            <img src={cod} alt="cod" />
+                        </div>
                     </div>
                 </div>
 
             </div>
 
             <div className="footer-bottom">
-                © 2026 EGA Sneaker. All rights reserved.
+                © 2026 ShoeShop. All rights reserved.
             </div>
         </footer>
     );
