@@ -42,7 +42,7 @@ function Dashboard() {
                     getRevenueReport(),
                     getTopSellingProducts(),
                     getCustomerOverviewReport(),
-                    getTopSpendersReport({ limit: 5 })
+                    
                 ]);
                 setRevenueData(revenueRes.data || []);
                 setTopProducts(productsRes.data || []);
@@ -52,7 +52,7 @@ function Dashboard() {
                     newCustomersThisMonth: 0,
                     customersWithOrders: 0
                 });
-                setTopSpenders(spendersRes.data || []);
+                // setTopSpenders(spendersRes.data || []);
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu Dashboard:", error);
             } finally {
@@ -328,7 +328,7 @@ function Dashboard() {
                     </Card>
                 </Col>
 
-                <Col xs={24} lg={16}>
+                {/* <Col xs={24} lg={16}>
                     <Card
                         loading={loading}
                         style={{ height: "450px", borderRadius: 16, border: 'none', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', overflow: 'hidden' }}
@@ -345,7 +345,7 @@ function Dashboard() {
                             size="middle"
                         />
                     </Card>
-                </Col>
+                </Col> */}
             </Row>
 
         </div>
