@@ -96,3 +96,10 @@
     background: #38434F;
     font-size: 14px;
 }
+
+@media (max-width: 768px) {
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}

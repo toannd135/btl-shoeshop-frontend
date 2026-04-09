@@ -668,10 +668,26 @@
     display: flex; gap: 12px; margin-top: 18px;
 }
 .btn-back {
-    flex: 1; padding: 10px; border: 1px solid #333; background: white; border-radius: 20px;
+    flex: 1; padding: 10px; border: 1px solid #38434F; color: #38434F; background: white; border-radius: 20px;
+    cursor: pointer; transition: all 0.2s;
+}
+.btn-back:hover {
+    background: #f0f0f0;
+}
+.btn-back:active {
+    background: #e0e0e0;
+    transform: scale(0.98);
 }
 .btn-view-cart {
-    flex: 1; padding: 10px; background: #111; color: white; border: none; border-radius: 20px;
+    flex: 1; padding: 10px; background: #38434F; color: white; border: none; border-radius: 20px;
+    cursor: pointer; transition: all 0.2s;
+}
+.btn-view-cart:hover {
+    background: #2b353f;
+}
+.btn-view-cart:active {
+    background: #1e252c;
+    transform: scale(0.98);
 }
 
 /* ===============================
@@ -786,6 +802,73 @@ background:#f5a623;
     padding:0 20px;
     display:flex;
     flex-direction:column;
+}
+
+.review-form {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+.review-form h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #38434F;
+}
+.form-group-star {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+.star-select {
+    font-size: 24px;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s;
+    margin: 0 2px;
+}
+.star-select.active, .star-select:hover {
+    color: #f5a623;
+}
+.review-input-text {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    resize: vertical;
+    margin-bottom: 15px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+.btn-submit-review {
+    background: #38434F;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.btn-submit-review:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+.review-error {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+.review-avatar-text {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #DA291C;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
 }
 
 /* ===============================

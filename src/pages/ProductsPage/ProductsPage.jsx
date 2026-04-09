@@ -5,6 +5,7 @@ import { getProductList, getProductVariants } from "../../services/productServic
 import { getCateList } from "../../services/cateService";
 import { getCouponList } from "../../services/couponService";
 import { Link, useSearchParams } from 'react-router-dom';
+import './ProductsPage.css';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -219,7 +220,7 @@ const ProductsPage = () => {
     }, [filters, sortOption]);
 
     const currentProducts = processedProducts.slice(
-        (currentPage - 1) * pageSize,
+        0,
         currentPage * pageSize
     );
 
@@ -309,7 +310,7 @@ const ProductsPage = () => {
                                         type="primary"
                                         icon={<CopyOutlined />}
                                         block
-                                        style={{ background: '#222', borderColor: '#222' }}
+                                        style={{ background: '#38434F', borderColor: '#38434F' }}
                                         onClick={() => copyToClipboard(coupon.code)}
                                     >
                                         Sao chép mã
@@ -322,11 +323,11 @@ const ProductsPage = () => {
             </div>
 
             {/* MAIN CONTENT: Sidebar + Products */}
-            <Row gutter={40}>
+            <Row gutter={[40, 40]}>
                 {/* SIDEBAR BỘ LỌC */}
-                <Col span={6}>
+                <Col xs={24} lg={6}>
                     <div style={{ marginBottom: 24 }}>
-                        <Title level={5}>Mức giá</Title>
+                        <Title level={5} style={{ color: '#38434F' }}>Mức giá</Title>
                         <Checkbox.Group
                             options={priceRanges}
                             style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
@@ -335,21 +336,21 @@ const ProductsPage = () => {
                     </div>
 
                     <div style={{ marginBottom: 24 }}>
-                        <Title level={5}>Hãng sản xuất</Title>
+                        <Title level={5} style={{ color: '#38434F' }}>Hãng sản xuất</Title>
                         <Checkbox.Group
                             options={showAllBrands ? dynamicBrands.map(b => ({ label: b, value: b })) : dynamicBrands.slice(0, DISPLAY_LIMIT).map(b => ({ label: b, value: b }))}
                             style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
                             onChange={(checkedValues) => setFilters({ ...filters, brands: checkedValues })}
                         />
                         {dynamicBrands.length > DISPLAY_LIMIT && (
-                            <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }} onClick={() => setShowAllBrands(!showAllBrands)}>
+                            <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#38434F' }} onClick={() => setShowAllBrands(!showAllBrands)}>
                                 {showAllBrands ? 'Thu gọn' : `Xem thêm (${dynamicBrands.length - DISPLAY_LIMIT})`}
                             </Button>
                         )}
                     </div>
 
                     <div style={{ marginBottom: 24 }}>
-                        <Title level={5}>Loại sản phẩm</Title>
+                        <Title level={5} style={{ color: '#38434F' }}>Loại sản phẩm</Title>
                         <Checkbox.Group
                             value={filters.categories}
                             style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
@@ -362,14 +363,14 @@ const ProductsPage = () => {
                             ))}
                         </Checkbox.Group>
                         {categories.length > DISPLAY_LIMIT && (
-                            <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }} onClick={() => setShowAllCategories(!showAllCategories)}>
+                            <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#38434F' }} onClick={() => setShowAllCategories(!showAllCategories)}>
                                 {showAllCategories ? 'Thu gọn' : `Xem thêm (${categories.length - DISPLAY_LIMIT})`}
                             </Button>
                         )}
                     </div>
 
                     <div style={{ marginBottom: 24 }}>
-                        <Title level={5}>Giới tính</Title>
+                        <Title level={5} style={{ color: '#38434F' }}>Giới tính</Title>
                         <Checkbox.Group
                             options={genders}
                             style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
@@ -380,7 +381,7 @@ const ProductsPage = () => {
                     {/* THÊM MỚI: UI Bộ lọc Màu sắc */}
                     {dynamicColors.length > 0 && (
                         <div style={{ marginBottom: 24 }}>
-                            <Title level={5}>Màu sắc</Title>
+                            <Title level={5} style={{ color: '#38434F' }}>Màu sắc</Title>
                             <Checkbox.Group
                                 value={filters.colors}
                                 style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
@@ -407,7 +408,7 @@ const ProductsPage = () => {
                                 ))}
                             </Checkbox.Group>
                             {dynamicColors.length > DISPLAY_LIMIT && (
-                                <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }} onClick={() => setShowAllColors(!showAllColors)}>
+                                <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#38434F' }} onClick={() => setShowAllColors(!showAllColors)}>
                                     {showAllColors ? 'Thu gọn' : `Xem thêm (${dynamicColors.length - DISPLAY_LIMIT})`}
                                 </Button>
                             )}
@@ -417,14 +418,14 @@ const ProductsPage = () => {
                     {/* THÊM MỚI: UI Bộ lọc Kích thước */}
                     {dynamicSizes.length > 0 && (
                         <div style={{ marginBottom: 24 }}>
-                            <Title level={5}>Kích thước (Size)</Title>
+                            <Title level={5} style={{ color: '#38434F' }}>Kích thước (Size)</Title>
                             <Checkbox.Group
                                 options={showAllSizes ? dynamicSizes.map(s => ({ label: `Size ${s}`, value: s })) : dynamicSizes.slice(0, DISPLAY_LIMIT).map(s => ({ label: `Size ${s}`, value: s }))}
                                 style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
                                 onChange={(checkedValues) => setFilters({ ...filters, sizes: checkedValues })}
                             />
                             {dynamicSizes.length > DISPLAY_LIMIT && (
-                                <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }} onClick={() => setShowAllSizes(!showAllSizes)}>
+                                <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#38434F' }} onClick={() => setShowAllSizes(!showAllSizes)}>
                                     {showAllSizes ? 'Thu gọn' : `Xem thêm (${dynamicSizes.length - DISPLAY_LIMIT})`}
                                 </Button>
                             )}
@@ -433,9 +434,9 @@ const ProductsPage = () => {
                 </Col>
 
                 {/* KHU VỰC HIỂN THỊ SẢN PHẨM */}
-                <Col span={18}>
+                <Col xs={24} lg={18}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                        <Title level={3} style={{ margin: 0 }}>Tất cả sản phẩm</Title>
+                        <Title level={3} style={{ margin: 0, color: '#38434F' }}>Tất cả sản phẩm</Title>
                         <div>
                             <Text type="secondary" style={{ marginRight: 8 }}>Sắp xếp:</Text>
                             <Select
@@ -460,7 +461,7 @@ const ProductsPage = () => {
                             {currentProducts.map(product => {
                                 const discountInfo = getBestCoupon(product.minPrice);
                                 return (
-                                    <Col span={6} key={product.productId}>
+                                    <Col xs={12} sm={8} md={6} lg={6} key={product.productId}>
                                         <Link to={`/productDetail/${product.productId}`}>
                                             <Card
                                                 hoverable
@@ -491,7 +492,7 @@ const ProductsPage = () => {
                                                     {product.brand}
                                                 </Text>
 
-                                                <Paragraph ellipsis={{ rows: 2 }} style={{ margin: "2px 0 4px 0", fontSize: 13, fontWeight: 500, lineHeight: 1.3 }}>
+                                                <Paragraph ellipsis={{ rows: 2 }} style={{ margin: "2px 0 4px 0", fontSize: 13, fontWeight: 500, lineHeight: 1.3, color: '#38434F' }}>
                                                     {product.name}
                                                 </Paragraph>
 
@@ -542,15 +543,14 @@ const ProductsPage = () => {
                         </div>
                     )}
 
-                    {processedProducts.length > 0 && (
+                    {processedProducts.length > currentProducts.length && (
                         <div style={{ textAlign: 'center', marginTop: 40 }}>
-                            <Pagination
-                                current={currentPage}
-                                pageSize={pageSize}
-                                total={processedProducts.length}
-                                onChange={(page) => setCurrentPage(page)}
-                                showSizeChanger={false}
-                            />
+                            <button 
+                                className="btn-show-more"
+                                onClick={() => setCurrentPage(prev => prev + 1)}
+                            >
+                                Xem thêm sản phẩm
+                            </button>
                         </div>
                     )}
                 </Col>

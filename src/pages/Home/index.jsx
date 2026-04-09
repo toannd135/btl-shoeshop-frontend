@@ -4,8 +4,9 @@ import { Link } from "react-router-dom";
 
 import slide1 from "../../images/slide1.png";
 import slide2 from "../../images/slide2.png";
-// import slide3 from "../../images/slide3.png";
-// import slide4 from "../../images/slide4.png";
+import slide3 from "../../images/slide3.png";
+import slide4 from "../../images/slide4.png";
+import slide5 from "../../images/slide5.png";
 
 import i1 from "../../images/coll_1.png";
 import i2 from "../../images/coll_2.png";
@@ -32,7 +33,10 @@ import { RxFontRoman } from "react-icons/rx";
 const Home = () => {
     const slides = [
         { image: slide1 },
-        { image: slide2 }
+        { image: slide2 },
+        { image: slide3 },
+        { image: slide4 },
+        { image: slide5 }
     ];
 
     const [current, setCurrent] = useState(0);
