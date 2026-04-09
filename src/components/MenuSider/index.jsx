@@ -1,5 +1,5 @@
 import { Menu } from "antd";
-import { AppstoreOutlined, DashboardOutlined, BookOutlined, UserOutlined, AuditOutlined, BarsOutlined } from "@ant-design/icons";
+import { AppstoreOutlined, DashboardOutlined, BookOutlined, UserOutlined, AuditOutlined, BarsOutlined, MessageOutlined } from "@ant-design/icons";
 import { Link, useLocation } from 'react-router-dom';
 
 
@@ -45,6 +45,11 @@ function MenuSider() {
             label: <Link to="/admin/order">Đơn hàng</Link>,
             icon: <AppstoreOutlined />,
             key: "/admin/order"
+        },
+        {
+            label: <Link to="/admin/chat">Tin nhắn</Link>,
+            icon: <MessageOutlined />,
+            key: "/admin/chat"
         }
     ];
     return (

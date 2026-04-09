@@ -25,6 +25,7 @@ import Checkout from "../pages/Checkout/Checkout";
 import CheckoutSuccess from "../pages/Checkout/CheckoutSuccess";
 import OrderList from "../pages/OrderAdmin/OrderList";
 import AccountPage from "../pages/Account/Account";
+import ChatAdmin from "../pages/ChatAdmin/ChatAdmin";
 const ClientLayout = () => {
     return (
         <div className="client-layout">
@@ -134,6 +135,10 @@ export const routes = [
             {
                 path: "order",
                 element: <OrderList/>
+            },
+            {
+                path: "chat",
+                element: <ChatAdmin/>
             }
         ]
     }
