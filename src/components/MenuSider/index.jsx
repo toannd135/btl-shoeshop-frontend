@@ -1,15 +1,27 @@
 import { Menu } from "antd";
-import { AppstoreOutlined, DashboardOutlined, BookOutlined, UserOutlined, AuditOutlined, BarsOutlined } from "@ant-design/icons";
-import { Link, useLocation } from 'react-router-dom';
-
+import {
+    DashboardOutlined,
+    UserOutlined,
+    SafetyCertificateOutlined,
+    TeamOutlined,
+    TagsOutlined,
+    ShoppingOutlined,
+    GiftOutlined,
+    FileTextOutlined,
+    InboxOutlined,
+    ShopOutlined,
+    ContainerOutlined
+} from "@ant-design/icons";
+import { Link, useLocation } from "react-router-dom";
 
 function MenuSider() {
     const location = useLocation();
+
     const items = [
         {
             label: <Link to="/admin">Trang chủ</Link>,
             icon: <DashboardOutlined />,
-            key: '/admin',
+            key: "/admin",
         },
         {
             label: <Link to="/admin/user">Người dùng</Link>,
@@ -18,47 +30,60 @@ function MenuSider() {
         },
         {
             label: <Link to="/admin/permission">Phân quyền</Link>,
-            icon: <AuditOutlined />,
+            icon: <SafetyCertificateOutlined />,
             key: "/admin/permission",
         },
         {
             label: <Link to="/admin/role">Vai trò</Link>,
-            icon: <BarsOutlined />,
+            icon: <TeamOutlined />,
             key: "/admin/role",
         },
         {
             label: <Link to="/admin/category">Danh mục</Link>,
-            icon: <BookOutlined />,
-            key: "/admin/category"
+            icon: <TagsOutlined />,
+            key: "/admin/category",
         },
         {
             label: <Link to="/admin/product">Sản phẩm</Link>,
-            icon: <AppstoreOutlined />,
-            key: "/admin/product"
+            icon: <ShoppingOutlined />,
+            key: "/admin/product",
         },
         {
             label: <Link to="/admin/coupon">Mã giảm giá</Link>,
-            icon: <AppstoreOutlined />,
-            key: "/admin/coupon"
+            icon: <GiftOutlined />,
+            key: "/admin/coupon",
         },
         {
             label: <Link to="/admin/order">Đơn hàng</Link>,
-            icon: <AppstoreOutlined />,
-            key: "/admin/order"
+            icon: <FileTextOutlined />,
+            key: "/admin/order",
+        },
+        {
+            label: <Link to="/admin/inventory-transaction">Kho hàng</Link>,
+            icon: <InboxOutlined />,
+            key: "/admin/inventory-transaction",
+        },
+        {
+            label: <Link to="/admin/purchase-orders">Phiếu nhập</Link>,
+            icon: <ContainerOutlined />,
+            key: "/admin/purchase-orders",
+        },
+        {
+            label: <Link to="/admin/supplier">Nhà cung cấp</Link>,
+            icon: <ShopOutlined />,
+            key: "/admin/supplier",
         }
+
     ];
+
     return (
-        <>
-
-            <Menu
-                theme="light"
-                mode="inline"
-                items={items}
-                selectedKeys={[location.pathname]}
-                defaultOpenKeys={["Dashboard"]} />
-
-        </>
-    )
+        <Menu
+            theme="light"
+            mode="inline"
+            items={items}
+            selectedKeys={[location.pathname]}
+        />
+    );
 }
 
 export default MenuSider;

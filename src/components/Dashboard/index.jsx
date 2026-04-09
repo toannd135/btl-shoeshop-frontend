@@ -17,7 +17,6 @@ import {
 import {
     getRevenueReport,
     getCustomerOverviewReport,
-    getTopSpendersReport,
     getTopSellingProducts
 } from "../../services/reportService";
 
@@ -29,7 +28,6 @@ function Dashboard() {
     const [revenueData, setRevenueData] = useState([]);
     const [topProducts, setTopProducts] = useState([]);
     const [customerOverview, setCustomerOverview] = useState({});
-    const [topSpenders, setTopSpenders] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const currentYear = new Date().getFullYear();
@@ -38,11 +36,10 @@ function Dashboard() {
         const fetchDashboardData = async () => {
             setLoading(true);
             try {
-                const [revenueRes, productsRes, customerRes, spendersRes] = await Promise.all([
+                const [revenueRes, productsRes, customerRes] = await Promise.all([
                     getRevenueReport(),
                     getTopSellingProducts(),
                     getCustomerOverviewReport(),
-                    getTopSpendersReport({ limit: 5 })
                 ]);
                 setRevenueData(revenueRes.data || []);
                 setTopProducts(productsRes.data || []);
@@ -52,7 +49,6 @@ function Dashboard() {
                     newCustomersThisMonth: 0,
                     customersWithOrders: 0
                 });
-                setTopSpenders(spendersRes.data || []);
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu Dashboard:", error);
             } finally {
@@ -325,25 +321,6 @@ function Dashboard() {
                                 </div>
                             ))}
                         </div>
-                    </Card>
-                </Col>
-
-                <Col xs={24} lg={16}>
-                    <Card
-                        loading={loading}
-                        style={{ height: "450px", borderRadius: 16, border: 'none', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', overflow: 'hidden' }}
-                        headStyle={{ borderBottom: 'none', paddingTop: 16 }}
-                        title={<Text type="secondary" strong>KHÁCH VIP — CHI TIÊU NHIỀU NHẤT</Text>}
-                        extra={<Tag color="#eef2ff" style={{ color: '#4f46e5', borderRadius: 12, fontWeight: 'bold' }}>TOP 5</Tag>}
-                    >
-                        <Table
-                            columns={columnsSpenders}
-                            dataSource={topSpenders}
-                            rowKey={(record) => record.customerId || record.id || Math.random()}
-                            pagination={false}
-                            showHeader={false}
-                            size="middle"
-                        />
                     </Card>
                 </Col>
             </Row>

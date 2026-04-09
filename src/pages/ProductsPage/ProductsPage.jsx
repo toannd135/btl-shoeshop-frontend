@@ -15,10 +15,10 @@ const ProductsPage = () => {
     const genderFilter = searchParams.get('gender');
 
     // --- 1. STATES LƯU TRỮ DỮ LIỆU TỪ API ---
-    const [allProducts, setAllProducts] = useState([]); 
+    const [allProducts, setAllProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [coupons, setCoupons] = useState([]);
-    
+
     // States cho các danh sách filter động
     const [dynamicBrands, setDynamicBrands] = useState([]);
     const [dynamicColors, setDynamicColors] = useState([]); // THÊM MỚI
@@ -41,6 +41,17 @@ const ProductsPage = () => {
         colors: [], // THÊM MỚI
         sizes: []   // THÊM MỚI
     });
+
+    useEffect(() => {
+        setFilters((prev) => ({
+            ...prev,
+            categories: categoryFilter ? [categoryFilter] : [],
+            brands: brandFilter ? [brandFilter] : [],
+            gender: genderFilter ? [genderFilter] : []
+        }));
+        setCurrentPage(1);
+    }, [categoryFilter, brandFilter, genderFilter]);
+
     const [sortOption, setSortOption] = useState('default');
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 12;
@@ -85,20 +96,20 @@ const ProductsPage = () => {
                             let minPrice = 0;
                             let colors = [];
                             let sizes = []; // THÊM MỚI
-                            
+
                             if (variants.length > 0) {
                                 minPrice = Math.min(...variants.map(v => v.basePrice));
                                 colors = [...new Set(variants.map(v => v.color).filter(Boolean))];
                                 sizes = [...new Set(variants.map(v => v.size).filter(Boolean))]; // Lấy tất cả size của SP này
                             }
                             // Gắn cả sizes vào product object
-                            return { ...product, minPrice, colors, sizes }; 
+                            return { ...product, minPrice, colors, sizes };
                         } catch (err) {
                             return { ...product, minPrice: 0, colors: [], sizes: [] };
                         }
                     })
                 );
-                
+
                 setAllProducts(productsWithVariants);
 
                 // THÊM MỚI: Tính toán danh sách Màu Sắc và Kích Thước DUY NHẤT trên toàn bộ cửa hàng
@@ -113,6 +124,29 @@ const ProductsPage = () => {
         };
         fetchData();
     }, []);
+
+    const expandedCategoryIds = useMemo(() => {
+        if (!filters.categories || filters.categories.length === 0) return [];
+
+        const selectedIds = [...filters.categories];
+        const allMatchedIds = new Set(selectedIds);
+
+        selectedIds.forEach((selectedId) => {
+            categories.forEach((cate) => {
+                const parentId = cate.parentId;
+
+                if (Array.isArray(parentId)) {
+                    if (parentId.includes(selectedId)) {
+                        allMatchedIds.add(cate.categoryId);
+                    }
+                } else if (parentId === selectedId) {
+                    allMatchedIds.add(cate.categoryId);
+                }
+            });
+        });
+
+        return [...allMatchedIds];
+    }, [filters.categories, categories]);
 
     // --- 4. LOGIC LỌC & SẮP XẾP ---
     const processedProducts = useMemo(() => {
@@ -134,8 +168,8 @@ const ProductsPage = () => {
         }
 
         // Lọc Loại
-        if (filters.categories.length > 0) {
-            result = result.filter(p => filters.categories.includes(p.categoryId));
+        if (expandedCategoryIds.length > 0) {
+            result = result.filter((p) => expandedCategoryIds.includes(p.categoryId));
         }
 
         // Lọc Giới tính
@@ -240,7 +274,7 @@ const ProductsPage = () => {
     return (
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '30px 15px' }}>
             <Text type="secondary" style={{ marginBottom: 30, display: 'block' }}>
-                <Link to="/">Trang chủ</Link> / Tất cả sản phẩm
+                <Link to="/">Trang chủ</Link> / <Link to="/productsPage">Tất cả sản phẩm</Link>
             </Text>
 
             {/* VOUCHER SECTION */}
@@ -303,7 +337,7 @@ const ProductsPage = () => {
                     <div style={{ marginBottom: 24 }}>
                         <Title level={5}>Hãng sản xuất</Title>
                         <Checkbox.Group
-                            options={showAllBrands ? dynamicBrands.map(b => ({label: b, value: b})) : dynamicBrands.slice(0, DISPLAY_LIMIT).map(b => ({label: b, value: b}))}
+                            options={showAllBrands ? dynamicBrands.map(b => ({ label: b, value: b })) : dynamicBrands.slice(0, DISPLAY_LIMIT).map(b => ({ label: b, value: b }))}
                             style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
                             onChange={(checkedValues) => setFilters({ ...filters, brands: checkedValues })}
                         />
@@ -317,8 +351,11 @@ const ProductsPage = () => {
                     <div style={{ marginBottom: 24 }}>
                         <Title level={5}>Loại sản phẩm</Title>
                         <Checkbox.Group
+                            value={filters.categories}
                             style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
-                            onChange={(checkedValues) => setFilters({ ...filters, categories: checkedValues })}
+                            onChange={(checkedValues) =>
+                                setFilters((prev) => ({ ...prev, categories: checkedValues }))
+                            }
                         >
                             {(showAllCategories ? categories : categories.slice(0, DISPLAY_LIMIT)).map(cate => (
                                 <Checkbox key={cate.categoryId} value={cate.categoryId}>{cate.categoryName}</Checkbox>
@@ -345,10 +382,30 @@ const ProductsPage = () => {
                         <div style={{ marginBottom: 24 }}>
                             <Title level={5}>Màu sắc</Title>
                             <Checkbox.Group
-                                options={showAllColors ? dynamicColors.map(c => ({label: c, value: c})) : dynamicColors.slice(0, DISPLAY_LIMIT).map(c => ({label: c, value: c}))}
-                                style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
-                                onChange={(checkedValues) => setFilters({ ...filters, colors: checkedValues })}
-                            />
+                                value={filters.colors}
+                                style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+                                onChange={(checkedValues) =>
+                                    setFilters((prev) => ({ ...prev, colors: checkedValues }))
+                                }
+                            >
+                                {(showAllColors ? dynamicColors : dynamicColors.slice(0, DISPLAY_LIMIT)).map((color) => (
+                                    <Checkbox key={color} value={color}>
+                                        <span
+                                            title={color}
+                                            style={{
+                                                width: 20,
+                                                height: 20,
+                                                borderRadius: "50%",
+                                                backgroundColor: color,
+                                                border: color.toLowerCase() === "#ffffff" || color.toLowerCase() === "white"
+                                                    ? "1px solid #ccc"
+                                                    : "1px solid #ddd",
+                                                display: "inline-block"
+                                            }}
+                                        />
+                                    </Checkbox>
+                                ))}
+                            </Checkbox.Group>
                             {dynamicColors.length > DISPLAY_LIMIT && (
                                 <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }} onClick={() => setShowAllColors(!showAllColors)}>
                                     {showAllColors ? 'Thu gọn' : `Xem thêm (${dynamicColors.length - DISPLAY_LIMIT})`}
@@ -362,7 +419,7 @@ const ProductsPage = () => {
                         <div style={{ marginBottom: 24 }}>
                             <Title level={5}>Kích thước (Size)</Title>
                             <Checkbox.Group
-                                options={showAllSizes ? dynamicSizes.map(s => ({label: `Size ${s}`, value: s})) : dynamicSizes.slice(0, DISPLAY_LIMIT).map(s => ({label: `Size ${s}`, value: s}))}
+                                options={showAllSizes ? dynamicSizes.map(s => ({ label: `Size ${s}`, value: s })) : dynamicSizes.slice(0, DISPLAY_LIMIT).map(s => ({ label: `Size ${s}`, value: s }))}
                                 style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
                                 onChange={(checkedValues) => setFilters({ ...filters, sizes: checkedValues })}
                             />

@@ -25,6 +25,9 @@ import Checkout from "../pages/Checkout/Checkout";
 import CheckoutSuccess from "../pages/Checkout/CheckoutSuccess";
 import OrderList from "../pages/OrderAdmin/OrderList";
 import AccountPage from "../pages/Account/Account";
+import InventoryTransactionList from "../pages/Inventory/InventoryTransactionList";
+import PurchaseOrder from "../pages/PurchaseOrder/PurchaseOrder";
+import Supplier from "../pages/Supplier/Supplier";
 const ClientLayout = () => {
     return (
         <div className="client-layout">
@@ -134,6 +137,18 @@ export const routes = [
             {
                 path: "order",
                 element: <OrderList/>
+            },
+            {
+                path: "inventory-transaction",
+                element: <InventoryTransactionList/>
+            },
+            {
+                path: "purchase-orders",
+                element: <PurchaseOrder />
+            },
+            {
+                path: "supplier",
+                element: <Supplier/>
             }
         ]
     }
