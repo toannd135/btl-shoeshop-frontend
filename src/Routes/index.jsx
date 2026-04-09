@@ -1,4 +1,5 @@
 import LayoutDefault from "../layout/LayoutDefault";
+import Blog from "../pages/Blog/index";
 import Dashboard from "../components/Dashboard";
 import UserList from "../pages/User/UserList";
 import PermissionList from "../pages/Permission/PermissionList";
@@ -64,6 +65,10 @@ export const routes = [
             {
                 path: "/productDetail/:id",
                 element: <ProductDetail />
+            },
+            {
+                path: "/blog",
+                element: <Blog />
             },
         ]
     },
