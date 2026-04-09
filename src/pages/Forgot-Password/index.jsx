@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./forgot.css";
-// import logo from "../../images/logoPtitShoesShoppng.png";
-import logo from "../../images/logo_shoeshop_removebg_preview.png";
+import logo from "../../images/logoPtitShoesShoppng.png";
 import { forgotPassword } from "../../services/authService";
 
 const ForgotPassword = () => {

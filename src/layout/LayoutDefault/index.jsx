@@ -4,7 +4,7 @@ import { Content, Header } from 'antd/es/layout/layout';
 import MenuSider from '../../components/MenuSider';
 import { Outlet } from 'react-router-dom';
 import "./LayoutDefault.css";
-import logo_shoeshop_removebg_preview from "../../images/logo_shoeshop_removebg_preview.png";
+import logo from "../../images/logoPtitShoesShoppng.png";
 import Notify from '../../components/Notify';
 import Message from '../../components/Message';
 import Profile from '../../components/Profile';
@@ -23,7 +23,7 @@ function LayoutDefault() {
             <Header className="header">
                 <div className='header__left'>
                     <div className='header__logo' onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                        <img src={logo_shoeshop_removebg_preview} alt="logo" />
+                        <img src={logo} alt="logo" />
                     </div>
 
                     <div className='header__collapse'>

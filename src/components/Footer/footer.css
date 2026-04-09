@@ -33,13 +33,11 @@
     color: #e53935;
 }
 
-.logo {
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.logo span {
-    color: #e53935;
+.footer-logo {
+    height: 80px;
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 20px;
 }
 
 .contact p {

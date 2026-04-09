@@ -3,6 +3,7 @@ import "./footer.css";
 import visa from "../../images/visa.png";
 import zalopay from "../../images/zalo.png";
 import cod from "../../images/shipping.png";
+import logo from "../../images/logoPtitShoesShoppng.png";
 const Footer = () => {
     return (
         <footer className="footer">
@@ -10,7 +11,7 @@ const Footer = () => {
 
                 {/* BRAND */}
                 <div className="footer-col">
-                    <h2 className="logo">SHOE<span>Shop</span></h2>
+                    <img src={logo} alt="Shoes Shop Logo" className="footer-logo" />
                     <p>
                         Chuyên cung cấp giày sneaker chính hãng,
                         cam kết chất lượng và giá tốt nhất.
