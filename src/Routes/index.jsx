@@ -28,6 +28,7 @@ import AccountPage from "../pages/Account/Account";
 import InventoryTransactionList from "../pages/Inventory/InventoryTransactionList";
 import PurchaseOrder from "../pages/PurchaseOrder/PurchaseOrder";
 import Supplier from "../pages/Supplier/Supplier";
+import ChatAdmin from "../pages/ChatAdmin/ChatAdmin";
 const ClientLayout = () => {
     return (
         <div className="client-layout">
@@ -149,6 +150,10 @@ export const routes = [
             {
                 path: "supplier",
                 element: <Supplier/>
+            },
+            {
+                path: "chat",
+                element: <ChatAdmin/>
             }
         ]
     }

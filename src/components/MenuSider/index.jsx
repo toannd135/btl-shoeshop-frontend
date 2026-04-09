@@ -10,7 +10,8 @@ import {
     FileTextOutlined,
     InboxOutlined,
     ShopOutlined,
-    ContainerOutlined
+    ContainerOutlined,
+    MessageOutlined
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 
@@ -72,6 +73,11 @@ function MenuSider() {
             label: <Link to="/admin/supplier">Nhà cung cấp</Link>,
             icon: <ShopOutlined />,
             key: "/admin/supplier",
+        },
+        {
+            label: <Link to="/admin/chat">Tin nhắn</Link>,
+            icon: <MessageOutlined />,
+            key: "/admin/chat"
         }
 
     ];

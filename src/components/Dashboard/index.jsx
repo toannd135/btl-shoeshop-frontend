@@ -40,6 +40,7 @@ function Dashboard() {
                     getRevenueReport(),
                     getTopSellingProducts(),
                     getCustomerOverviewReport(),
+                    
                 ]);
                 setRevenueData(revenueRes.data || []);
                 setTopProducts(productsRes.data || []);
