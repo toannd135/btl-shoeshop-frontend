@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./Cart.css";
-import { getMyCart } from "../../services/cartService";
+import { getMyCart, updateCartItemQuantity, deleteCartItem } from "../../services/cartService";
 import { Link } from "react-router-dom";
 import { getCouponList } from "../../services/couponService";
 
@@ -67,16 +67,32 @@ function Cart() {
     }
   };
 
-  const changeQty = (index, type) => {
-    const newItems = [...items];
-    if (type === "inc") newItems[index].quantity++;
-    if (type === "dec" && newItems[index].quantity > 1) newItems[index].quantity--;
-    setItems(newItems);
+  const changeQty = async (index, type) => {
+    const item = items[index];
+    if (!item?.cartItemId) return;
+
+    try {
+      await updateCartItemQuantity({
+        cartItemId: item.cartItemId,
+        step: type === "inc" ? "INCREASE" : "DECREASE",
+      });
+
+      await loadCart();
+    } catch (error) {
+      console.error("Lỗi update quantity:", error);
+    }
   };
 
-  const removeItem = (index) => {
-    const newItems = items.filter((_, i) => i !== index);
-    setItems(newItems);
+  const removeItem = async (index) => {
+    const item = items[index];
+    if (!item?.cartItemId) return;
+
+    try {
+      await deleteCartItem(item.cartItemId);
+      await loadCart();
+    } catch (error) {
+      console.error("Lỗi xóa item:", error);
+    }
   };
 
   const totalPrice = items.reduce(

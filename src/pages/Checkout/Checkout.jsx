@@ -211,59 +211,73 @@ const Checkout = () => {
   };
 
   const handlePlaceOrder = async () => {
-    if (!formData.receiverName || !formData.receiverPhone || !formData.address || !formData.province) {
-      alert("Vui lòng điền đầy đủ thông tin nhận hàng và chọn Tỉnh/Thành phố!");
+  if (!formData.receiverName || !formData.receiverPhone || !formData.address || !formData.province) {
+    alert("Vui lòng điền đầy đủ thông tin nhận hàng và chọn Tỉnh/Thành phố!");
+    return;
+  }
+
+  setIsProcessing(true);
+
+  try {
+    const selectedProvinceObj = provinces.find(p => p.code == formData.province);
+    const provinceDisplayName = selectedProvinceObj ? selectedProvinceObj.name : "";
+    const wardDisplayName = formData.ward || "";
+
+    const fullShippingAddress = [
+      formData.address,
+      wardDisplayName,
+      provinceDisplayName
+    ].filter(part => part && part.trim() !== "").join(", ");
+
+    const checkoutPayload = {
+      receiverName: formData.receiverName,
+      receiverPhone: formData.receiverPhone,
+      shippingAddress: fullShippingAddress,
+      provinceCode: formData.province,
+      note: formData.note,
+      couponCode: formData.couponCode || null
+    };
+
+    const orderResult = await checkoutOrder(checkoutPayload);
+    const orderData = orderResult?.data || orderResult;
+    const orderId = orderData?.orderId;
+
+    if (!orderId) {
+      throw new Error("Không tạo được đơn hàng, vui lòng thử lại!");
+    }
+
+    if (paymentMethod === "COD") {
+      navigate(`/checkout/success/${orderId}`, {
+        state: {
+          paymentMethod: "COD",
+          orderId: orderId
+        }
+      });
       return;
     }
 
-    setIsProcessing(true);
+    const paymentPayload = {
+      orderId,
+      paymentMethod: "VNPAY",
+      bankCode: "NCB"
+    };
 
-    try {
-      const selectedProvinceObj = provinces.find(p => p.code == formData.province);
-      const provinceDisplayName = selectedProvinceObj ? selectedProvinceObj.name : "";
-      const wardDisplayName = formData.ward || "";
-      const fullShippingAddress = [
-        formData.address,
-        wardDisplayName,
-        provinceDisplayName
-      ].filter(part => part && part.trim() !== "").join(", ");
+    const paymentResponse = await createPayment(paymentPayload);
+    const paymentData = paymentResponse?.data || paymentResponse;
 
-      const checkoutPayload = {
-        receiverName: formData.receiverName,
-        receiverPhone: formData.receiverPhone,
-        shippingAddress: fullShippingAddress,
-        provinceCode: formData.province,
-        note: formData.note,
-        couponCode: formData.couponCode || null
-      };
-
-      const orderResult = await checkoutOrder(checkoutPayload);
-      const orderId = orderResult?.orderId || orderResult?.data?.orderId;
-
-      if (!orderId) throw new Error("Không tạo được đơn hàng, vui lòng thử lại!");
-
-      const paymentPayload = {
-        orderId: orderId,
-        paymentMethod: paymentMethod,
-        bankCode: "NCB"
-      };
-
-      const paymentResponse = await createPayment(paymentPayload);
-      const paymentData = paymentResponse.data || paymentResponse;
-
-      if (paymentMethod === 'VNPAY' && paymentData.paymentUrl) {
-        window.location.href = paymentData.paymentUrl;
-      } else {
-        navigate(`/checkout/success/${orderId}`);
-      }
-
-    } catch (error) {
-      console.error(error);
-      alert(error.response?.data?.message || error.message || "Có lỗi xảy ra khi đặt hàng!");
-    } finally {
-      setIsProcessing(false);
+    if (paymentData?.paymentUrl) {
+      window.location.href = paymentData.paymentUrl;
+    } else {
+      throw new Error("Không tạo được link thanh toán VNPAY");
     }
-  };
+
+  } catch (error) {
+    console.error(error);
+    alert(error?.response?.data?.message || error.message || "Có lỗi xảy ra khi đặt hàng!");
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
   return (
     <div className="checkout-page">

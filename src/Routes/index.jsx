@@ -76,7 +76,7 @@ export const routes = [
             },
             {
                 path: "productsPage",
-                element: <ProductsPage/>
+                element: <ProductsPage />
             },
             {
                 path: "productDetail/:id",
@@ -84,19 +84,23 @@ export const routes = [
             },
             {
                 path: "cart",
-                element: <Cart/>
+                element: <Cart />
             },
             {
                 path: "checkout",
-                element: <Checkout/>
+                element: <Checkout />
             },
             {
                 path: "checkoutSuccess",
-                element: <CheckoutSuccess/>
+                element: <CheckoutSuccess />
+            },
+            {
+                path: "checkout/success/:orderId",
+                element: <CheckoutSuccess />
             },
             {
                 path: "account",
-                element: <AccountPage/>
+                element: <AccountPage />
             },
             {
                 path: "/blog",
@@ -138,15 +142,15 @@ export const routes = [
             },
             {
                 path: "coupon",
-                element: <CouponList/>
+                element: <CouponList />
             },
             {
                 path: "order",
-                element: <OrderList/>
+                element: <OrderList />
             },
             {
                 path: "inventory-transaction",
-                element: <InventoryTransactionList/>
+                element: <InventoryTransactionList />
             },
             {
                 path: "purchase-orders",
@@ -154,11 +158,11 @@ export const routes = [
             },
             {
                 path: "supplier",
-                element: <Supplier/>
+                element: <Supplier />
             },
             {
                 path: "chat",
-                element: <ChatAdmin/>
+                element: <ChatAdmin />
             }
         ]
     }
