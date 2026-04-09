@@ -271,7 +271,7 @@ const Checkout = () => {
 
         {/* CỘT 1: THÔNG TIN NHẬN HÀNG */}
         <div className="checkout-col checkout-info">
-          <h1 className="shop-name">PTIT Shoe Shop</h1>
+          <h1 className="shop-name"></h1>
 
           <div className="section-header">
             <h2>Thông tin nhận hàng</h2>

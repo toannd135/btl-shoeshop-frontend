@@ -6,7 +6,8 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: #333;
+  color: #38434F;
+  /* Đã đổi từ #333 */
   background-color: #fff;
 }
 
@@ -21,8 +22,9 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 1200px; /* Tăng độ rộng tổng để đủ chỗ cho 3 cột */
-  box-shadow: 0 0 15px rgba(0,0,0,0.05);
+  max-width: 1200px;
+  /* Tăng độ rộng tổng để đủ chỗ cho 3 cột */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
   background: #fff;
   border-radius: 8px;
   overflow: hidden;
@@ -68,7 +70,8 @@ body {
 /* --- CHUNG --- */
 .shop-name {
   font-size: 28px;
-  color: #338dbc;
+  color: #38434F;
+  /* Đã đổi từ #338dbc */
   margin-bottom: 25px;
   font-weight: 500;
 }
@@ -88,7 +91,8 @@ body {
 }
 
 .login-link {
-  color: #338dbc;
+  color: #38434F;
+  /* Đã đổi từ #338dbc */
   text-decoration: none;
   font-size: 14px;
 }
@@ -115,7 +119,8 @@ body {
 }
 
 .input-field:focus {
-  border-color: #338dbc;
+  border-color: #38434F;
+  /* Đã đổi từ #338dbc */
 }
 
 .input-group {
@@ -126,7 +131,8 @@ body {
 }
 
 .input-group:focus-within {
-  border-color: #338dbc;
+  border-color: #38434F;
+  /* Đã đổi từ #338dbc */
 }
 
 .input-group-addon {
@@ -170,11 +176,13 @@ body {
 }
 
 .method-box.active {
-  border-color: #338dbc;
+  border-color: #38434F;
+  /* Đã đổi từ #338dbc */
   background-color: #f4f8fa;
 }
 
-.method-box label, .method-item label {
+.method-box label,
+.method-item label {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -224,6 +232,7 @@ body {
 .product-list::-webkit-scrollbar {
   width: 6px;
 }
+
 .product-list::-webkit-scrollbar-thumb {
   background-color: #ccc;
   border-radius: 4px;
@@ -274,6 +283,7 @@ body {
   z-index: 10;
   background-color: #8f9bb3;
   color: #fff;
+  /* Chữ nằm trong huy hiệu (badge), nên để trắng cho dễ đọc */
   font-size: 12px;
   width: 20px;
   height: 20px;
@@ -297,13 +307,15 @@ body {
 
 .product-variant {
   font-size: 12px;
-  color: #737373;
+  color: #38434F;
+  /* Đã đổi từ #737373 */
   margin-top: 4px;
 }
 
 .product-price {
   font-size: 14px;
-  color: #717171;
+  color: #38434F;
+  /* Đã đổi từ #717171 */
   font-weight: 500;
 }
 
@@ -321,8 +333,9 @@ body {
 }
 
 .btn-apply {
-  background-color: #338dbc;
+  background-color: #38434F;
   color: #fff;
+  /* Chữ trên nền tối để màu trắng */
   border: none;
   border-radius: 4px;
   padding: 0 20px;
@@ -332,7 +345,8 @@ body {
 }
 
 .btn-apply:hover {
-  background-color: #2b77a0; 
+  background-color: #2c353f;
+  /* Làm tối một chút khi hover để thấy hiệu ứng */
 }
 
 .btn-apply:disabled {
@@ -346,7 +360,8 @@ body {
   gap: 12px;
   margin-bottom: 20px;
   font-size: 14px;
-  color: #717171;
+  color: #38434F;
+  /* Đã đổi từ #717171 */
 }
 
 .price-row {
@@ -365,13 +380,15 @@ body {
 
 .total-row span:first-child {
   font-size: 16px;
-  color: #717171;
+  color: #38434F;
+  /* Đã đổi từ #717171 */
 }
 
 .total-price {
   font-size: 24px;
   font-weight: 500;
-  color: #338dbc;
+  color: #38434F;
+  /* Đã đổi từ #338dbc */
 }
 
 .checkout-actions {
@@ -381,7 +398,8 @@ body {
 }
 
 .back-to-cart {
-  color: #338dbc;
+  color: #38434F;
+  /* Đã đổi từ #338dbc */
   text-decoration: none;
   font-size: 14px;
 }
@@ -391,8 +409,9 @@ body {
 }
 
 .btn-submit {
-  background-color: #338dbc;
+  background-color: #38434F;
   color: #fff;
+  /* Giữ chữ trắng trên nền tối */
   border: none;
   border-radius: 4px;
   padding: 15px 35px;
@@ -403,7 +422,8 @@ body {
 }
 
 .btn-submit:hover {
-  background-color: #2b77a0;
+  background-color: #2c353f;
+  /* Đã đổi từ #2b77a0 (xanh) sang tone tối hơn của #38434F */
 }
 
 .btn-submit:disabled {

@@ -11,10 +11,11 @@
   background: #fff;
   padding: 40px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   max-width: 500px;
   width: 100%;
   text-align: center;
+  color: #38434F;
 }
 
 .icon-wrapper {
@@ -22,22 +23,20 @@
   margin-bottom: 20px;
 }
 
-.icon-wrapper.success {
-  color: #28a745;
-}
-
+/* Đã đổi màu cả hai icon thành công và thất bại */
+.icon-wrapper.success,
 .icon-wrapper.failed {
-  color: #dc3545;
+  color: #38434F;
 }
 
 .success-card h2 {
-  color: #333;
+  color: #38434F;
   font-size: 24px;
   margin-bottom: 15px;
 }
 
 .success-card p {
-  color: #666;
+  color: #38434F;
   font-size: 15px;
   margin-bottom: 10px;
   line-height: 1.5;
@@ -45,7 +44,7 @@
 
 .sub-text {
   font-size: 13px !important;
-  color: #999 !important;
+  color: #38434F !important;
   margin-top: 15px;
 }
 
@@ -67,8 +66,8 @@
 
 .btn-view-order {
   background-color: #fff;
-  color: #338dbc;
-  border: 1px solid #338dbc;
+  color: #38434F;
+  border: 1px solid #38434F;
 }
 
 .btn-view-order:hover {
@@ -76,9 +75,9 @@
 }
 
 .btn-continue {
-  background-color: #338dbc;
+  background-color: #38434F;
   color: #fff;
-  border: 1px solid #338dbc;
+  border: 1px solid #38434F;
 }
 
 .btn-continue:hover {
