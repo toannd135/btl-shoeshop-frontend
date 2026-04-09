@@ -296,3 +296,62 @@
 .search-view-more:hover {
     text-decoration: underline;
 }
+
+.mobile-menu-btn {
+    display: none;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+@media (max-width: 768px) {
+    .header-client {
+        padding: 0 20px;
+    }
+    .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+    }
+    .nav {
+        position: fixed;
+        top: var(--header-height);
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - var(--header-height));
+        background: #fff;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 30px;
+        transition: left 0.3s ease;
+        gap: 20px;
+        z-index: 999;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        overflow-y: auto;
+    }
+    .nav.mobile-open {
+        left: 0;
+    }
+    .menu-item {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        height: auto;
+    }
+    .simple-dropdown {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+        box-shadow: none;
+        border-top: none;
+        margin-top: 10px;
+        padding-left: 20px;
+        display: none;
+    }
+    .menu-item:hover .simple-dropdown {
+        display: flex;
+    }
+    .search-modal-content {
+        width: 100%;
+        padding: 20px;
+    }
+}

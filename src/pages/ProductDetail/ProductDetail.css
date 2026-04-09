@@ -788,6 +788,73 @@ background:#f5a623;
     flex-direction:column;
 }
 
+.review-form {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+.review-form h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #38434F;
+}
+.form-group-star {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+.star-select {
+    font-size: 24px;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s;
+    margin: 0 2px;
+}
+.star-select.active, .star-select:hover {
+    color: #f5a623;
+}
+.review-input-text {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    resize: vertical;
+    margin-bottom: 15px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+.btn-submit-review {
+    background: #38434F;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.btn-submit-review:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+.review-error {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+.review-avatar-text {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #DA291C;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
 /* ===============================
    SUGGESTED PRODUCTS (AUTO SCROLL)
 ================================ */

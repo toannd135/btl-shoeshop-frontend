@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiUser, FiShoppingCart, FiSearch, FiLogOut, FiSettings, FiX, FiUser as FiProfile } from 'react-icons/fi';
+import { FiUser, FiShoppingCart, FiSearch, FiLogOut, FiSettings, FiX, FiUser as FiProfile, FiMenu } from 'react-icons/fi';
 import "./header.css";
 
 import { getCateList } from "../../services/cateService";
@@ -18,6 +18,7 @@ const Header = () => {
     // --- STATE CHO NAVBAR ---
     const [show, setShow] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [userProfile, setUserProfile] = useState(null);
     const [cartCount, setCartCount] = useState(0);
 
@@ -198,11 +199,15 @@ const Header = () => {
 
     return (
         <header className={`header-client ${show ? '' : 'hidden'}`}>
+            <div className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                {isMobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
+            </div>
+
             <Link to='/' className="logo">
                 <img src={logo} alt="PTIT Shoe Shop logo" />
             </Link>
 
-            <nav className="nav">
+            <nav className={`nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
                 <Link to="/sale" className="nav-highlight">Khuyến mãi</Link>
 
                 {["Nam", "Nữ", "Bé trai", "Bé gái"].map((menuName, index) => {
@@ -245,7 +250,7 @@ const Header = () => {
                     );
                 })}
 
-                <Link to="/blog">Blog</Link>
+                <Link to="/blog" onClick={() => setIsMobileMenuOpen(false)}>Blog</Link>
             </nav>
 
             <div className="header-client-icons">

@@ -26,7 +26,8 @@
 }
 
 .voucher-title span {
-  color: #f53d2d; /* Màu đỏ cho chữ giảm giá */
+  color: #f53d2d;
+  /* Màu đỏ cho chữ giảm giá */
   font-weight: normal;
 }
 
@@ -44,7 +45,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
 }
 
 .voucher-badge {
@@ -162,8 +163,9 @@
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); 
-  gap: 15px; /* Thu nhỏ khoảng cách giữa các ô */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  /* Thu nhỏ khoảng cách giữa các ô */
 }
 
 /* Thẻ Sản phẩm */
@@ -173,12 +175,14 @@
 
 .product-image {
   background-color: #f6f6f6;
-  border-radius: 8px; /* Bo góc nhẹ lại cho hợp form nhỏ */
+  border-radius: 8px;
+  /* Bo góc nhẹ lại cho hợp form nhỏ */
   aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px; /* Giảm padding từ 20px xuống 10px để box bé lại */
+  padding: 10px;
+  /* Giảm padding từ 20px xuống 10px để box bé lại */
   margin-bottom: 10px;
   overflow: hidden;
 }
@@ -202,11 +206,13 @@
 }
 
 .product-name {
-  font-size: 13px; /* Cỡ chữ nhỏ hơn */
+  font-size: 13px;
+  /* Cỡ chữ nhỏ hơn */
   color: #333;
   margin: 0 0 8px 0;
   line-height: 1.4;
-  height: 36px; /* Ép cứng chiều cao cho 2 dòng gọn gàng */
+  height: 36px;
+  /* Ép cứng chiều cao cho 2 dòng gọn gàng */
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -216,7 +222,8 @@
 .product-price {
   color: #f53d2d;
   font-weight: bold;
-  font-size: 14px; /* Hạ size chữ của giá tiền */
+  font-size: 14px;
+  /* Hạ size chữ của giá tiền */
   margin-bottom: 8px;
 }
 
@@ -226,9 +233,49 @@
 }
 
 .color-swatch {
-  width: 18px; 
+  width: 18px;
   height: 18px;
   border-radius: 3px;
   border: 1px solid #ddd;
 }
 
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .products-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .products-header {
+    width: 100%;
+  }
+
+  .sort-select {
+    width: 100%;
+  }
+}
