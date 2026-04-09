@@ -78,7 +78,7 @@ const SuggestedProductCard = ({ prod }) => {
             try {
                 const res = await getProductVariants(prod.productId);
                 const variantsList = res?.data || res || [];
-                
+
                 if (variantsList.length > 0) {
                     setPrice(variantsList[0].basePrice || 0);
                 }
@@ -706,7 +706,7 @@ function ProductDetail() {
                     </div>
 
                 </div>
-                
+
                 <div className="review-section">
                     <h2 className="review-title">Đánh giá sản phẩm</h2>
 
@@ -716,21 +716,21 @@ function ProductDetail() {
                         <div className="form-group-star">
                             <span>Đánh giá: </span>
                             {[1, 2, 3, 4, 5].map(star => (
-                                <span 
-                                    key={star} 
+                                <span
+                                    key={star}
                                     className={`star-select ${star <= newReview.rating ? 'active' : ''}`}
-                                    onClick={() => setNewReview({...newReview, rating: star})}
+                                    onClick={() => setNewReview({ ...newReview, rating: star })}
                                 >
                                     ★
                                 </span>
                             ))}
                         </div>
-                        <textarea 
-                            className="review-input-text" 
-                            rows="4" 
+                        <textarea
+                            className="review-input-text"
+                            rows="4"
                             placeholder="Nhập nội dung đánh giá..."
                             value={newReview.note}
-                            onChange={(e) => setNewReview({...newReview, note: e.target.value})}
+                            onChange={(e) => setNewReview({ ...newReview, note: e.target.value })}
                         />
                         <button type="submit" className="btn-submit-review" disabled={submittingReview}>
                             {submittingReview ? "Đang gửi..." : "Gửi đánh giá"}

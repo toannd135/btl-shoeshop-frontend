@@ -668,10 +668,26 @@
     display: flex; gap: 12px; margin-top: 18px;
 }
 .btn-back {
-    flex: 1; padding: 10px; border: 1px solid #333; background: white; border-radius: 20px;
+    flex: 1; padding: 10px; border: 1px solid #38434F; color: #38434F; background: white; border-radius: 20px;
+    cursor: pointer; transition: all 0.2s;
+}
+.btn-back:hover {
+    background: #f0f0f0;
+}
+.btn-back:active {
+    background: #e0e0e0;
+    transform: scale(0.98);
 }
 .btn-view-cart {
-    flex: 1; padding: 10px; background: #111; color: white; border: none; border-radius: 20px;
+    flex: 1; padding: 10px; background: #38434F; color: white; border: none; border-radius: 20px;
+    cursor: pointer; transition: all 0.2s;
+}
+.btn-view-cart:hover {
+    background: #2b353f;
+}
+.btn-view-cart:active {
+    background: #1e252c;
+    transform: scale(0.98);
 }
 
 /* ===============================

@@ -32,7 +32,8 @@
 .slide {
     width: 100%;
     height: calc(100vh - 90px);
-    background-size: contain;
+    background-size: cover;
+    background-repeat: no-repeat;
     background-position: center;
     transition: 0.8s ease-in-out;
     display: flex;
@@ -145,7 +146,7 @@
 
 /* FLASH SALE */
 .flash-sale {
-    background: #111;
+    background: #38434F;
     padding: 40px 60px;
 }
 
@@ -317,6 +318,7 @@
     .collection-list {
         grid-template-columns: repeat(3, 1fr);
     }
+
     .flash-products {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -326,30 +328,38 @@
     .collection-list {
         grid-template-columns: repeat(2, 1fr);
     }
+
     .flash-products {
         grid-template-columns: repeat(2, 1fr);
     }
+
     .collection {
         padding: 40px 20px;
     }
+
     .flash-sale {
         padding: 40px 20px;
     }
+
     .flash-top {
         flex-direction: column;
         align-items: flex-start;
         gap: 20px;
     }
+
     .flash-countdown-wrapper {
         align-items: flex-start;
     }
+
     .flash-countdown-label {
         text-align: left;
     }
+
     .slide {
         padding-left: 20px;
         background-position: center;
     }
+
     .overlay h1 {
         font-size: 32px;
     }
@@ -359,6 +369,7 @@
     .collection-list {
         grid-template-columns: 1fr;
     }
+
     .flash-products {
         grid-template-columns: 1fr;
     }

@@ -9,7 +9,7 @@
   font-size: 28px;
   margin-bottom: 30px;
   font-weight: 700;
-  color: #111;
+  color: #38434F;
 }
 
 .cart-content {
@@ -38,7 +38,7 @@
 
 .reward-msg {
   font-weight: 700;
-  color: #111;
+  color: #38434F;
 }
 
 .reward-coupon {
@@ -69,7 +69,7 @@
   top: 0;
   left: 0;
   height: 100%;
-  background: #000;
+  background: #38434F;
   border-radius: 2px;
 }
 
@@ -95,7 +95,7 @@
   padding: 15px 0;
   border-bottom: 1px solid #ddd;
   font-weight: 700;
-  color: #111;
+  color: #38434F;
   text-align: center;
   font-size: 15px;
 }
@@ -138,7 +138,7 @@
 .cart-name {
   font-weight: 700;
   font-size: 15px;
-  color: #111;
+  color: #38434F;
   line-height: 1.4;
 }
 
@@ -206,13 +206,13 @@
 }
 
 .btn-remove:hover {
-  color: #111;
+  color: #38434F;
 }
 
 /* KHU VỰC BÊN PHẢI */
 .cart-right {
   width: 340px;
-  border: 1.5px solid #111;
+  border: 1.5px solid #38434F;
   border-radius: 12px;
   padding: 25px;
   position: sticky;
@@ -254,7 +254,7 @@
 }
 
 .action-text:hover {
-  color: #111;
+  color: #38434F;
 }
 
 .summary-row {
@@ -267,7 +267,7 @@
 .summary-label {
   font-weight: 800;
   font-size: 16px;
-  color: #111;
+  color: #38434F;
 }
 
 .summary-total {
@@ -278,7 +278,7 @@
 
 .checkout-btn {
   width: 100%;
-  background: #111;
+  background: #38434F;
   color: white;
   padding: 18px;
   border: none;
@@ -289,10 +289,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.2s;
 }
 
 .checkout-btn:hover {
-  background: #333;
+  background: #2b353f;
+}
+
+.checkout-btn:active {
+  background: #1e252c;
+  transform: scale(0.98);
 }
 
 .checkout-note {
