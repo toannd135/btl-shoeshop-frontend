@@ -1,24 +1,24 @@
-let accessToken = null;
-let currentUser = null;
-
 export const setAccessToken = (token) => {
-    accessToken = token;
+    localStorage.setItem("accessToken", token);
 };
 
 export const getAccessToken = () => {
-    return accessToken;
+    return localStorage.getItem("accessToken");
 };
 
 export const clearAccessToken = () => {
-    accessToken = null;
+    localStorage.removeItem("accessToken");
 };
 
 export const setCurrentUser = (user) => {
-    currentUser = user;
+    localStorage.setItem("currentUser", JSON.stringify(user));
 };
+
 export const getCurrentUser = () => {
-    return currentUser;
+    const user = localStorage.getItem("currentUser");
+    return user ? JSON.parse(user) : null;
 };
+
 export const clearCurrentUser = () => {
-    currentUser = null;
+    localStorage.removeItem("currentUser");
 };

@@ -29,7 +29,11 @@ const Header = () => {
     const [categories, setCategories] = useState([]);
 
     const isLoggedIn = !!userProfile;
-    const isAdmin = userProfile && (userProfile.roleCode === "ADMIN" || userProfile.roleCode === "ROLE_ADMIN");
+    const adminRoles = ["SUPER_ADMIN", "ADMIN", "MANAGER", "INVENTORY_MANAGER", "SELLER"];
+    const isAdmin = userProfile && adminRoles.some(role => {
+        const userRole = userProfile.roleCode || "";
+        return userRole === role || userRole === `ROLE_${role}`;
+    });
 
     const fetchUserFromMemory = () => {
         const user = getCurrentUser();
@@ -195,15 +199,15 @@ const Header = () => {
         },
         ...(isAdmin
             ? [
-                  {
-                      key: "admin",
-                      label: (
-                          <Link to="/admin" style={{ fontWeight: 500, padding: "5px 10px" }}>
-                              Trang quản trị
-                          </Link>
-                      ),
-                  },
-              ]
+                {
+                    key: "admin",
+                    label: (
+                        <Link to="/admin" style={{ fontWeight: 500, padding: "5px 10px" }}>
+                            Trang quản trị
+                        </Link>
+                    ),
+                },
+            ]
             : []),
         { type: "divider" },
         {

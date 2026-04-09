@@ -111,7 +111,7 @@ export const routes = [
     {
         path: "/admin",
         element: (
-            <ProtectRoute allowedRoles={['ROLE_ADMIN']}>
+            <ProtectRoute allowedRoles={['ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_SELLER']}>
                 <LayoutDefault />
             </ProtectRoute>
         ),
