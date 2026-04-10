@@ -1,0 +1,37 @@
+.verify-result-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f7f7f7;
+    padding: 20px;
+}
+
+.verify-result-card {
+    width: 100%;
+    max-width: 500px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.verify-result-card h2 {
+    margin-bottom: 16px;
+}
+
+.verify-result-card p {
+    margin-bottom: 20px;
+    line-height: 1.6;
+    color: #4b5563;
+}
+
+.verify-result-card button {
+    border: none;
+    background: #1677ff;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+}

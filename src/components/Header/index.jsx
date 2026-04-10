@@ -30,6 +30,22 @@ const Header = () => {
 
     const isLoggedIn = !!userProfile;
     const adminRoles = ["SUPER_ADMIN", "ADMIN", "MANAGER", "INVENTORY_MANAGER", "SELLER"];
+
+    const getAdminPageLabel = (roleCode) => {
+        const normalizedRole = (roleCode || "").replace("ROLE_", "");
+
+        const roleLabelMap = {
+            SUPER_ADMIN: "Trang siêu quản trị",
+            ADMIN: "Trang quản trị hệ thống",
+            MANAGER: "Trang quản lý",
+            INVENTORY_MANAGER: "Trang quản lý kho",
+            SELLER: "Trang bán hàng",
+        };
+
+        return roleLabelMap[normalizedRole] || "Trang quản trị";
+    };
+
+
     const isAdmin = userProfile && adminRoles.some(role => {
         const userRole = userProfile.roleCode || "";
         return userRole === role || userRole === `ROLE_${role}`;
@@ -203,7 +219,7 @@ const Header = () => {
                     key: "admin",
                     label: (
                         <Link to="/admin" style={{ fontWeight: 500, padding: "5px 10px" }}>
-                            Trang quản trị
+                            {getAdminPageLabel(userProfile?.roleCode)}
                         </Link>
                     ),
                 },
@@ -231,7 +247,6 @@ const Header = () => {
             </Link>
 
             <nav className={`nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
-                <Link to="/sale" className="nav-highlight">Khuyến mãi</Link>
 
                 {mainMenus.map((menuName, index) => {
                     const parentCate = categories.find(

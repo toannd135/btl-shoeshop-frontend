@@ -30,6 +30,8 @@ import InventoryTransactionList from "../pages/Inventory/InventoryTransactionLis
 import PurchaseOrder from "../pages/PurchaseOrder/PurchaseOrder";
 import Supplier from "../pages/Supplier/Supplier";
 import ChatAdmin from "../pages/ChatAdmin/ChatAdmin";
+import VarifyEmailNotice from "../pages/VerifyEmailNotice/index"
+import VarifyResult from "../pages/VerifyResult/index"
 const ClientLayout = () => {
     return (
         <div className="client-layout">
@@ -66,6 +68,14 @@ export const routes = [
     {
         path: "/resetpassword",
         element: <ResetPassword />
+    },
+    {
+        path: "verify-email-notice",
+        element: <VarifyEmailNotice />
+    },
+    {
+        path: "verify-result",
+        element: <VarifyResult/>
     },
     {
         element: <ClientLayout />,
