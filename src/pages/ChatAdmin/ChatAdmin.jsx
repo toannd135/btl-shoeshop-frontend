@@ -1,7 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Input, Spin, Empty, Avatar, Button } from "antd";
 import { SearchOutlined, SendOutlined, ArrowLeftOutlined, MessageOutlined } from "@ant-design/icons";
-import { getConversations, getConversationMessages, sendMessage } from "../../services/chatService";
+import {
+    getConversations,
+    getConversationMessages,
+    sendMessage,
+    createWebSocketConnection,
+    subscribeToConversation,
+    unsubscribe as unsub,
+    disconnectWebSocket,
+    isWebSocketConnected
+} from "../../services/chatService";
+import { isSenderCurrentUser } from "../../utils/tokenStore";
 import "./ChatAdmin.css";
 
 const formatConversationTime = (isoString) => {
@@ -75,7 +85,19 @@ function ChatAdmin() {
 
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
-    const lastMessageRef = useRef(null);
+    const subscriptionRef = useRef(null);
+    const reconnectTimerRef = useRef(null);
+
+    // Dùng refs để tránh stale closure trong callbacks và reconnect
+    const selectedConversationRef = useRef(null);
+    const onMessageRef = useRef(null);
+
+    const PAGE_SIZE = 20;
+
+    // Luôn giữ ref đồng bộ với state
+    useEffect(() => {
+        selectedConversationRef.current = selectedConversation;
+    }, [selectedConversation]);
 
     // Debounce search
     useEffect(() => {
@@ -87,12 +109,12 @@ function ChatAdmin() {
 
     // Fetch conversations
     useEffect(() => {
-        const fetchConversations = async () => {
+        const fetchConversationList = async () => {
             setConversationsLoading(true);
             try {
                 const params = debouncedSearch ? { search: debouncedSearch } : {};
                 const res = await getConversations(params);
-                const data = res?.data?.conversations || res?.conversations || [];
+                const data = res?.conversations || res?.data?.conversations || res?.data || [];
                 setConversations(data);
             } catch (error) {
                 console.error("Lỗi tải danh sách cuộc trò chuyện:", error);
@@ -101,7 +123,7 @@ function ChatAdmin() {
                 setConversationsLoading(false);
             }
         };
-        fetchConversations();
+        fetchConversationList();
     }, [debouncedSearch]);
 
     // Fetch messages when select conversation
@@ -113,14 +135,24 @@ function ChatAdmin() {
         }
 
         try {
-            const res = await getConversationMessages({ conversationId: conversationId, page: pageNum, size: 20 });
+            const res = await getConversationMessages(conversationId, pageNum, PAGE_SIZE);
             const content = res?.content || res?.data?.content || res?.data || [];
             const lastPage = res?.last ?? res?.data?.last ?? true;
 
+            const convertedMessages = content.map((msg, index) => ({
+                id: msg.messageId || `msg-${index}`,
+                conversationId: msg.conversationId,
+                senderId: msg.senderId,
+                content: msg.content,
+                me: isSenderCurrentUser(msg.senderId),
+                createdAt: msg.createdAt,
+                senderSummary: msg.senderSummary
+            }));
+
             if (append) {
-                setMessages((prev) => [...content.reverse(), ...prev]);
+                setMessages(prev => [...convertedMessages, ...prev]);
             } else {
-                setMessages(content);
+                setMessages(convertedMessages);
             }
             setHasMore(!lastPage);
             setPage(pageNum);
@@ -133,6 +165,107 @@ function ChatAdmin() {
         }
     }, []);
 
+    // Handle new message from WebSocket — dùng ref để luôn nhận conversation mới nhất
+    const handleNewMessage = useCallback((messageData) => {
+        const currentConv = selectedConversationRef.current;
+        if (!currentConv) return;
+
+        if (messageData.conversationId !== currentConv.conversationId) {
+            // Cập nhật conversation list cho các conversation khác
+            setConversations(prev => prev.map(conv => {
+                if (conv.conversationId === messageData.conversationId) {
+                    return {
+                        ...conv,
+                        lastMessage: messageData.content,
+                        updatedAt: messageData.createdAt
+                    };
+                }
+                return conv;
+            }));
+            return;
+        }
+
+        // Thêm message vào conversation hiện tại
+        setMessages(prev => {
+            if (prev.some(m => m.id === messageData.messageId)) return prev;
+            return [...prev, {
+                id: messageData.messageId,
+                conversationId: messageData.conversationId,
+                senderId: messageData.senderId,
+                content: messageData.content,
+                me: isSenderCurrentUser(messageData.senderId),
+                createdAt: messageData.createdAt,
+                senderSummary: messageData.senderSummary
+            }];
+        });
+
+        // Cập nhật conversation list
+        setConversations(prev => prev.map(conv => {
+            if (conv.conversationId === currentConv.conversationId) {
+                return {
+                    ...conv,
+                    lastMessage: messageData.content,
+                    updatedAt: messageData.createdAt
+                };
+            }
+            return conv;
+        }));
+    }, []);
+
+    // Cập nhật ref mỗi khi callback thay đổi
+    useEffect(() => {
+        onMessageRef.current = handleNewMessage;
+    }, [handleNewMessage]);
+
+    // Connect WebSocket cho conversation cụ thể
+    const connectWebSocket = useCallback(async (conversationId) => {
+        // Cleanup subscription cũ
+        if (subscriptionRef.current) {
+            unsub(subscriptionRef.current);
+            subscriptionRef.current = null;
+        }
+        if (reconnectTimerRef.current) {
+            clearTimeout(reconnectTimerRef.current);
+            reconnectTimerRef.current = null;
+        }
+
+        // Nếu đã connect rồi, chỉ subscribe thôi
+        if (isWebSocketConnected()) {
+            console.log("Admin: WebSocket already connected, subscribing to:", conversationId);
+            subscriptionRef.current = subscribeToConversation(conversationId, (msg) => {
+                if (onMessageRef.current) onMessageRef.current(msg);
+            });
+            return;
+        }
+
+        // Tạo connection mới
+        try {
+            await createWebSocketConnection(
+                () => {
+                    console.log("Admin WebSocket connected to:", conversationId);
+                    // Cleanup subscription cũ
+                    if (subscriptionRef.current) {
+                        unsub(subscriptionRef.current);
+                        subscriptionRef.current = null;
+                    }
+                    subscriptionRef.current = subscribeToConversation(conversationId, (msg) => {
+                        if (onMessageRef.current) onMessageRef.current(msg);
+                    });
+                },
+                (error) => {
+                    console.error("Admin WebSocket error:", error);
+                },
+                () => {
+                    console.log("Admin WebSocket disconnected");
+                    // NOT scheduling reconnect here — STOMP's reconnectDelay handles it automatically.
+                    // Module-level _onConnectedCallback/_onErrorCallback are updated on next connect attempt.
+                }
+            );
+        } catch (error) {
+            console.error("Failed to connect Admin WebSocket:", error);
+        }
+    }, []);
+
     // Handle select conversation
     const handleSelectConversation = (conv) => {
         setSelectedConversation(conv);
@@ -140,7 +273,9 @@ function ChatAdmin() {
         setPage(0);
         setHasMore(true);
         setIsMobileListVisible(false);
+
         fetchMessages(conv.conversationId, 0, false);
+        connectWebSocket(conv.conversationId);
     };
 
     // Handle scroll to load more
@@ -150,15 +285,17 @@ function ChatAdmin() {
         const { scrollTop } = messagesContainerRef.current;
         if (scrollTop < 80) {
             const nextPage = page + 1;
+            const convId = selectedConversationRef.current?.conversationId;
+            if (!convId) return;
+
             setLoadingMore(true);
-            fetchMessages(selectedConversation.conversationId, nextPage, true).then(() => {
+            fetchMessages(convId, nextPage, true).then(() => {
                 if (messagesContainerRef.current) {
-                    const newScrollHeight = messagesContainerRef.current.scrollHeight;
                     messagesContainerRef.current.scrollTop = 40;
                 }
             });
         }
-    }, [page, loadingMore, hasMore, messagesLoading, selectedConversation, fetchMessages]);
+    }, [page, loadingMore, hasMore, messagesLoading, fetchMessages]);
 
     useEffect(() => {
         const container = messagesContainerRef.current;
@@ -175,26 +312,58 @@ function ChatAdmin() {
         }
     }, [messages]);
 
+    // Cleanup khi unmount
+    useEffect(() => {
+        return () => {
+            if (subscriptionRef.current) {
+                unsub(subscriptionRef.current);
+                subscriptionRef.current = null;
+            }
+            if (reconnectTimerRef.current) {
+                clearTimeout(reconnectTimerRef.current);
+            }
+            disconnectWebSocket();
+        };
+    }, []);
+
+    // Cleanup khi conversation bị unset (back to list) — KHÔNG disconnect toàn bộ WS
+    useEffect(() => {
+        if (!selectedConversation) {
+            if (subscriptionRef.current) {
+                unsub(subscriptionRef.current);
+                subscriptionRef.current = null;
+            }
+        }
+    }, [selectedConversation]);
+
     // Send message
     const handleSendMessage = async () => {
         const trimmed = messageInput.trim();
-        if (!trimmed || !selectedConversation || sending) return;
+        const conv = selectedConversationRef.current;
+        if (!trimmed || !conv || sending) return;
 
         setSending(true);
         try {
-            const receiverId = selectedConversation.senderSummary?.senderId;
-            await sendMessage(receiverId, trimmed);
-            const newMsg = {
-                messageId: Date.now().toString(),
-                conversationId: selectedConversation.conversationId,
-                content: trimmed,
-                me: true,
-                createdAt: new Date().toISOString(),
-            };
-            setMessages((prev) => [...prev, newMsg]);
+            const receiverId = conv.senderSummary?.senderId;
+            const response = await sendMessage(trimmed, receiverId);
+            const sentMessage = response?.data || response;
+
+            if (sentMessage) {
+                setMessages(prev => [...prev, {
+                    id: sentMessage.messageId || `temp-${Date.now()}`,
+                    conversationId: conv.conversationId,
+                    senderId: sentMessage.senderId,
+                    content: trimmed,
+                    me: isSenderCurrentUser(sentMessage.senderId),
+                    createdAt: new Date().toISOString(),
+                    senderSummary: sentMessage.senderSummary
+                }]);
+            }
+
             setMessageInput("");
         } catch (error) {
             console.error("Lỗi gửi tin nhắn:", error);
+            alert("Không thể gửi tin nhắn. Vui lòng thử lại!");
         } finally {
             setSending(false);
         }
@@ -208,8 +377,13 @@ function ChatAdmin() {
     };
 
     const handleBackToList = () => {
+        if (subscriptionRef.current) {
+            unsub(subscriptionRef.current);
+            subscriptionRef.current = null;
+        }
         setIsMobileListVisible(true);
         setSelectedConversation(null);
+        setMessages([]);
     };
 
     return (
@@ -261,8 +435,8 @@ function ChatAdmin() {
                                     </span>
                                 </div>
                             </div>
-                        ))
-                    )}
+                        )
+                    ))}
                 </div>
             </div>
 
@@ -300,16 +474,17 @@ function ChatAdmin() {
                                     </div>
                                 )}
                                 {messages.map((msg, index) => {
-                                    const isMe = msg.me === true || msg.me === "true";
+                                    const isMe = isSenderCurrentUser(msg.senderId);
+                                    const prev = messages[index - 1];
+                                    const prevIsMe = prev ? isSenderCurrentUser(prev.senderId) : false;
                                     const showAvatar = index === 0 ||
-                                        messages[index - 1]?.me !== msg.me ||
-                                        messages[index - 1]?.senderId !== msg.senderId;
+                                        prevIsMe !== isMe ||
+                                        prev?.senderId !== msg.senderId;
 
                                     return (
                                         <div
-                                            key={msg.messageId}
+                                            key={msg.id}
                                             className={`chat-message-wrapper ${isMe ? "me" : "other"}`}
-                                            ref={index === messages.length - 1 ? lastMessageRef : null}
                                         >
                                             {showAvatar && !isMe && (
                                                 <div className="chat-message-avatar">
