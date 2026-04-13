@@ -18,34 +18,12 @@
     box-sizing: border-box;
 }
 
-<<<<<<< HEAD
-/* LOGO */
-.logo-container{
-    display: flex;
-    align-items: center;
-    height: 100%;
-}
-
-.logo-container a{
-    display: flex;
-    align-items: center;
-}
-
-.logo{
-    height: 150px;
-    width: auto;
-    object-fit: contain;
-}
-
-/* HEADER CÓ THÊM HIỆU ỨNG TRANSITION CỦA BẠN */
-=======
 .logo img {
     height: 50px;
     width: auto;
     object-fit: contain;
 }
 
->>>>>>> feature/recommend
 .header-client {
     position: fixed;
     width: 100%;

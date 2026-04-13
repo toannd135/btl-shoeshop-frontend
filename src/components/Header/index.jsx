@@ -2,17 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiUser, FiShoppingCart, FiSearch, FiLogOut, FiSettings, FiX, FiUser as FiProfile, FiMenu } from 'react-icons/fi';
 import "./header.css";
-<<<<<<< HEAD
-import logoShoes from '../../images/logoPtitShoesShoppng.png';
-import { getProductList } from "../../services/productService";
-import { getCurrentUser } from "../../utils/tokenStore";
-import { Dropdown, message } from "antd";
-=======
 
 import { getCateList } from "../../services/cateService";
 import { getFilteredProducts, getProductVariants } from "../../services/productService";
 import { getMyCart } from "../../services/cartService";
->>>>>>> feature/recommend
 import { logout } from "../../services/authService";
 import { getCurrentUser, clearAccessToken, clearCurrentUser } from "../../utils/tokenStore";
 import { Dropdown, message } from "antd";
@@ -245,18 +238,9 @@ const Header = () => {
 
     return (
         <header className={`header-client ${show ? '' : 'hidden'}`}>
-<<<<<<< HEAD
-            <div className="logo-container">
-                <a href="/">
-                    <img src={logoShoes} alt="PTIT Sneaker Logo" className="logo" />
-                </a>
-            </div>
-            <nav className="nav">
-=======
             <div className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
                 {isMobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
             </div>
->>>>>>> feature/recommend
 
             <Link to='/' className="logo">
                 <img src={logo} alt="PTIT Shoe Shop logo" />

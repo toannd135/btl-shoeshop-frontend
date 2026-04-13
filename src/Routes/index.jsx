@@ -75,17 +75,13 @@ export const routes = [
     },
     {
         path: "verify-result",
-        element: <VarifyResult/>
+        element: <VarifyResult />
     },
     {
         element: <ClientLayout />,
         children: [
             {
-<<<<<<< HEAD
-                path: "/",
-=======
                 index: true,
->>>>>>> feature/recommend
                 element: <Home />
             },
             {
@@ -93,11 +89,6 @@ export const routes = [
                 element: <ProductsPage />
             },
             {
-<<<<<<< HEAD
-                path: "/blog",
-                element: <Blog />
-            },
-=======
                 path: "productDetail/:id",
                 element: <ProductDetail />,
             },
@@ -125,7 +116,6 @@ export const routes = [
                 path: "/blog",
                 element: <Blog />
             }
->>>>>>> feature/recommend
         ]
     },
     {

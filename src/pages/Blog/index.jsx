@@ -38,11 +38,7 @@ const Blog = () => {
             id: 4,
             title: "Lịch Sử Đằng Sau Đôi Giày Huyền Thoại Adidas Stan Smith",
             excerpt: "Ít ai biết rằng Adidas Stan Smith ban đầu được thiết kế cho một ngôi sao quần vợt khác trước khi mang tên huyền thoại. Hãy cùng tìm hiểu câu chuyện lịch sử thú vị của đôi giày kinh điển này.",
-<<<<<<< HEAD
-            image: "https://images.unsplash.com/photo-1620138546344-7b2c38516efa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-=======
             image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
->>>>>>> feature/recommend
             tag: "Lịch sử",
             author: "Sneakerhead",
             date: "20 Tháng 3, 2026"
@@ -51,11 +47,7 @@ const Blog = () => {
             id: 5,
             title: "Chạy Bộ Mùa Hè: Chọn Giày Nào Để Êm Ái Và Thoáng Mát Nhất?",
             excerpt: "Mùa hè là thử thách với đam mê chạy bộ. Việc chọn một đôi giày ưu tiên sự thoáng khí nhưng vẫn đảm bảo khả năng giảm xóc là vô cùng quan trọng.",
-<<<<<<< HEAD
-            image: "https://images.unsplash.com/photo-1538330627166-419119ffe986?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-=======
             image: "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
->>>>>>> feature/recommend
             tag: "Thể thao",
             author: "PTIT Sports",
             date: "15 Tháng 3, 2026"
@@ -74,11 +66,7 @@ const Blog = () => {
     return (
         <div className="blog-container">
             <div className="blog-header">
-<<<<<<< HEAD
-                <h1>PTIT Sneaker Blog</h1>
-=======
                 <h1>ShoeShop Blog</h1>
->>>>>>> feature/recommend
                 <p>Khám phá những xu hướng mới nhất, chia sẻ bí quyết chăm sóc giày và câu chuyện văn hóa sneaker cùng chúng tôi.</p>
             </div>
 
@@ -86,26 +74,17 @@ const Blog = () => {
                 {blogPosts.map(post => (
                     <article key={post.id} className="blog-card">
                         <div style={{ overflow: 'hidden' }}>
-<<<<<<< HEAD
-                            <img src={post.image} alt={post.title} className="blog-image" />
-=======
-                            <img 
-                                src={post.image} 
-                                alt={post.title} 
-                                className="blog-image" 
+                            <img
+                                src={post.image}
+                                alt={post.title}
+                                className="blog-image"
                                 onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" }}
                             />
->>>>>>> feature/recommend
                         </div>
                         <div className="blog-content">
                             <span className="blog-tag">{post.tag}</span>
                             <h2 className="blog-title">{post.title}</h2>
                             <p className="blog-excerpt">{post.excerpt}</p>
-<<<<<<< HEAD
-                            
-=======
-
->>>>>>> feature/recommend
                             <div className="blog-footer">
                                 <span className="blog-author">{post.author}</span>
                                 <span className="blog-date">{post.date}</span>
