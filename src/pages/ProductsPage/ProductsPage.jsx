@@ -9,7 +9,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 const { Title, Text, Paragraph } = Typography;
 
 const ProductsPage = () => {
-    
+
     const [searchParams] = useSearchParams();
     const brandFilter = searchParams.get('brand');
     const categoryFilter = searchParams.get('categoryId');
@@ -126,6 +126,10 @@ const ProductsPage = () => {
         fetchData();
     }, []);
 
+    const activeCategories = useMemo(() => {
+        return categories.filter((cate) => cate.status !== "DELETED");
+    }, [categories]);
+
     const expandedCategoryIds = useMemo(() => {
         if (!filters.categories || filters.categories.length === 0) return [];
 
@@ -133,7 +137,7 @@ const ProductsPage = () => {
         const allMatchedIds = new Set(selectedIds);
 
         selectedIds.forEach((selectedId) => {
-            categories.forEach((cate) => {
+            activeCategories.forEach((cate) => {
                 const parentId = cate.parentId;
 
                 if (Array.isArray(parentId)) {
@@ -147,7 +151,7 @@ const ProductsPage = () => {
         });
 
         return [...allMatchedIds];
-    }, [filters.categories, categories]);
+    }, [filters.categories, activeCategories]);
 
     // --- 4. LOGIC LỌC & SẮP XẾP ---
     const processedProducts = useMemo(() => {
@@ -358,13 +362,13 @@ const ProductsPage = () => {
                                 setFilters((prev) => ({ ...prev, categories: checkedValues }))
                             }
                         >
-                            {(showAllCategories ? categories : categories.slice(0, DISPLAY_LIMIT)).map(cate => (
+                            {(showAllCategories ? activeCategories  : categories.slice(0, DISPLAY_LIMIT)).map(cate => (
                                 <Checkbox key={cate.categoryId} value={cate.categoryId}>{cate.categoryName}</Checkbox>
                             ))}
                         </Checkbox.Group>
-                        {categories.length > DISPLAY_LIMIT && (
+                        {activeCategories.length > DISPLAY_LIMIT && (
                             <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }} onClick={() => setShowAllCategories(!showAllCategories)}>
-                                {showAllCategories ? 'Thu gọn' : `Xem thêm (${categories.length - DISPLAY_LIMIT})`}
+                                {showAllCategories ? 'Thu gọn' : `Xem thêm (${activeCategories.length - DISPLAY_LIMIT})`}
                             </Button>
                         )}
                     </div>
