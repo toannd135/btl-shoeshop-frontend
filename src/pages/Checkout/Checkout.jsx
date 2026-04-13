@@ -81,8 +81,12 @@ const Checkout = () => {
     try {
       const payload = {
         toProvinceCode: formData.province,
-        totalWeightInGrams: 1000
-      }
+        toDistrictCode: formData.ward || "WARD_TEMP",
+        totalWeightInGrams: Math.max(
+          1,
+          cartItems.reduce((sum, item) => sum + item.quantity * 500, 0)
+        )
+      };
       const response = await estimateShipping(payload);
       setShippingFee(response.data.shippingFee);
     } catch (error) {
@@ -91,10 +95,10 @@ const Checkout = () => {
   };
 
   useEffect(() => {
-    if (formData.province) { // Chỉ cần province là có thể tính phí ship
+    if (formData.province && cartItems.length > 0) {
       fetchShippingFee();
     }
-  }, [formData.province]);
+  }, [formData.province, formData.ward, cartItems]);
 
   // Khởi tạo data ban đầu (Cart, User, Addresses)
   useEffect(() => {
@@ -211,73 +215,73 @@ const Checkout = () => {
   };
 
   const handlePlaceOrder = async () => {
-  if (!formData.receiverName || !formData.receiverPhone || !formData.address || !formData.province) {
-    alert("Vui lòng điền đầy đủ thông tin nhận hàng và chọn Tỉnh/Thành phố!");
-    return;
-  }
-
-  setIsProcessing(true);
-
-  try {
-    const selectedProvinceObj = provinces.find(p => p.code == formData.province);
-    const provinceDisplayName = selectedProvinceObj ? selectedProvinceObj.name : "";
-    const wardDisplayName = formData.ward || "";
-
-    const fullShippingAddress = [
-      formData.address,
-      wardDisplayName,
-      provinceDisplayName
-    ].filter(part => part && part.trim() !== "").join(", ");
-
-    const checkoutPayload = {
-      receiverName: formData.receiverName,
-      receiverPhone: formData.receiverPhone,
-      shippingAddress: fullShippingAddress,
-      provinceCode: formData.province,
-      note: formData.note,
-      couponCode: formData.couponCode || null
-    };
-
-    const orderResult = await checkoutOrder(checkoutPayload);
-    const orderData = orderResult?.data || orderResult;
-    const orderId = orderData?.orderId;
-
-    if (!orderId) {
-      throw new Error("Không tạo được đơn hàng, vui lòng thử lại!");
-    }
-
-    if (paymentMethod === "COD") {
-      navigate(`/checkout/success/${orderId}`, {
-        state: {
-          paymentMethod: "COD",
-          orderId: orderId
-        }
-      });
+    if (!formData.receiverName || !formData.receiverPhone || !formData.address || !formData.province) {
+      alert("Vui lòng điền đầy đủ thông tin nhận hàng và chọn Tỉnh/Thành phố!");
       return;
     }
 
-    const paymentPayload = {
-      orderId,
-      paymentMethod: "VNPAY",
-      bankCode: "NCB"
-    };
+    setIsProcessing(true);
 
-    const paymentResponse = await createPayment(paymentPayload);
-    const paymentData = paymentResponse?.data || paymentResponse;
+    try {
+      const selectedProvinceObj = provinces.find(p => p.code == formData.province);
+      const provinceDisplayName = selectedProvinceObj ? selectedProvinceObj.name : "";
+      const wardDisplayName = formData.ward || "";
 
-    if (paymentData?.paymentUrl) {
-      window.location.href = paymentData.paymentUrl;
-    } else {
-      throw new Error("Không tạo được link thanh toán VNPAY");
+      const fullShippingAddress = [
+        formData.address,
+        wardDisplayName,
+        provinceDisplayName
+      ].filter(part => part && part.trim() !== "").join(", ");
+
+      const checkoutPayload = {
+        receiverName: formData.receiverName,
+        receiverPhone: formData.receiverPhone,
+        shippingAddress: fullShippingAddress,
+        provinceCode: formData.province,
+        note: formData.note,
+        couponCode: formData.couponCode || null
+      };
+
+      const orderResult = await checkoutOrder(checkoutPayload);
+      const orderData = orderResult?.data || orderResult;
+      const orderId = orderData?.orderId;
+
+      if (!orderId) {
+        throw new Error("Không tạo được đơn hàng, vui lòng thử lại!");
+      }
+
+      if (paymentMethod === "COD") {
+        navigate(`/checkout/success/${orderId}`, {
+          state: {
+            paymentMethod: "COD",
+            orderId: orderId
+          }
+        });
+        return;
+      }
+
+      const paymentPayload = {
+        orderId,
+        paymentMethod: "VNPAY",
+        bankCode: "NCB"
+      };
+
+      const paymentResponse = await createPayment(paymentPayload);
+      const paymentData = paymentResponse?.data || paymentResponse;
+
+      if (paymentData?.paymentUrl) {
+        window.location.href = paymentData.paymentUrl;
+      } else {
+        throw new Error("Không tạo được link thanh toán VNPAY");
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert(error?.response?.data?.message || error.message || "Có lỗi xảy ra khi đặt hàng!");
+    } finally {
+      setIsProcessing(false);
     }
-
-  } catch (error) {
-    console.error(error);
-    alert(error?.response?.data?.message || error.message || "Có lỗi xảy ra khi đặt hàng!");
-  } finally {
-    setIsProcessing(false);
-  }
-};
+  };
 
   return (
     <div className="checkout-page">
