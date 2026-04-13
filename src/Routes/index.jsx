@@ -18,6 +18,20 @@ import ResetPassword from "../pages/ResetPassword/index";
 import { Outlet } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { Navigate } from "react-router-dom";
+import CouponList from "../pages/Coupon/CouponList";
+import ProductsPage from "../pages/ProductsPage/ProductsPage";
+import Cart from "../pages/Cart";
+import Checkout from "../pages/Checkout/Checkout";
+import CheckoutSuccess from "../pages/Checkout/CheckoutSuccess";
+import OrderList from "../pages/OrderAdmin/OrderList";
+import AccountPage from "../pages/Account/Account";
+import InventoryTransactionList from "../pages/Inventory/InventoryTransactionList";
+import PurchaseOrder from "../pages/PurchaseOrder/PurchaseOrder";
+import Supplier from "../pages/Supplier/Supplier";
+import ChatAdmin from "../pages/ChatAdmin/ChatAdmin";
+import VarifyEmailNotice from "../pages/VerifyEmailNotice/index"
+import VarifyResult from "../pages/VerifyResult/index"
 const ClientLayout = () => {
     return (
         <div className="client-layout">
@@ -56,26 +70,68 @@ export const routes = [
         element: <ResetPassword />
     },
     {
+        path: "verify-email-notice",
+        element: <VarifyEmailNotice />
+    },
+    {
+        path: "verify-result",
+        element: <VarifyResult/>
+    },
+    {
         element: <ClientLayout />,
         children: [
             {
+<<<<<<< HEAD
                 path: "/",
+=======
+                index: true,
+>>>>>>> feature/recommend
                 element: <Home />
             },
             {
-                path: "/productDetail/:id",
-                element: <ProductDetail />
+                path: "productsPage",
+                element: <ProductsPage />
+            },
+            {
+<<<<<<< HEAD
+                path: "/blog",
+                element: <Blog />
+            },
+=======
+                path: "productDetail/:id",
+                element: <ProductDetail />,
+            },
+            {
+                path: "cart",
+                element: <Cart />
+            },
+            {
+                path: "checkout",
+                element: <Checkout />
+            },
+            {
+                path: "checkoutSuccess",
+                element: <CheckoutSuccess />
+            },
+            {
+                path: "checkout/success/:orderId",
+                element: <CheckoutSuccess />
+            },
+            {
+                path: "account",
+                element: <AccountPage />
             },
             {
                 path: "/blog",
                 element: <Blog />
-            },
+            }
+>>>>>>> feature/recommend
         ]
     },
     {
         path: "/admin",
         element: (
-            <ProtectRoute allowedRoles={['ROLE_ADMIN']}>
+            <ProtectRoute allowedRoles={['ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_SELLER']}>
                 <LayoutDefault />
             </ProtectRoute>
         ),
@@ -103,6 +159,30 @@ export const routes = [
             {
                 path: "product",
                 element: <ProductList />
+            },
+            {
+                path: "coupon",
+                element: <CouponList />
+            },
+            {
+                path: "order",
+                element: <OrderList />
+            },
+            {
+                path: "inventory-transaction",
+                element: <InventoryTransactionList />
+            },
+            {
+                path: "purchase-orders",
+                element: <PurchaseOrder />
+            },
+            {
+                path: "supplier",
+                element: <Supplier />
+            },
+            {
+                path: "chat",
+                element: <ChatAdmin />
             }
         ]
     }

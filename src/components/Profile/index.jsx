@@ -1,11 +1,25 @@
-import { Button, Dropdown, message } from "antd";
+import { Dropdown, message } from "antd";
 import "./Profile.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../services/authService";
-import { clearAccessToken } from "../../utils/tokenStore";
+// Nhớ import thêm clearCurrentUser để đồng bộ logic đăng xuất với Header
+import { clearAccessToken, getCurrentUser, clearCurrentUser } from "../../utils/tokenStore";
+import { useEffect, useState } from "react";
 
 function Profile() {
+    const [userProfile, setUserProfile] = useState(null);
     const navigate = useNavigate();
+
+    const fetchUserFromMemory = () => {
+        const user = getCurrentUser();
+        setUserProfile(user);
+    };
+
+    // Đã thêm [] để tránh component bị render lại liên tục (infinite loop)
+    useEffect(() => {
+        fetchUserFromMemory();
+    }, []);
+
     const handleLogout = async () => {
         try {
             await logout();
@@ -14,35 +28,60 @@ function Profile() {
         }
 
         clearAccessToken();
+        clearCurrentUser(); // Đồng bộ với Header
+        window.dispatchEvent(new Event("logoutSuccess")); // Cập nhật state toàn cục nếu cần
         message.success("Đăng xuất thành công");
         navigate("/login");
     };
+
+    // Khởi tạo menu giống hệt Header.js nhưng thay "Trang quản trị" thành "Trang chủ"
+    const userMenuItems = [
+        {
+            key: 'account',
+            label: (
+                <Link to="/account" style={{ fontWeight: 500, padding: '5px 10px' }}>
+                    Tài khoản
+                </Link>
+            )
+        },
+        {
+            key: 'home',
+            label: (
+                <Link to="/" style={{ fontWeight: 500, padding: '5px 10px' }}>
+                    Trang chủ
+                </Link>
+            )
+        },
+        {
+            type: 'divider',
+        },
+        {
+            key: 'logout',
+            label: (
+                <div onClick={handleLogout} style={{ fontWeight: 500, color: 'red', padding: '5px 10px' }}>
+                    Đăng xuất
+                </div>
+            ),
+        },
+    ];
+
     return (
         <>
-            <Dropdown
-                trigger={["click"]}
-                popupRender={() => (
-                    <div className="profile__dropdown">
-                        <div className="profile__up">
-                            <div className="item">Profile</div>
-                            <div className="item">Settings & Privacy</div>
-                        </div>
-                        <div className="profile__down">
-                            <div className="item">Help</div>
-                            <div className="item" onClick={handleLogout}>Log out</div>
-                        </div>
-                    </div>
-                )}
+            <Dropdown 
+                menu={{ items: userMenuItems }} 
+                trigger={["click"]} 
+                placement="bottomRight"
             >
-                <Button type="text" className="profile__btn">
+                {/* Thay đổi button thành div tương tự Header để UI gọn gàng hơn */}
+                <div className="profile__btn" style={{ cursor: 'pointer' }} title={userProfile?.username}>
                     <div className="profile__avatar">
                         <img
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTp3E05PU096A0sYK811kyRs0MwZNqZNpGOQ&s"
+                            // Lấy avatar từ thông tin user, nếu không có thì dùng ảnh mặc định
+                            src={userProfile?.avatarImage || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTp3E05PU096A0sYK811kyRs0MwZNqZNpGOQ&s"}
                             alt="avatar"
                         />
                     </div>
-                </Button>
-
+                </div>
             </Dropdown>
         </>
     )

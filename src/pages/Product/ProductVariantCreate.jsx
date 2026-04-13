@@ -1,12 +1,22 @@
 import { Modal, Form, Input, InputNumber, Select, Button, message, Row, Col, ColorPicker, Upload } from "antd";
 import { SafetyCertificateOutlined, UploadOutlined } from "@ant-design/icons";
 import { createProductVariant, createVariantImage } from "../../services/productService";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import "./ProductVariantCreate.css"; 
 
 function ProductVariantCreate({ open, onClose, productId, onReload }) {
     const [form] = Form.useForm();
     const [fileList, setFileList] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    // Tạo URL preview cho ảnh đầu tiên (tránh memory leak)
+    const previewImage = useMemo(() => {
+        if (fileList.length > 0 && fileList[0].originFileObj) {
+            return URL.createObjectURL(fileList[0].originFileObj);
+        }
+        return null;
+    }, [fileList]);
+
     const handleSubmit = async (values) => {
         setLoading(true);
         try {
@@ -20,17 +30,26 @@ function ProductVariantCreate({ open, onClose, productId, onReload }) {
                 basePrice: values.basePrice,
                 status: values.status || "ACTIVE"
             };
+            
+            // 1. Tạo Variant trước
             const res = await createProductVariant(productId, payload);
             const newVariantId = res.data?.productVariantId || res.productVariantId;
+            
+            // 2. Nếu có ảnh, upload TẤT CẢ ảnh bằng Promise.all
             if (fileList.length > 0 && newVariantId) {
-                const formData = new FormData();
-                formData.append("image", fileList[0].originFileObj);
-                formData.append("isPrimary", true);
-                formData.append("status", "ACTIVE");
+                const uploadPromises = fileList.map((file, index) => {
+                    const formData = new FormData();
+                    formData.append("image", file.originFileObj);
+                    // Ảnh đầu tiên (index 0) sẽ là ảnh primary
+                    formData.append("isPrimary", index === 0); 
+                    
+                    return createVariantImage(productId, newVariantId, formData);
+                });
 
-                await createVariantImage(productId, newVariantId, formData);
+                await Promise.all(uploadPromises);
             }
-            message.success("Tạo biến thể thành công!");
+
+            message.success("Tạo biến thể và tải ảnh thành công!");
             form.resetFields();
             setFileList([]);
             onReload();
@@ -95,25 +114,35 @@ function ProductVariantCreate({ open, onClose, productId, onReload }) {
                             <InputNumber style={{ width: '100%' }} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => value.replace(/\$\s?|(,*)/g, '')} />
                         </Form.Item>
                     </Col>
-                    <Col span={12}>
+                    <Col span={24}>
                         <Form.Item label="Hình ảnh (Tùy chọn)">
                             <Upload
-                                beforeUpload={() => false} 
-                                maxCount={1}
-                                listType="picture"
+                                listType="picture-card" // Chuyển sang dạng lưới ô vuông
                                 fileList={fileList}
+                                beforeUpload={() => false} 
+                                multiple={true} 
                                 onChange={({ fileList: newFileList }) => setFileList(newFileList)}
                                 accept="image/*"
+                                onRemove={(file) => {
+                                    // Chức năng xóa ảnh ngay lúc đang chọn (chưa upload)
+                                    const newFileList = fileList.filter(item => item.uid !== file.uid);
+                                    setFileList(newFileList);
+                                }}
                             >
-                                <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+                                {fileList.length >= 8 ? null : (
+                                    <div>
+                                        <UploadOutlined />
+                                        <div style={{ marginTop: 8 }}>Chọn ảnh</div>
+                                    </div>
+                                )}
                             </Upload>
                         </Form.Item>
                     </Col>
                 </Row>
 
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-                    <Button onClick={onClose}>Hủy</Button>
-                    <Button type="primary" htmlType="submit">Lưu lại</Button>
+                    <Button onClick={onClose} disabled={loading}>Hủy</Button>
+                    <Button type="primary" htmlType="submit" loading={loading}>Lưu lại</Button>
                 </div>
             </Form>
         </Modal>

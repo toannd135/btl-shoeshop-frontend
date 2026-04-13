@@ -30,17 +30,17 @@ function ProductCreate({ open, onClose }) {
             formData.append("brand", values.brand);
             formData.append("description", values.description);
             formData.append("gender", values.gender);
-            
+
             if (values.categoryId) formData.append("categoryId", values.categoryId);
             if (values.status) formData.append("status", values.status);
-            
+
             if (imageFile) {
-                formData.append("image", imageFile); 
+                formData.append("image", imageFile);
             }
 
             await createProduct(formData);
             message.success("Tạo sản phẩm gốc thành công!");
-            
+
             form.resetFields();
             setImageFile(null);
             onClose(true);
@@ -81,7 +81,7 @@ function ProductCreate({ open, onClose }) {
                             const reader = new FileReader();
                             reader.onload = e => form.setFieldsValue({ imageUrl: e.target.result });
                             reader.readAsDataURL(file);
-                            return false; 
+                            return false;
                         }}
                     >
                         <Button icon={<UploadOutlined />}>Chọn file ảnh</Button>
@@ -111,14 +111,25 @@ function ProductCreate({ open, onClose }) {
                 <div style={{ display: "flex", gap: 16 }}>
                     <Form.Item label="Danh mục" name="categoryId" style={{ flex: 1 }}>
                         <Select
+                            showSearch
+                            optionFilterProp="label"
                             options={categories
-                                .filter(c => c.parentId != null) 
-                                .map(c => ({ 
-                                    value: c.categoryId, 
-                                    label: c.categoryName 
-                                }))
+                                .filter(c => c.status === 'ACTIVE')
+                                .map(c => {
+                                    let labelDisplay = c.categoryName;
+                                    if (c.parentId) {
+                                        const parentCate = categories.find(p => p.categoryId === c.parentId);
+                                        if (parentCate) {
+                                            labelDisplay = `${c.categoryName} - ${parentCate.categoryName}`;
+                                        }
+                                    }
+                                    return {
+                                        value: c.categoryId,
+                                        label: labelDisplay
+                                    };
+                                })
                             }
-                            placeholder="Chọn danh mục con"
+                            placeholder="Chọn danh mục"
                         />
                     </Form.Item>
                     <Form.Item label="Giới tính" name="gender" rules={[{ required: true, message: "Bắt buộc chọn" }]} style={{ flex: 1 }}>
@@ -137,8 +148,8 @@ function ProductCreate({ open, onClose }) {
                         options={[
                             { value: "ACTIVE", label: "ACTIVE" },
                             { value: "INACTIVE", label: "INACTIVE" },
-                            { value: "SUSPENDED", label: "SUSPENDED"},
-                            { value: "DELETED", label: "DELETED"}
+                            { value: "SUSPENDED", label: "SUSPENDED" },
+                            { value: "DELETED", label: "DELETED" }
                         ]}
                     />
                 </Form.Item>

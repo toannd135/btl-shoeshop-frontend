@@ -47,10 +47,12 @@ function UserUpdate({ open, onClose, user, onReload }) {
             if (avatarFile) {
                 const formData = new FormData();
                 formData.append("file", avatarFile);
-                formData.append("upload_preset", "shoes_shop_fe");
+                const preset = import.meta.env.VITE_CLOUDINARY_PRESET;
+                const cloudinary = import.meta.env.VITE_CLOUDINARY_URL;
+                formData.append("upload_preset", preset);
 
                 const cloudinaryRes = await fetch(
-                    "https://api.cloudinary.com/v1_1/dkuckfe1m/image/upload",
+                    cloudinary,
                     {
                         method: "POST",
                         body: formData,

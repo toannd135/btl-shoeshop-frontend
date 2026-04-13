@@ -16,7 +16,11 @@
     font-weight: 800;
     color: #1a1a1a;
     margin-bottom: 15px;
+<<<<<<< HEAD
     background: linear-gradient(90deg, #ff416c, #ff4b2b);
+=======
+    background: linear-gradient(90deg, #38434f, #273038);
+>>>>>>> feature/recommend
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -72,7 +76,11 @@
     font-size: 0.85rem;
     text-transform: uppercase;
     font-weight: 700;
+<<<<<<< HEAD
     color: #ff4b2b;
+=======
+    color: #38434f;
+>>>>>>> feature/recommend
     margin-bottom: 10px;
     letter-spacing: 1px;
 }
@@ -87,7 +95,11 @@
 }
 
 .blog-title:hover {
+<<<<<<< HEAD
     color: #ff4b2b;
+=======
+    color: #38434f;
+>>>>>>> feature/recommend
     cursor: pointer;
 }
 
@@ -133,7 +145,11 @@
 }
 
 .blog-read-more:hover {
+<<<<<<< HEAD
     background-color: #ff4b2b;
+=======
+    background-color: #38434f;
+>>>>>>> feature/recommend
     transform: translateY(-2px);
     color: #fff;
 }

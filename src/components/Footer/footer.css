@@ -33,13 +33,11 @@
     color: #e53935;
 }
 
-.logo {
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.logo span {
-    color: #e53935;
+.footer-logo {
+    height: 80px;
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 20px;
 }
 
 .contact p {
@@ -95,4 +93,30 @@
     padding: 15px;
     background: #38434F;
     font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+.payment-section h4 {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+.payment {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.payment img {
+    height: 35px;
+    background: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    object-fit: contain;
 }

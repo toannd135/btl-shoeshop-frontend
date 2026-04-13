@@ -70,7 +70,6 @@ function CateList() {
 
     const processedCategories = useMemo(() => {
         let result = categories.filter(cate => 
-            cate.parentId !== null && 
             cate.categoryName.toLowerCase().includes(searchValue.toLowerCase())
         );
 
@@ -147,7 +146,7 @@ function CateList() {
             <div className="cate-content">
                 <Row gutter={[16, 16]}>
                     {processedCategories.map((cate) => {
-                        const parentName = categoryMap[cate.parentId] || "Không xác định";
+                        const parentName = cate.parentId ? (categoryMap[cate.parentId] || "Không xác định") : "Danh mục gốc";
 
                         return (
                             <Col xs={24} sm={24} md={12} lg={8} key={cate.categoryId}>

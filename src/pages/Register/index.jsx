@@ -1,36 +1,38 @@
-import { useState } from 'react';
-import './Register.css';
-import logoShoes from '../../images/logoPtitShoesShoppng.png';
-import { message, notification } from 'antd';
-import { register } from '../../services/authService';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import "./Register.css";
+import logoShoes from "../../images/logoPtitShoesShoppng.png";
+import { message, notification } from "antd";
+import { register } from "../../services/authService";
+import { useNavigate } from "react-router-dom";
+
 function Register() {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        username: '',
-        phone: '',
-        password: '',
-        confirmPassword: ''
+        firstName: "",
+        lastName: "",
+        email: "",
+        username: "",
+        phone: "",
+        password: "",
+        confirmPassword: "",
     });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.username || !formData.password || !formData.email) {
+        if (!formData.email || !formData.username || !formData.password || !formData.confirmPassword) {
             message.warning("Vui lòng nhập đầy đủ các trường bắt buộc!");
             return;
         }
@@ -41,41 +43,56 @@ function Register() {
         }
 
         try {
-            await register({
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                email: formData.email,
-                username: formData.username,
-                phone: formData.phone,
-                password: formData.password
-            });
+            setLoading(true);
+
+            const payload = {
+                firstName: formData.firstName?.trim(),
+                lastName: formData.lastName?.trim(),
+                email: formData.email?.trim(),
+                username: formData.username?.trim(),
+                phone: formData.phone?.trim(),
+                password: formData.password,
+                confirmPassword: formData.confirmPassword,
+            };
+
+            const res = await register(payload);
+
             notification.success({
                 message: "Đăng ký thành công",
-                description: "Tài khoản của bạn đã được tạo. Hãy đăng nhập để tiếp tục.",
+                description:
+                    res?.data?.message ||
+                    "Tài khoản đã được tạo. Vui lòng kiểm tra email để xác thực tài khoản.",
             });
-            setTimeout(() => {
-                navigate('/login');
-            }, 1500);
-        }
-        catch (err) {
+
+            navigate("/verify-email-notice", {
+                state: {
+                    email: formData.email,
+                },
+                replace: true,
+            });
+        } catch (err) {
             console.log("REGISTER ERROR:", err);
+
             notification.error({
                 message: "Đăng ký thất bại",
-                description: err.message || JSON.stringify(err)
+                description:
+                    err?.response?.data?.message ||
+                    err?.message ||
+                    "Không thể đăng ký tài khoản",
             });
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="register-container">
             <div className="register-card">
-
                 <div className="register-form-section">
                     <div className="register-header">
                         <h2 className="register-title">Tạo tài khoản mới</h2>
                         <p className="register-subtitle">Đăng ký tài khoản mới của bạn</p>
                     </div>
-
 
                     <form className="register-form" onSubmit={handleSubmit}>
                         <div className="form-row">
@@ -137,7 +154,10 @@ function Register() {
                                 onChange={handleChange}
                                 placeholder="Password"
                             />
-                            <span className="password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
+                            <span
+                                className="password-toggle-icon"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
                                 {showPassword ? "👁️" : "👁️‍🗨️"}
                             </span>
                         </div>
@@ -150,12 +170,17 @@ function Register() {
                                 onChange={handleChange}
                                 placeholder="Confirm password"
                             />
-                            <span className="password-toggle-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                            <span
+                                className="password-toggle-icon"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            >
                                 {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
                             </span>
                         </div>
 
-                        <button type="submit" className="btn-register">Tạo tài khoản</button>
+                        <button type="submit" className="btn-register" disabled={loading}>
+                            {loading ? "Đang đăng ký..." : "Tạo tài khoản"}
+                        </button>
                     </form>
 
                     <p className="login-link">
@@ -166,10 +191,9 @@ function Register() {
                 <div className="register-image-section">
                     <img src={logoShoes} alt="Shoes Shop Logo" className="shoes-logo" />
                 </div>
-
             </div>
         </div>
     );
-};
+}
 
 export default Register;

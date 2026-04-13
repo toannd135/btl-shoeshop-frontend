@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Popconfirm, message, Space } from "antd";
+import { Table, Button, Popconfirm, message, Space, Image } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { getProductVariants, deleteProductVariant, getVariantImages } from "../../services/productService";
 import ProductVariantCreate from "./ProductVariantCreate";
@@ -24,13 +24,16 @@ function ProductVariantList({ productId, productName, productBrand, productImage
                     try {
                         const imageRes = await getVariantImages(productId, variant.productVariantId);
                         const images = imageRes.data || imageRes || [];
-                        const primaryImg = images.find(img => img.isPrimary) || images[0];
+                        
+                        // Sắp xếp để ảnh isPrimary lên đầu
+                        const sortedImages = [...images].sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0));
+                        
                         return {
                             ...variant,
-                            imageURL: primaryImg ? primaryImg.imageURL : null
+                            images: sortedImages
                         };
                     } catch (err) {
-                        return { ...variant, imageURL: null };
+                        return { ...variant, images: [] };
                     }
                 })
             );
@@ -58,6 +61,7 @@ function ProductVariantList({ productId, productName, productBrand, productImage
             message.error("Xóa thất bại");
         }
     };
+
     const renderStatus = (status) => {
         const colorMap = {
             ACTIVE: { bg: "#d9f7e6", color: "#1f8f4e" },
@@ -83,26 +87,71 @@ function ProductVariantList({ productId, productName, productBrand, productImage
             </span>
         );
     };
+
     const columns = [
         {
             title: "Hình ảnh",
-            dataIndex: "imageURL", 
-            key: "imageURL",
+            dataIndex: "images", 
+            key: "images",
             width: 80,
             align: "center",
-            render: (url) => (
-                <img
-                    src={url || "https://placehold.co/40x40?text=No+Image"} 
-                    alt="variant"
-                    style={{ 
-                        width: 40, 
-                        height: 40, 
-                        objectFit: "cover", 
-                        borderRadius: 4, 
-                        border: "1px solid #f0f0f0" 
-                    }}
-                />
-            )
+            render: (images) => {
+                if (!images || images.length === 0) {
+                    return (
+                        <img
+                            src="https://placehold.co/40x40?text=No+Image"
+                            alt="variant"
+                            style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 4, border: "1px solid #f0f0f0" }}
+                        />
+                    );
+                }
+
+                return (
+                    <Image.PreviewGroup>
+                        <div style={{ position: "relative", width: 40, height: 40, margin: "0 auto" }}>
+                            {/* Ảnh đại diện */}
+                            <Image
+                                src={images[0].imageURL}
+                                width={40}
+                                height={40}
+                                style={{ objectFit: "cover", borderRadius: 4, border: "1px solid #f0f0f0", cursor: "pointer" }}
+                                preview={{ mask: false }}
+                            />
+                            
+                            {/* Overlay "+x" */}
+                            {images.length > 1 && (
+                                <div
+                                    style={{
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        width: "100%",
+                                        height: "100%",
+                                        background: "rgba(0, 0, 0, 0.5)",
+                                        color: "#fff",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        borderRadius: 4,
+                                        fontSize: 12,
+                                        fontWeight: 600,
+                                        pointerEvents: "none"
+                                    }}
+                                >
+                                    +{images.length - 1}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Các ảnh còn lại ẩn đi để chạy slideshow */}
+                        <div style={{ display: "none" }}>
+                            {images.slice(1).map((img, index) => (
+                                <Image key={index} src={img.imageURL} />
+                            ))}
+                        </div>
+                    </Image.PreviewGroup>
+                );
+            }
         },
         {
             title: "Màu",

@@ -1,0 +1,95 @@
+.purchase-order-container {
+    margin: 10px;
+    height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.purchase-order-header {
+    border: 1px solid #ddd;
+    padding: 20px 20px;
+    border-radius: 5px;
+    background: #fff;
+}
+
+.purchase-order-header h2 {
+    margin: 0;
+}
+
+.purchase-order-header h5 {
+    margin: 0;
+    font-weight: normal;
+    color: #888;
+}
+
+.purchase-order-header h5 a {
+    color: #1677ff;
+    text-decoration: none;
+}
+
+.purchase-order-header h5 a:hover {
+    text-decoration: underline;
+}
+
+.purchase-order-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ddd;
+    padding: 16px 20px;
+    border-radius: 5px;
+    background: #fff;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.purchase-order-bar-left {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.purchase-order-search {
+    width: 320px;
+}
+
+.purchase-order-arrange {
+    width: 180px;
+}
+
+.purchase-order-create-btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.purchase-order-container .ant-table-thead > tr > th {
+    background: #f3f4f6 !important;
+    font-weight: 600;
+}
+
+.purchase-order-container .ant-table-tbody > tr > td {
+    padding: 18px 16px;
+}
+
+@media (max-width: 992px) {
+    .purchase-order-bar {
+        align-items: stretch;
+    }
+
+    .purchase-order-bar-left {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .purchase-order-search,
+    .purchase-order-arrange {
+        width: 100%;
+    }
+
+    .purchase-order-create-btn {
+        width: 100%;
+    }
+}

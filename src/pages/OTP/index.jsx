@@ -52,7 +52,12 @@ const Otp = () => {
 
         try {
             const res = await verifyOtp({ email, otp: otpCode });
-            const resetToken = res.data ? res.data.response : res.response;
+            // Backend trả về { data: { message: "resetToken" } } thông qua ApiMessage response wrapper
+            const resetToken = res.data?.message || res.data?.response || res.message;
+            if (!resetToken) {
+                alert("Xảy ra lỗi khi xác thực OTP. Vui lòng thử lại.");
+                return;
+            }
             navigate("/resetpassword", {
                 state: { email, resetToken }
             });

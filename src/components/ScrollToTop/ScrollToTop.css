@@ -1,0 +1,35 @@
+.scroll-top-btn {
+    position: fixed;
+    bottom: 28px;
+    /* Nằm trên nút chat */
+    right: 28px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: white;
+    color: #38434f;
+    border: 1.5px solid #e0e0e0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    z-index: 9997;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.3s, transform 0.3s, visibility 0.3s, background 0.2s;
+}
+
+.scroll-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.scroll-top-btn:hover {
+    background: #38434f;
+    color: white;
+    border-color: #38434f;
+}

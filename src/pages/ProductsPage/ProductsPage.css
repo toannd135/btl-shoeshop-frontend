@@ -1,0 +1,86 @@
+/* ===== ProductsPage styles (scoped) ===== */
+
+/* Khu vực Voucher */
+.ps-voucher-section {
+  margin-bottom: 50px;
+}
+
+.ps-voucher-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.ps-voucher-title span {
+  color: #f53d2d;
+  font-weight: normal;
+}
+
+.ps-voucher-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.ps-voucher-card {
+  border: 1px solid #ebebeb;
+  border-radius: 12px;
+  padding: 20px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
+
+.ps-btn-copy {
+  background-color: #38434F;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.ps-btn-copy:hover {
+  background-color: #2b353f;
+}
+
+.ps-btn-copy:active {
+  background-color: #1e252c;
+  transform: scale(0.98);
+}
+
+.btn-show-more {
+  border: 1.5px solid #38434F;
+  color: #38434F;
+  padding: 0 40px;
+  height: 44px;
+  border-radius: 22px;
+  font-size: 15px;
+  font-weight: bold;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 250px;
+  letter-spacing: 0.5px;
+}
+
+.btn-show-more:hover {
+  background: #38434F;
+  color: #fff;
+  box-shadow: 0 6px 15px rgba(56, 67, 79, 0.25);
+  transform: translateY(-2px);
+}
+
+.btn-show-more:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px rgba(56, 67, 79, 0.15);
+}
+
