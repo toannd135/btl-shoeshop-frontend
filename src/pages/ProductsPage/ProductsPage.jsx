@@ -5,11 +5,11 @@ import { getProductList, getProductVariants } from "../../services/productServic
 import { getCateList } from "../../services/cateService";
 import { getCouponList } from "../../services/couponService";
 import { Link, useSearchParams } from 'react-router-dom';
-import './ProductsPage.css';
 
 const { Title, Text, Paragraph } = Typography;
 
 const ProductsPage = () => {
+    
     const [searchParams] = useSearchParams();
     const brandFilter = searchParams.get('brand');
     const categoryFilter = searchParams.get('categoryId');
@@ -220,7 +220,7 @@ const ProductsPage = () => {
     }, [filters, sortOption]);
 
     const currentProducts = processedProducts.slice(
-        0,
+        (currentPage - 1) * pageSize,
         currentPage * pageSize
     );
 
@@ -310,7 +310,7 @@ const ProductsPage = () => {
                                         type="primary"
                                         icon={<CopyOutlined />}
                                         block
-                                        style={{ background: '#38434F', borderColor: '#38434F' }}
+                                        style={{ background: '#222', borderColor: '#222' }}
                                         onClick={() => copyToClipboard(coupon.code)}
                                     >
                                         Sao chép mã
@@ -323,11 +323,11 @@ const ProductsPage = () => {
             </div>
 
             {/* MAIN CONTENT: Sidebar + Products */}
-            <Row gutter={[40, 40]}>
+            <Row gutter={40}>
                 {/* SIDEBAR BỘ LỌC */}
-                <Col xs={24} lg={6}>
+                <Col span={6}>
                     <div style={{ marginBottom: 24 }}>
-                        <Title level={5} style={{ color: '#38434F' }}>Mức giá</Title>
+                        <Title level={5}>Mức giá</Title>
                         <Checkbox.Group
                             options={priceRanges}
                             style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
@@ -336,21 +336,21 @@ const ProductsPage = () => {
                     </div>
 
                     <div style={{ marginBottom: 24 }}>
-                        <Title level={5} style={{ color: '#38434F' }}>Hãng sản xuất</Title>
+                        <Title level={5}>Hãng sản xuất</Title>
                         <Checkbox.Group
                             options={showAllBrands ? dynamicBrands.map(b => ({ label: b, value: b })) : dynamicBrands.slice(0, DISPLAY_LIMIT).map(b => ({ label: b, value: b }))}
                             style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
                             onChange={(checkedValues) => setFilters({ ...filters, brands: checkedValues })}
                         />
                         {dynamicBrands.length > DISPLAY_LIMIT && (
-                            <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#38434F' }} onClick={() => setShowAllBrands(!showAllBrands)}>
+                            <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }} onClick={() => setShowAllBrands(!showAllBrands)}>
                                 {showAllBrands ? 'Thu gọn' : `Xem thêm (${dynamicBrands.length - DISPLAY_LIMIT})`}
                             </Button>
                         )}
                     </div>
 
                     <div style={{ marginBottom: 24 }}>
-                        <Title level={5} style={{ color: '#38434F' }}>Loại sản phẩm</Title>
+                        <Title level={5}>Loại sản phẩm</Title>
                         <Checkbox.Group
                             value={filters.categories}
                             style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
@@ -363,14 +363,14 @@ const ProductsPage = () => {
                             ))}
                         </Checkbox.Group>
                         {categories.length > DISPLAY_LIMIT && (
-                            <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#38434F' }} onClick={() => setShowAllCategories(!showAllCategories)}>
+                            <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#1890ff' }} onClick={() => setShowAllCategories(!showAllCategories)}>
                                 {showAllCategories ? 'Thu gọn' : `Xem thêm (${categories.length - DISPLAY_LIMIT})`}
                             </Button>
                         )}
                     </div>
 
                     <div style={{ marginBottom: 24 }}>
-                        <Title level={5} style={{ color: '#38434F' }}>Giới tính</Title>
+                        <Title level={5}>Giới tính</Title>
                         <Checkbox.Group
                             options={genders}
                             style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
@@ -378,55 +378,149 @@ const ProductsPage = () => {
                         />
                     </div>
 
-                    {/* THÊM MỚI: UI Bộ lọc Màu sắc */}
+                    {/* Bộ lọc Màu sắc */}
                     {dynamicColors.length > 0 && (
-                        <div style={{ marginBottom: 24 }}>
-                            <Title level={5} style={{ color: '#38434F' }}>Màu sắc</Title>
-                            <Checkbox.Group
-                                value={filters.colors}
-                                style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
-                                onChange={(checkedValues) =>
-                                    setFilters((prev) => ({ ...prev, colors: checkedValues }))
-                                }
+                        <div style={{ marginBottom: 28, borderTop: '1px solid #f0f0f0', paddingTop: 18 }}>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    marginBottom: 14
+                                }}
                             >
-                                {(showAllColors ? dynamicColors : dynamicColors.slice(0, DISPLAY_LIMIT)).map((color) => (
-                                    <Checkbox key={color} value={color}>
-                                        <span
+                                <Title level={5} style={{ margin: 0, fontSize: 15, fontWeight: 600 }}>
+                                    Màu sắc
+                                </Title>
+                                <span style={{ color: '#9ca3af', fontSize: 18, lineHeight: 1 }}>–</span>
+                            </div>
+
+                            <div
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(5, 36px)',
+                                    gap: 12
+                                }}
+                            >
+                                {(showAllColors ? dynamicColors : dynamicColors.slice(0, 10)).map((color) => {
+                                    const checked = filters.colors.includes(color);
+                                    const isWhite =
+                                        color?.toLowerCase?.() === '#ffffff' ||
+                                        color?.toLowerCase?.() === '#fff' ||
+                                        color?.toLowerCase?.() === 'white';
+
+                                    return (
+                                        <button
+                                            key={color}
+                                            type="button"
                                             title={color}
+                                            onClick={() =>
+                                                setFilters((prev) => ({
+                                                    ...prev,
+                                                    colors: checked
+                                                        ? prev.colors.filter((item) => item !== color)
+                                                        : [...prev.colors, color]
+                                                }))
+                                            }
                                             style={{
-                                                width: 20,
-                                                height: 20,
-                                                borderRadius: "50%",
-                                                backgroundColor: color,
-                                                border: color.toLowerCase() === "#ffffff" || color.toLowerCase() === "white"
-                                                    ? "1px solid #ccc"
-                                                    : "1px solid #ddd",
-                                                display: "inline-block"
+                                                width: 28,
+                                                height: 28,
+                                                borderRadius: '50%',
+                                                background: color,
+                                                border: checked
+                                                    ? '2px solid #111'
+                                                    : isWhite
+                                                        ? '1px solid #d1d5db'
+                                                        : '1px solid #e5e7eb',
+                                                boxShadow: checked ? '0 0 0 3px #e5e7eb' : 'none',
+                                                cursor: 'pointer',
+                                                padding: 0
                                             }}
                                         />
-                                    </Checkbox>
-                                ))}
-                            </Checkbox.Group>
-                            {dynamicColors.length > DISPLAY_LIMIT && (
-                                <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#38434F' }} onClick={() => setShowAllColors(!showAllColors)}>
-                                    {showAllColors ? 'Thu gọn' : `Xem thêm (${dynamicColors.length - DISPLAY_LIMIT})`}
+                                    );
+                                })}
+                            </div>
+
+                            {dynamicColors.length > 10 && (
+                                <Button
+                                    type="link"
+                                    style={{ padding: 0, marginTop: 14, fontSize: 13, color: '#1890ff' }}
+                                    onClick={() => setShowAllColors(!showAllColors)}
+                                >
+                                    {showAllColors ? 'Thu gọn' : `Xem thêm (${dynamicColors.length - 10})`}
                                 </Button>
                             )}
                         </div>
                     )}
 
-                    {/* THÊM MỚI: UI Bộ lọc Kích thước */}
+                    {/* Bộ lọc Kích thước */}
                     {dynamicSizes.length > 0 && (
-                        <div style={{ marginBottom: 24 }}>
-                            <Title level={5} style={{ color: '#38434F' }}>Kích thước (Size)</Title>
-                            <Checkbox.Group
-                                options={showAllSizes ? dynamicSizes.map(s => ({ label: `Size ${s}`, value: s })) : dynamicSizes.slice(0, DISPLAY_LIMIT).map(s => ({ label: `Size ${s}`, value: s }))}
-                                style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
-                                onChange={(checkedValues) => setFilters({ ...filters, sizes: checkedValues })}
-                            />
-                            {dynamicSizes.length > DISPLAY_LIMIT && (
-                                <Button type="link" style={{ padding: 0, marginTop: 10, fontSize: 13, color: '#38434F' }} onClick={() => setShowAllSizes(!showAllSizes)}>
-                                    {showAllSizes ? 'Thu gọn' : `Xem thêm (${dynamicSizes.length - DISPLAY_LIMIT})`}
+                        <div style={{ marginBottom: 28, borderTop: '1px solid #f0f0f0', paddingTop: 18 }}>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    marginBottom: 14
+                                }}
+                            >
+                                <Title level={5} style={{ margin: 0, fontSize: 15, fontWeight: 600 }}>
+                                    Kích thước
+                                </Title>
+                                <span style={{ color: '#9ca3af', fontSize: 18, lineHeight: 1 }}>–</span>
+                            </div>
+
+                            <div
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(5, minmax(44px, 1fr))',
+                                    gap: 8
+                                }}
+                            >
+                                {(showAllSizes ? dynamicSizes : dynamicSizes.slice(0, 20)).map((size) => {
+                                    const checked = filters.sizes.includes(size);
+
+                                    return (
+                                        <button
+                                            key={size}
+                                            type="button"
+                                            onClick={() =>
+                                                setFilters((prev) => ({
+                                                    ...prev,
+                                                    sizes: checked
+                                                        ? prev.sizes.filter((item) => item !== size)
+                                                        : [...prev.sizes, size]
+                                                }))
+                                            }
+                                            style={{
+                                                minWidth: 42,
+                                                height: 34,
+                                                padding: '0 8px',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                borderRadius: 4,
+                                                border: checked ? '1px solid #111' : '1px solid #dcdfe4',
+                                                background: checked ? '#f5f5f5' : '#fff',
+                                                color: '#111',
+                                                fontSize: 13,
+                                                fontWeight: 500,
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            {size}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {dynamicSizes.length > 20 && (
+                                <Button
+                                    type="link"
+                                    style={{ padding: 0, marginTop: 14, fontSize: 13, color: '#1890ff' }}
+                                    onClick={() => setShowAllSizes(!showAllSizes)}
+                                >
+                                    {showAllSizes ? 'Thu gọn' : `Xem thêm (${dynamicSizes.length - 20})`}
                                 </Button>
                             )}
                         </div>
@@ -434,9 +528,9 @@ const ProductsPage = () => {
                 </Col>
 
                 {/* KHU VỰC HIỂN THỊ SẢN PHẨM */}
-                <Col xs={24} lg={18}>
+                <Col span={18}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                        <Title level={3} style={{ margin: 0, color: '#38434F' }}>Tất cả sản phẩm</Title>
+                        <Title level={3} style={{ margin: 0 }}>Tất cả sản phẩm</Title>
                         <div>
                             <Text type="secondary" style={{ marginRight: 8 }}>Sắp xếp:</Text>
                             <Select
@@ -461,7 +555,7 @@ const ProductsPage = () => {
                             {currentProducts.map(product => {
                                 const discountInfo = getBestCoupon(product.minPrice);
                                 return (
-                                    <Col xs={12} sm={8} md={6} lg={6} key={product.productId}>
+                                    <Col span={6} key={product.productId}>
                                         <Link to={`/productDetail/${product.productId}`}>
                                             <Card
                                                 hoverable
@@ -492,7 +586,7 @@ const ProductsPage = () => {
                                                     {product.brand}
                                                 </Text>
 
-                                                <Paragraph ellipsis={{ rows: 2 }} style={{ margin: "2px 0 4px 0", fontSize: 13, fontWeight: 500, lineHeight: 1.3, color: '#38434F' }}>
+                                                <Paragraph ellipsis={{ rows: 2 }} style={{ margin: "2px 0 4px 0", fontSize: 13, fontWeight: 500, lineHeight: 1.3 }}>
                                                     {product.name}
                                                 </Paragraph>
 
@@ -543,14 +637,15 @@ const ProductsPage = () => {
                         </div>
                     )}
 
-                    {processedProducts.length > currentProducts.length && (
+                    {processedProducts.length > 0 && (
                         <div style={{ textAlign: 'center', marginTop: 40 }}>
-                            <button 
-                                className="btn-show-more"
-                                onClick={() => setCurrentPage(prev => prev + 1)}
-                            >
-                                Xem thêm sản phẩm
-                            </button>
+                            <Pagination
+                                current={currentPage}
+                                pageSize={pageSize}
+                                total={processedProducts.length}
+                                onChange={(page) => setCurrentPage(page)}
+                                showSizeChanger={false}
+                            />
                         </div>
                     )}
                 </Col>
