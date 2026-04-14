@@ -12,7 +12,6 @@ import {
 } from "../../services/chatService";
 import { getAccessToken, isSenderCurrentUser } from "../../utils/tokenStore";
 
-/** Phía bubble: user = của mình (phải), bot = đối phương (trái). Tin hệ thống không có senderId thì theo `from`. */
 const chatBotSide = (msg) => {
     if (msg.senderId != null && msg.senderId !== "") {
         return isSenderCurrentUser(msg.senderId) ? "user" : "bot";
@@ -37,7 +36,7 @@ const ChatBot = () => {
     const [loading, setLoading] = useState(false);
     const [connected, setConnected] = useState(false);
 
-    // State cho pagination
+    // Pagination
     const [conversationId, setConversationId] = useState(null);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(0);
@@ -46,59 +45,149 @@ const ChatBot = () => {
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
     const subscriptionRef = useRef(null);
-    const scrollPositionRef = useRef(null);
-    const isAtBottomRef = useRef(true);
+    const prevScrollHeightRef = useRef(0);
 
-    // Dùng ref để giữ callback mới nhất, tránh stale closure trong useCallback chain
+    // Refs to avoid stale closures
     const onMessageRef = useRef(null);
-    const onConnectedRef = useRef(null);
     const conversationIdRef = useRef(null);
 
     const PAGE_SIZE = 20;
 
-    // Format thời gian tin nhắn
+    // Track sent message IDs để dedupe
+    const sentMessageIdsRef = useRef(new Set());
+
     const formatTime = (dateOrString) => {
         if (!dateOrString) return "";
         const date = typeof dateOrString === 'string' ? new Date(dateOrString) : dateOrString;
         return date.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
     };
 
-    // Kiểm tra user đã đăng nhập chưa
     const isLoggedIn = !!getAccessToken();
 
-    // Xử lý tin nhắn mới từ WebSocket — dùng functional update để luôn nhận state mới nhất
+    // ================================================================
+    // HELPER: convert message từ API
+    // ================================================================
+    const convertMessage = useCallback((msg) => ({
+        id: msg.messageId,
+        senderId: msg.senderId,
+        from: isSenderCurrentUser(msg.senderId) ? "user" : "bot",
+        text: msg.content,
+        time: msg.createdAt ? new Date(msg.createdAt) : new Date(),
+        senderSummary: msg.senderSummary
+    }), []);
+
+    // ================================================================
+    // FETCH MESSAGES — CORE LOGIC (đồng bộ với ChatAdmin)
+    // page=0: DESC (newest first) → reverse để ASC (oldest→newest)
+    // page>0: ASC (oldest first) → prepend
+    // ================================================================
+    const fetchMessages = useCallback(async (convId, pageNum = 0) => {
+        if (pageNum === 0) {
+            setLoading(true);
+        } else {
+            setLoadingMore(true);
+        }
+
+        try {
+            const direction = pageNum === 0 ? "desc" : "asc";
+            const response = await getConversationMessages(convId, pageNum, PAGE_SIZE, direction);
+            const content = response?.content || response?.data?.content || response?.data || [];
+            const lastPage = response?.last ?? response?.data?.last ?? true;
+
+            const converted = content.map(msg => convertMessage(msg));
+
+            if (pageNum === 0) {
+                // Initial load: DESC (newest→oldest) → reverse để ASC (oldest→newest)
+                const reversed = [...converted].reverse();
+                setMessages(reversed);
+                setHasMore(!lastPage);
+                setPage(0);
+
+                // Scroll to bottom sau khi render
+                requestAnimationFrame(() => {
+                    if (messagesContainerRef.current) {
+                        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+                    }
+                });
+            } else {
+                // Load more: ASC (oldest first) → prepend
+                setMessages(prev => {
+                    const existingIds = new Set(prev.map(m => m.id));
+                    const newMsgs = converted.filter(m => !existingIds.has(m.id));
+                    const reversed = [...newMsgs].reverse();
+                    return [...reversed, ...prev];
+                });
+                setHasMore(!lastPage);
+                setPage(pageNum);
+
+                // Giữ nguyên scroll position
+                requestAnimationFrame(() => {
+                    if (messagesContainerRef.current && prevScrollHeightRef.current > 0) {
+                        const newScrollHeight = messagesContainerRef.current.scrollHeight;
+                        const heightDiff = newScrollHeight - prevScrollHeightRef.current;
+                        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollTop + heightDiff;
+                    }
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching messages:", error);
+            if (pageNum === 0) setMessages([]);
+        } finally {
+            setLoading(false);
+            setLoadingMore(false);
+            prevScrollHeightRef.current = 0;
+        }
+    }, [convertMessage]);
+
+    // ================================================================
+    // HANDLER: WebSocket message
+    // ================================================================
     const handleNewMessage = useCallback((messageData) => {
+        const msgId = messageData.messageId;
+        if (!msgId) return;
+
+        // Bỏ qua nếu đã có trong dedupe set
+        if (sentMessageIdsRef.current.has(msgId)) {
+            sentMessageIdsRef.current.delete(msgId);
+        }
+
         setMessages(prev => {
-            // Tránh duplicate
-            if (prev.some(m => m.id === messageData.messageId)) {
-                return prev;
+            // Dedupe
+            if (prev.some(m => m.id === msgId)) return prev;
+
+            // Replace temp message nếu có
+            const tempIdx = prev.findIndex(m =>
+                m.id && m.id.startsWith('temp-') &&
+                m.text === messageData.content &&
+                m.senderId === messageData.senderId
+            );
+            if (tempIdx !== -1) {
+                const updated = [...prev];
+                updated[tempIdx] = convertMessage(messageData);
+                return updated;
             }
 
-            const newMsg = {
-                id: messageData.messageId,
-                senderId: messageData.senderId,
-                from: isSenderCurrentUser(messageData.senderId) ? "user" : "bot",
-                text: messageData.content,
-                time: messageData.createdAt ? new Date(messageData.createdAt) : new Date(),
-                senderSummary: messageData.senderSummary
-            };
-
-            return [...prev, newMsg];
+            // APPEND vào cuối
+            return [...prev, convertMessage(messageData)];
         });
-    }, []);
+    }, [convertMessage]);
 
-    // Gửi tin nhắn
+    useEffect(() => {
+        onMessageRef.current = handleNewMessage;
+    }, [handleNewMessage]);
+
+    // ================================================================
+    // HANDLER: Send message
+    // ================================================================
     const handleSendMessage = useCallback(async (text) => {
         const trimmed = text.trim();
         if (!trimmed || sending) return;
 
-        // Nếu chưa đăng nhập
         if (!isLoggedIn) {
             alert("Vui lòng đăng nhập để gửi tin nhắn!");
             return;
         }
 
-        // Nếu chưa có conversation
         if (!conversationIdRef.current) {
             alert("Đang khởi tạo cuộc trò chuyện, vui lòng thử lại!");
             return;
@@ -111,25 +200,31 @@ const ChatBot = () => {
             const response = await sendMessageApi(trimmed);
             const sentMessage = response?.data || response;
 
-            // Optimistic update: thêm tạm message vào UI
             if (sentMessage) {
-                const newMsg = {
-                    id: sentMessage.messageId || `temp-${Date.now()}`,
-                    senderId: sentMessage.senderId,
-                    from: "user",
-                    text: sentMessage.content || trimmed,
-                    time: sentMessage.createdAt ? new Date(sentMessage.createdAt) : new Date(),
-                    senderSummary: sentMessage.senderSummary
-                };
+                const realId = sentMessage.messageId;
+                const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+                sentMessageIdsRef.current.add(tempId);
+                if (realId) sentMessageIdsRef.current.add(realId);
 
                 setMessages(prev => {
-                    if (prev.some(m => m.id === newMsg.id && m.id.startsWith('temp-'))) {
-                        return prev;
-                    }
-                    return [...prev, newMsg];
+                    if (prev.some(m => m.id === tempId || (realId && m.id === realId))) return prev;
+                    return [...prev, {
+                        id: tempId,
+                        senderId: sentMessage.senderId,
+                        from: "user",
+                        text: sentMessage.content || trimmed,
+                        time: sentMessage.createdAt ? new Date(sentMessage.createdAt) : new Date(),
+                        senderSummary: sentMessage.senderSummary
+                    }];
                 });
 
-                isAtBottomRef.current = true;
+                // Scroll to bottom sau khi gửi
+                requestAnimationFrame(() => {
+                    if (messagesContainerRef.current) {
+                        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+                    }
+                });
             }
         } catch (error) {
             console.error("Error sending message:", error);
@@ -140,22 +235,46 @@ const ChatBot = () => {
         }
     }, [sending, isLoggedIn]);
 
-    // Quick reply click
     const handleQuickReply = (replyText) => {
         handleSendMessage(replyText);
     };
 
-    // Kết nối WebSocket cho conversation cụ thể
+    // ================================================================
+    // HANDLER: Scroll load more
+    // ================================================================
+    const handleScroll = useCallback(() => {
+        if (!messagesContainerRef.current || loadingMore || !hasMore || loading) return;
+
+        const { scrollTop } = messagesContainerRef.current;
+        if (scrollTop < 80) {
+            const nextPage = page + 1;
+            const convId = conversationIdRef.current;
+            if (!convId) return;
+
+            prevScrollHeightRef.current = messagesContainerRef.current.scrollHeight;
+            setLoadingMore(true);
+            fetchMessages(convId, nextPage);
+        }
+    }, [page, loadingMore, hasMore, loading, fetchMessages]);
+
+    useEffect(() => {
+        const container = messagesContainerRef.current;
+        if (container) {
+            container.addEventListener("scroll", handleScroll);
+            return () => container.removeEventListener("scroll", handleScroll);
+        }
+    }, [handleScroll]);
+
+    // ================================================================
+    // WEBSOCKET
+    // ================================================================
     const connectWebSocket = useCallback(async (convId) => {
-        // Cleanup subscription cũ trước
         if (subscriptionRef.current) {
             unsub(subscriptionRef.current);
             subscriptionRef.current = null;
         }
 
-        // Nếu đã connect rồi thì chỉ cần subscribe thôi
         if (isWebSocketConnected()) {
-            console.log("ChatBot: WebSocket already connected, subscribing to:", convId);
             setConnected(true);
             conversationIdRef.current = convId;
             subscriptionRef.current = subscribeToConversation(convId, (msg) => {
@@ -164,7 +283,6 @@ const ChatBot = () => {
             return;
         }
 
-        // Tạo connection mới
         try {
             await createWebSocketConnection(
                 () => {
@@ -172,7 +290,6 @@ const ChatBot = () => {
                     setConnected(true);
                     conversationIdRef.current = convId;
 
-                    // Cleanup subscription cũ nếu có
                     if (subscriptionRef.current) {
                         unsub(subscriptionRef.current);
                         subscriptionRef.current = null;
@@ -197,93 +314,9 @@ const ChatBot = () => {
         }
     }, []);
 
-    // Cập nhật refs mỗi khi callback thay đổi
-    useEffect(() => {
-        onMessageRef.current = handleNewMessage;
-    }, [handleNewMessage]);
-
-    // Load thêm tin nhắn cũ (infinite scroll)
-    const loadMoreMessages = useCallback(async () => {
-        if (!conversationIdRef.current || loadingMore || !hasMore) return;
-
-        setLoadingMore(true);
-        if (messagesContainerRef.current) {
-            scrollPositionRef.current = messagesContainerRef.current.scrollHeight;
-        }
-
-        try {
-            const nextPage = page + 1;
-            const response = await getConversationMessages(conversationIdRef.current, nextPage, PAGE_SIZE);
-            const olderMessages = response?.content || response?.data?.content || [];
-
-            if (olderMessages.length === 0) {
-                setHasMore(false);
-                return;
-            }
-
-            const convertedOlder = olderMessages.map((msg, index) => ({
-                id: msg.messageId || `older-${nextPage}-${index}`,
-                senderId: msg.senderId,
-                from: isSenderCurrentUser(msg.senderId) ? "user" : "bot",
-                text: msg.content,
-                time: msg.createdAt ? new Date(msg.createdAt) : new Date(),
-                senderSummary: msg.senderSummary
-            }));
-
-            setMessages(prev => [...convertedOlder, ...prev]);
-            setPage(nextPage);
-
-            const isLastPage = response?.last ?? response?.data?.last ?? true;
-            setHasMore(!isLastPage);
-
-            // Giữ nguyên vị trí scroll
-            requestAnimationFrame(() => {
-                if (messagesContainerRef.current && scrollPositionRef.current) {
-                    const newHeight = messagesContainerRef.current.scrollHeight;
-                    const scrollDiff = newHeight - scrollPositionRef.current;
-                    messagesContainerRef.current.scrollTop = scrollDiff;
-                }
-            });
-        } catch (error) {
-            console.error("Error loading more messages:", error);
-        } finally {
-            setLoadingMore(false);
-        }
-    }, [loadingMore, hasMore, page]);
-
-    // Handle scroll - detect khi nào cần load thêm
-    const handleScroll = useCallback(() => {
-        if (!messagesContainerRef.current || loadingMore) return;
-
-        const { scrollTop } = messagesContainerRef.current;
-
-        if (scrollTop < 80 && hasMore) {
-            loadMoreMessages();
-        }
-    }, [loadingMore, hasMore, loadMoreMessages]);
-
-    // Auto scroll xuống cuối khi có tin nhắn mới (nếu đang ở cuối)
-    useEffect(() => {
-        if (messagesEndRef.current && isAtBottomRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-        }
-    }, [messages]);
-
-    // Track xem user có đang ở cuối không
-    useEffect(() => {
-        const container = messagesContainerRef.current;
-        if (!container) return;
-
-        const handleScrollTrack = () => {
-            const { scrollTop, scrollHeight, clientHeight } = container;
-            isAtBottomRef.current = scrollHeight - scrollTop - clientHeight < 100;
-        };
-
-        container.addEventListener('scroll', handleScrollTrack);
-        return () => container.removeEventListener('scroll', handleScrollTrack);
-    }, [messages]);
-
-    // Khởi tạo conversation và load messages
+    // ================================================================
+    // INIT CHAT
+    // ================================================================
     const initializeChat = useCallback(async () => {
         if (!isLoggedIn) {
             setMessages([{
@@ -297,7 +330,6 @@ const ChatBot = () => {
 
         setLoading(true);
         try {
-            // Bước 1: Ensure conversation
             const convResponse = await ensureConversation();
             const convData = convResponse?.data || convResponse;
             const convId = convData?.conversationId;
@@ -309,26 +341,9 @@ const ChatBot = () => {
             setConversationId(convId);
             conversationIdRef.current = convId;
 
-            // Bước 2: Load messages
-            const messagesResponse = await getConversationMessages(convId, 0, PAGE_SIZE);
-            const messagesData = messagesResponse?.content || messagesResponse?.data?.content || [];
+            // Fetch messages: page=0, direction=desc → sẽ reverse ở trong fetchMessages
+            await fetchMessages(convId, 0);
 
-            const convertedMessages = messagesData.map((msg, index) => ({
-                id: msg.messageId || `temp-${index}`,
-                senderId: msg.senderId,
-                from: isSenderCurrentUser(msg.senderId) ? "user" : "bot",
-                text: msg.content,
-                time: msg.createdAt ? new Date(msg.createdAt) : new Date(),
-                senderSummary: msg.senderSummary
-            }));
-
-            setMessages(convertedMessages);
-
-            const isLastPage = messagesResponse?.last ?? messagesResponse?.data?.last ?? true;
-            setHasMore(!isLastPage);
-            setPage(0);
-
-            // Bước 3: Connect WebSocket
             await connectWebSocket(convId);
         } catch (error) {
             console.error("Error initializing chat:", error);
@@ -341,23 +356,16 @@ const ChatBot = () => {
         } finally {
             setLoading(false);
         }
-    }, [isLoggedIn, connectWebSocket]);
+    }, [isLoggedIn, fetchMessages, connectWebSocket]);
 
-    // Khởi tạo khi mở chat
+    // Init when chat opens
     useEffect(() => {
         if (open && !conversationId) {
             initializeChat();
         }
     }, [open, conversationId, initializeChat]);
 
-    // Cleanup khi đóng chat — KHÔNG có dependency nào gây disconnect ngoài ý muốn
-    useEffect(() => {
-        return () => {
-            // Chỉ cleanup khi component unmount
-        };
-    }, []);
-
-    // Cleanup khi đóng chat widget
+    // Cleanup when chat closes
     useEffect(() => {
         if (!open) {
             if (subscriptionRef.current) {
@@ -366,7 +374,6 @@ const ChatBot = () => {
             }
             disconnectWebSocket();
             setConnected(false);
-            // Reset conversation để lần sau mở lại re-init đầy đủ
             setConversationId(null);
             conversationIdRef.current = null;
             setMessages([]);
@@ -375,9 +382,12 @@ const ChatBot = () => {
         }
     }, [open]);
 
+    // ================================================================
+    // RENDER
+    // ================================================================
     return (
         <>
-            {/* Nút mở chat */}
+            {/* Toggle button */}
             <button
                 className={`chatbot-toggle ${open ? "active" : ""}`}
                 onClick={() => setOpen(!open)}
@@ -396,7 +406,7 @@ const ChatBot = () => {
                 {!open && <span className="chatbot-dot" />}
             </button>
 
-            {/* Khung chat */}
+            {/* Chat window */}
             <div className={`chatbot-window ${open ? "open" : ""}`}>
                 {/* Header */}
                 <div className="chatbot-header">
@@ -418,7 +428,7 @@ const ChatBot = () => {
                 </div>
 
                 {/* Messages */}
-                <div className="chatbot-messages" ref={messagesContainerRef} onScroll={handleScroll}>
+                <div className="chatbot-messages" ref={messagesContainerRef}>
                     {loading ? (
                         <div className="chatbot-loading">
                             <div className="loading-dots">

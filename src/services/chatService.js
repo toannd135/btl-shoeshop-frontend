@@ -36,10 +36,11 @@ export const ensureConversation = async () => {
 };
 
 // Get paged messages cho 1 conversation
-export const getConversationMessages = async (conversationId, page = 0, size = 20) => {
+// direction: "desc" (mới nhất trước, cho initial load) | "asc" (cũ nhất trước, cho load-more)
+export const getConversationMessages = async (conversationId, page = 0, size = 20, direction = "desc") => {
     const token = getAccessToken();
     const response = await fetch(
-        `${API_DOMAIN}/chat/messages?conversationId=${conversationId}&page=${page}&size=${size}`,
+        `${API_DOMAIN}/chat/messages?conversationId=${conversationId}&page=${page}&size=${size}&direction=${direction}`,
         {
             method: "GET",
             headers: {
@@ -92,11 +93,31 @@ export const getConversations = async () => {
         },
         credentials: "include"
     });
-    
+
     if (!response.ok) {
         throw new Error("Failed to fetch conversations");
     }
     return await response.json();
+};
+
+/**
+ * Đánh dấu một conversation là đã đọc bởi admin.
+ * @param {string} conversationId
+ */
+export const markConversationAsRead = async (conversationId) => {
+    const token = getAccessToken();
+    const response = await fetch(`${API_DOMAIN}/conversations/${conversationId}/read`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        credentials: "include"
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to mark conversation as read");
+    }
 };
 
 // ============================================================
@@ -214,7 +235,11 @@ export const subscribeToConversation = (conversationId, onMessageReceived) => {
         return null;
     }
 
-    const topic = `/topic/conversation/${conversationId}`;
+    // conversationId === "chat" -> global topic /topic/chat (nhận mọi tin nhắn)
+    // conversationId === UUID -> per-conversation topic /topic/conversation/{id}
+    const topic = conversationId === "chat"
+        ? "/topic/chat"
+        : `/topic/conversation/${conversationId}`;
     console.log(`Subscribing to: ${topic}`);
 
     const subscription = stompClient.subscribe(
