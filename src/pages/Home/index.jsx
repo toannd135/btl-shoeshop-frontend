@@ -203,42 +203,76 @@ const Home = () => {
             </div>
 
             <section className="collection">
-                <h2>
-                    Khám phá các <span>bộ sưu tập</span>
-                </h2>
+                <div className="collection-header">
+                    <span className="collection-badge">Bộ sưu tập nổi bật</span>
+                    <h2>
+                        Khám phá các <span>bộ sưu tập</span>
+                    </h2>
+                    <p>
+                        Lựa chọn phong cách phù hợp với nhu cầu vận động, thời trang và trải nghiệm mỗi ngày.
+                    </p>
+                </div>
 
                 <div className="collection-list">
-
                     <Link to="/productsPage" className="collection-item">
-                        <img src={i1} alt="" />
-                        <p>Giày chạy bộ</p>
+                        <div className="collection-image-wrap">
+                            <img src={i1} alt="Giày chạy bộ" />
+                        </div>
+                        <div className="collection-content">
+                            <h3>Giày chạy bộ</h3>
+                            <span>Xem ngay</span>
+                        </div>
                     </Link>
 
                     <Link to="/productsPage" className="collection-item">
-                        <img src={i2} alt="" />
-                        <p>Giày đi bộ</p>
+                        <div className="collection-image-wrap">
+                            <img src={i2} alt="Giày đi bộ" />
+                        </div>
+                        <div className="collection-content">
+                            <h3>Giày đi bộ</h3>
+                            <span>Xem ngay</span>
+                        </div>
                     </Link>
 
                     <Link to="/productsPage" className="collection-item">
-                        <img src={i3} alt="" />
-                        <p>Giày Tennis</p>
+                        <div className="collection-image-wrap">
+                            <img src={i3} alt="Giày Tennis" />
+                        </div>
+                        <div className="collection-content">
+                            <h3>Giày Tennis</h3>
+                            <span>Xem ngay</span>
+                        </div>
                     </Link>
 
                     <Link to="/productsPage" className="collection-item">
-                        <img src={i4} alt="" />
-                        <p>Giày thời trang</p>
+                        <div className="collection-image-wrap">
+                            <img src={i4} alt="Giày thời trang" />
+                        </div>
+                        <div className="collection-content">
+                            <h3>Giày thời trang</h3>
+                            <span>Xem ngay</span>
+                        </div>
                     </Link>
 
                     <Link to="/productsPage" className="collection-item">
-                        <img src={i5} alt="" />
-                        <p>Giày Trekking</p>
+                        <div className="collection-image-wrap">
+                            <img src={i5} alt="Giày Trekking" />
+                        </div>
+                        <div className="collection-content">
+                            <h3>Giày Trekking</h3>
+                            <span>Xem ngay</span>
+                        </div>
                     </Link>
 
                     <Link to="/productsPage" className="collection-item">
-                        <img src={i6} alt="" />
-                        <p>Giày luyện tập</p>
+                        <div className="collection-image-wrap">
+                            <img src={i6} alt="Giày luyện tập" />
+                        </div>
+                        <div className="collection-content">
+                            <h3>Giày luyện tập</h3>
+                            <span>Xem ngay</span>
+                        </div>
                     </Link>
-
                 </div>
             </section>
 
@@ -287,7 +321,7 @@ const Home = () => {
                                         className="flash-product-img"
                                         onError={(e) => { e.target.style.display = "none"; }}
                                     />
-                                    
+
                                     <h4>{product.brand?.toUpperCase() ?? ""}</h4>
                                     <p>{product.name}</p>
                                     <span className="price">
