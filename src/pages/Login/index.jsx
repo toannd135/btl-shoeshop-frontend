@@ -4,7 +4,7 @@ import { message, notification } from "antd";
 import { useState } from "react";
 import { login } from "../../services/authService";
 import { setAccessToken, setCurrentUser } from "../../utils/tokenStore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
     const navigate = useNavigate();
@@ -113,7 +113,9 @@ function Login() {
                     </p>
                 </div>
                 <div className="login-image-section">
-                    <img src={logoShoes} alt="Shoes Shop Logo" className="shoes-logo" />
+                    <Link to="/">
+                        <img src={logoShoes} alt="Shoes Shop Logo" className="shoes-logo" />
+                    </Link>
                 </div>
             </div>
         </div>

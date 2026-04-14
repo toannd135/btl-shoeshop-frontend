@@ -19,12 +19,19 @@ import {
     getCustomerOverviewReport,
     getTopSellingProducts
 } from "../../services/reportService";
-
+import { getCurrentUser } from "../../utils/tokenStore";
+import { Navigate } from "react-router-dom";
 const { Title, Text } = Typography;
 
 const COLORS = ['#8b5cf6', '#4338ca', '#9ca3af'];
 
 function Dashboard() {
+    const currentUser = getCurrentUser();
+    const role = (currentUser?.roleCode || "").replace("ROLE_", "");
+
+    if (!["MANAGER", "SUPER_ADMIN"].includes(role)) {
+        return <Navigate to="/admin/user" replace />;
+    }
     const [revenueData, setRevenueData] = useState([]);
     const [topProducts, setTopProducts] = useState([]);
     const [customerOverview, setCustomerOverview] = useState({});
@@ -40,7 +47,7 @@ function Dashboard() {
                     getRevenueReport(),
                     getTopSellingProducts(),
                     getCustomerOverviewReport(),
-                    
+
                 ]);
                 setRevenueData(revenueRes.data || []);
                 setTopProducts(productsRes.data || []);
