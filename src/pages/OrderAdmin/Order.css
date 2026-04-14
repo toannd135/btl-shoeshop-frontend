@@ -48,8 +48,7 @@
 }
 
 .order-export {
-    border-radius: 6px;
-    font-weight: 500;
+    /* style được set inline để đồng bộ với các button Xuất CSV trong toàn app */
 }
 
 .order-container .ant-table-thead > tr > th {

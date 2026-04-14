@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Card, Avatar, Typography, Tag, Space, Table, List } from "antd";
+import { Row, Col, Card, Avatar, Typography, Tag, Space, Table, List, Button, message } from "antd";
 import {
     ArrowUpOutlined,
     ArrowDownOutlined,
@@ -7,8 +7,10 @@ import {
     StarOutlined,
     ShoppingCartOutlined,
     DollarCircleOutlined,
-    BarChartOutlined
+    BarChartOutlined,
+    DownloadOutlined
 } from "@ant-design/icons";
+
 import {
     AreaChart, Area, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -17,10 +19,12 @@ import {
 import {
     getRevenueReport,
     getCustomerOverviewReport,
-    getTopSellingProducts
+    getTopSellingProducts,
+    exportReportCsv
 } from "../../services/reportService";
 import { getCurrentUser } from "../../utils/tokenStore";
 import { Navigate } from "react-router-dom";
+
 const { Title, Text } = Typography;
 
 const COLORS = ['#8b5cf6', '#4338ca', '#9ca3af'];
@@ -36,8 +40,21 @@ function Dashboard() {
     const [topProducts, setTopProducts] = useState([]);
     const [customerOverview, setCustomerOverview] = useState({});
     const [loading, setLoading] = useState(true);
+    const [exportLoading, setExportLoading] = useState(false);
 
     const currentYear = new Date().getFullYear();
+
+    const handleExportCsv = async () => {
+        setExportLoading(true);
+        try {
+            await exportReportCsv({ limitProduct: 10, limitCustomer: 10 });
+            message.success("Xuất CSV thành công!");
+        } catch (err) {
+            message.error("Xuất CSV thất bại: " + (err?.message || "Lỗi không xác định"));
+        } finally {
+            setExportLoading(false);
+        }
+    };
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -139,7 +156,24 @@ function Dashboard() {
                     <Title level={2} style={{ margin: 0 }}>Thống kê tổng quan</Title>
                     <Tag color="#7c3aed" style={{ borderRadius: 12, padding: '0 10px', fontWeight: 'bold' }}>LIVE</Tag>
                 </Space>
-                <Text type="secondary" style={{ fontSize: 16 }}>Năm {currentYear}</Text>
+                <Space size="middle">
+                    <Text type="secondary" style={{ fontSize: 16 }}>Năm {currentYear}</Text>
+                    <Button
+                        id="btn-export-report-csv"
+                        type="primary"
+                        icon={<DownloadOutlined />}
+                        loading={exportLoading}
+                        onClick={handleExportCsv}
+                        style={{
+                            backgroundColor: '#16a34a',
+                            borderColor: '#16a34a',
+                            borderRadius: 8,
+                            fontWeight: 600
+                        }}
+                    >
+                        Xuất CSV
+                    </Button>
+                </Space>
             </div>
 
             <Row gutter={[20, 20]}>
