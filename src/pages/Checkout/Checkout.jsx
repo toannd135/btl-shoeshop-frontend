@@ -76,22 +76,17 @@ const Checkout = () => {
     fetchWards();
   }, [formData.province]);
 
-  // Tính phí ship
+  const getMockShippingFeeByProvince = (provinceCode) => {
+    const code = String(provinceCode || "");
+
+    if (!code) return 0;
+    if (code === "01") return 20000;
+    if (code.startsWith("0") || code.startsWith("1")) return 30000;
+    return 40000;
+  };
+
   const fetchShippingFee = async () => {
-    try {
-      const payload = {
-        toProvinceCode: formData.province,
-        toDistrictCode: formData.ward || "WARD_TEMP",
-        totalWeightInGrams: Math.max(
-          1,
-          cartItems.reduce((sum, item) => sum + item.quantity * 500, 0)
-        )
-      };
-      const response = await estimateShipping(payload);
-      setShippingFee(response.data.shippingFee);
-    } catch (error) {
-      console.error("Lỗi tính phí ship", error);
-    }
+    setShippingFee(getMockShippingFeeByProvince(formData.province));
   };
 
   useEffect(() => {

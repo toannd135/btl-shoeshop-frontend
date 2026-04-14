@@ -20,14 +20,14 @@ export const deleteSupplier = async (id) => {
   return await del(`supplier/${id}`);
 };
 
-export const addSupplierVariant = async (id, data) => {
-  return await post(`supplier/${id}/add`, data);
+export const addSupplierVariant = async (supplierId, data) => {
+  return await post(`supplier/${supplierId}/add`, data);
 };
 
-export const updateSupplierVariant = async (id, variantId, data) => {
-  return await edit(`supplier/${id}/add/${variantId}`, data);
+export const updateSupplierVariant = async (supplierId, variantId, data) => {
+  return await edit(`supplier/${supplierId}/add/${variantId}`, data);
 };
 
-export const deleteSupplierVariant = async (id, variantId) => {
-  return await del(`supplier/${id}/remove/${variantId}`);
+export const deleteSupplierVariant = async (supplierId, variantId) => {
+  return await del(`supplier/${supplierId}/remove/${variantId}`);
 };

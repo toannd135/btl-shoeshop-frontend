@@ -50,7 +50,7 @@ export const routes = [
         element: <Login />
     },
     {
-        path: "/oauth2/redirect",
+        path: "/oauth2-success",
         element: <OAuth2RedirectHandler />
     },
     {

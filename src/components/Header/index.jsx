@@ -102,8 +102,13 @@ const Header = () => {
         const fetchMenuData = async () => {
             try {
                 const cateRes = await getCateList();
-                const cateList = cateRes.data?.data || cateRes.data || cateRes || [];
-                setCategories(Array.isArray(cateList) ? cateList : []);
+                const cateList = cateRes.data || [];
+
+                const activeCategories = Array.isArray(cateList)
+                    ? cateList.filter((cate) => cate?.status !== "DELETED")
+                    : [];
+
+                setCategories(activeCategories);
             } catch (error) {
                 console.error("Lỗi lấy dữ liệu menu:", error);
             }

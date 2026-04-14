@@ -109,7 +109,7 @@ const ProductList = () => {
                                 <ProductCard key={product.productId} {...product} />
                             ))
                         ) : (
-                            <p style={{ textAlign: "center", width: "100%" }}>Chưa có sản phẩm nào ở mục này.</p>
+                            <p style={{ textAlign: "center", width: "100%" }}></p>
                         )}
                     </div>
                 </>

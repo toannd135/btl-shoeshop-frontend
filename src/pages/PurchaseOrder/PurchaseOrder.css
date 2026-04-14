@@ -1,25 +1,33 @@
 .purchase-order-container {
     margin: 10px;
-    height: calc(100vh - 64px);
+    min-height: calc(100vh - 64px);
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.purchase-order-header {
+.purchase-order-header,
+.purchase-order-bar {
     border: 1px solid #ddd;
-    padding: 20px 20px;
-    border-radius: 5px;
+    border-radius: 8px;
     background: #fff;
+}
+
+.purchase-order-header {
+    padding: 20px;
 }
 
 .purchase-order-header h2 {
     margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
 }
 
 .purchase-order-header h5 {
-    margin: 0;
-    font-weight: normal;
+    margin: 4px 0 0;
+    font-weight: 400;
+    font-size: 14px;
     color: #888;
 }
 
@@ -33,21 +41,18 @@
 }
 
 .purchase-order-bar {
+    padding: 16px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid #ddd;
-    padding: 16px 20px;
-    border-radius: 5px;
-    background: #fff;
     gap: 12px;
     flex-wrap: wrap;
 }
 
 .purchase-order-bar-left {
     display: flex;
-    gap: 12px;
     align-items: center;
+    gap: 12px;
     flex-wrap: wrap;
 }
 
@@ -60,19 +65,144 @@
 }
 
 .purchase-order-create-btn {
-    border-radius: 6px;
+    border-radius: 8px;
     font-weight: 500;
+}
+
+/* table list */
+.purchase-order-container .ant-table-wrapper {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .purchase-order-container .ant-table-thead > tr > th {
     background: #f3f4f6 !important;
     font-weight: 600;
+    color: #111827;
 }
 
 .purchase-order-container .ant-table-tbody > tr > td {
     padding: 18px 16px;
+    vertical-align: middle;
 }
 
+.purchase-order-container .ant-table-tbody > tr:hover > td {
+    background: #fafafa !important;
+}
+
+/* action button ngoài list */
+.purchase-order-view-btn {
+    border: 1px solid #6366f1;
+    background: #fff;
+    color: #6366f1;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.purchase-order-view-btn:hover {
+    background: #eef2ff;
+}
+
+/* item section trong modal */
+.po-item-section {
+    margin-top: 8px;
+}
+
+.po-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.po-item-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.po-item-section .ant-table-wrapper {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.po-item-section .ant-table-thead > tr > th {
+    background: #f9fafb !important;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.po-item-section .ant-table-tbody > tr > td {
+    padding: 14px 12px;
+}
+
+.po-item-name {
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.5;
+}
+
+.po-item-color-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.po-item-color-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid #d1d5db;
+    display: inline-block;
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.08);
+}
+
+/* modal */
+.purchase-order-container .ant-modal .ant-modal-content {
+    border-radius: 16px;
+}
+
+.purchase-order-container .ant-modal .ant-modal-header {
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+}
+
+.purchase-order-container .ant-modal .ant-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.purchase-order-container .ant-form-item {
+    margin-bottom: 16px;
+}
+
+.purchase-order-container .ant-input,
+.purchase-order-container .ant-input-number,
+.purchase-order-container .ant-picker,
+.purchase-order-container .ant-input-affix-wrapper,
+.purchase-order-container .ant-select-selector,
+.purchase-order-container textarea.ant-input {
+    border-radius: 8px !important;
+}
+
+.purchase-order-container .ant-btn {
+    border-radius: 8px;
+}
+
+/* responsive */
 @media (max-width: 992px) {
     .purchase-order-bar {
         align-items: stretch;
@@ -85,11 +215,17 @@
     }
 
     .purchase-order-search,
-    .purchase-order-arrange {
+    .purchase-order-arrange,
+    .purchase-order-create-btn {
         width: 100%;
     }
 
-    .purchase-order-create-btn {
+    .po-item-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .po-item-header .ant-btn {
         width: 100%;
     }
 }

@@ -1,6 +1,6 @@
 .supplier-container {
     margin: 10px;
-    height: calc(100vh - 64px);
+    min-height: calc(100vh - 64px);
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -64,6 +64,13 @@
     font-weight: 500;
 }
 
+.supplier-container .ant-table-wrapper {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
 .supplier-container .ant-table-thead > tr > th {
     background: #f3f4f6 !important;
     font-weight: 600;
@@ -71,6 +78,167 @@
 
 .supplier-container .ant-table-tbody > tr > td {
     padding: 18px 16px;
+    vertical-align: middle;
+}
+
+/* Email xuống dòng đẹp hơn */
+.supplier-email-cell {
+    word-break: break-word;
+    line-height: 1.6;
+}
+
+/* Địa chỉ hiện full */
+.supplier-address-cell {
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.6;
+    max-width: 280px;
+}
+
+/* số variant nhỏ gọn hơn */
+.supplier-variant-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* action icon only */
+.supplier-action-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.supplier-icon-btn {
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px !important;
+}
+
+.supplier-icon-btn .anticon {
+    font-size: 16px;
+}
+
+/* expanded row */
+.supplier-container .ant-table-expanded-row > td {
+    background: #fafafa !important;
+    padding: 14px 18px !important;
+}
+
+/* box variant */
+.supplier-variant-table {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.supplier-variant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.supplier-variant-table .ant-table-wrapper {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.supplier-variant-table .ant-table-thead > tr > th {
+    background: #f9fafb !important;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 12px !important;
+}
+
+.supplier-variant-table .ant-table-tbody > tr > td {
+    padding: 12px !important;
+    font-size: 14px;
+}
+
+/* ô variant đẹp hơn */
+.variant-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.variant-thumb {
+    width: 58px;
+    height: 58px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    flex-shrink: 0;
+}
+
+.variant-thumb-placeholder {
+    width: 58px;
+    height: 58px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: #f3f4f6;
+    flex-shrink: 0;
+}
+
+.variant-info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.variant-title {
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.4;
+}
+
+.variant-meta {
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.variant-color-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.variant-color-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    flex-shrink: 0;
+}
+
+.variant-action-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
 }
 
 @media (max-width: 992px) {
@@ -92,4 +260,34 @@
     .supplier-create-btn {
         width: 100%;
     }
+
+    .supplier-variant-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .supplier-address-cell {
+        max-width: unset;
+    }
+}
+
+.supplier-variant-name {
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.5;
+}
+
+.variant-color-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.variant-color-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid #d1d5db;
+    display: inline-block;
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.08);
 }
