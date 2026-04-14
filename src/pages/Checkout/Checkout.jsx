@@ -80,9 +80,9 @@ const Checkout = () => {
     const code = String(provinceCode || "");
 
     if (!code) return 0;
-    if (code === "01") return 20000;
-    if (code.startsWith("0") || code.startsWith("1")) return 30000;
-    return 40000;
+    // if (code === "01") return 20000;
+    // if (code.startsWith("0") || code.startsWith("1")) return 30000;
+    return 30000;
   };
 
   const fetchShippingFee = async () => {
