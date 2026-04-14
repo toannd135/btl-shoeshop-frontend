@@ -11,7 +11,8 @@ import {
     InboxOutlined,
     ShopOutlined,
     ContainerOutlined,
-    MessageOutlined
+    MessageOutlined,
+    StarOutlined
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { getCurrentUser } from "../../utils/tokenStore";
@@ -97,6 +98,12 @@ function MenuSider() {
             icon: <MessageOutlined />,
             key: "/admin/chat",
             roles: ["SUPER_ADMIN", "SELLER"]
+        },
+        {
+            label: <Link to="/admin/reviews">Đánh giá</Link>,
+            icon: <StarOutlined />,
+            key: "/admin/reviews",
+            roles: ["SUPER_ADMIN", "MANAGER"]
         }
     ];
 

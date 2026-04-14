@@ -32,6 +32,7 @@ import Supplier from "../pages/Supplier/Supplier";
 import ChatAdmin from "../pages/ChatAdmin/ChatAdmin";
 import VarifyEmailNotice from "../pages/VerifyEmailNotice/index"
 import VarifyResult from "../pages/VerifyResult/index"
+import ReviewList from "../pages/Review/ReviewList";
 const ClientLayout = () => {
     return (
         <div className="client-layout">
@@ -173,6 +174,14 @@ export const routes = [
             {
                 path: "chat",
                 element: <ChatAdmin />
+            },
+            {
+                path: "reviews",
+                element: (
+                    <ProtectRoute allowedRoles={['ROLE_SUPER_ADMIN', 'ROLE_MANAGER']}>
+                        <ReviewList />
+                    </ProtectRoute>
+                )
             }
         ]
     }
