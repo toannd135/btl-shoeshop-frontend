@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Input, Select, Button, Popover, Tag, DatePicker } from "antd";
+import { Table, Input, Select, Button, Popover, Tag, DatePicker, message } from "antd";
 import { Link } from "react-router-dom";
 import { SearchOutlined, EyeOutlined, EditOutlined, DownloadOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -30,6 +30,7 @@ function OrderList() {
     const [openDetail, setOpenDetail] = useState(false);
     const [openUpdate, setOpenUpdate] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
+    const [exportLoading, setExportLoading] = useState(false);
 
     // --- CƠ CHẾ DEBOUNCE: CHỜ NGƯỜI DÙNG DỪNG GÕ 0.5 GIÂY ---
     useEffect(() => {
@@ -80,14 +81,22 @@ function OrderList() {
         fetchOrders();
     }, [currentPage, pageSize, filterStatus, dateRange, debouncedPhone]);
 
-    const handleExport = () => {
+    const handleExport = async () => {
         const params = {};
         if (filterStatus) params.status = filterStatus;
         if (dateRange && dateRange[0] && dateRange[1]) {
             params.startDate = dateRange[0].toISOString();
             params.endDate = dateRange[1].toISOString();
         }
-        exportOrdersCsv(params);
+        setExportLoading(true);
+        try {
+            await exportOrdersCsv(params);
+            message.success("Xuất file CSV thành công!");
+        } catch (err) {
+            message.error(err?.message || "Xuất CSV thất bại, vui lòng thử lại!");
+        } finally {
+            setExportLoading(false);
+        }
     };
 
     const renderStatus = (status) => {
@@ -215,6 +224,7 @@ function OrderList() {
                     icon={<DownloadOutlined />}
                     className="order-export"
                     onClick={handleExport}
+                    loading={exportLoading}
                 >
                     Xuất CSV
                 </Button>
