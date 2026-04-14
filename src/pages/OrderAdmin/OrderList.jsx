@@ -220,11 +220,18 @@ function OrderList() {
                     />
                 </div>
                 <Button
+                    id="btn-export-orders-csv"
                     type="primary"
                     icon={<DownloadOutlined />}
                     className="order-export"
                     onClick={handleExport}
                     loading={exportLoading}
+                    style={{
+                        backgroundColor: '#16a34a',
+                        borderColor: '#16a34a',
+                        borderRadius: 8,
+                        fontWeight: 600
+                    }}
                 >
                     Xuất CSV
                 </Button>
